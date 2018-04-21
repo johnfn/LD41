@@ -92,6 +92,13 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         continue;
       }
 
+      if (selection.isFogged) {
+        obj.canBuild = false;
+        obj.whyNot   = "I can't see anything there!"
+
+        continue;
+      }
+
       if (b.requirement.on && b.requirement.on.indexOf(selection.terrain) === -1) {
         obj.canBuild = false;
         obj.whyNot = `Needs to be on ${ b.requirement.on.join(" or ") }.`
@@ -137,32 +144,42 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     });
   }
 
-  render(): JSX.Element {
-    const selection = this.gameState.map.world.getCellAt(this.state.selX, this.state.selY);
-    let description = "";
+  getDescription(cell: WorldCell): string {
+    if (cell.isFogged) {
+      return "I can't see anything there";
+    }
 
-    if (selection.isFogged) {
-      description = "I can't see anything there";
-    } else {
-      if (selection.special === "ice") {
-        description = "A mysterious-looking ice temple.";
-      } else if (selection.special === "water") {
-        description = "It seems like there's something under the water.";
-      } else if (selection.special === "end") {
-        description = "A mysterious obelisk.";
-      } else if (selection.special === "start") {
-        description = "My hometown.";
-      } else if (selection.special === "none") {
-        if (selection.terrain === "snow") {
-          description = "Snowy mountains.";
-        } else if (selection.terrain === "water") {
-          description = "A body of water.";
-        } else if (selection.terrain === "grass") {
-          description = "A grassy field.";
-        }
+    if (cell.building) {
+      return `A ${ cell.building.building.name.toLowerCase() }.`;
+    } 
+
+    if (cell.special !== "none") {
+      if (cell.special === "ice") {
+        return "A mysterious-looking ice temple.";
+      } else if (cell.special === "water") {
+        return "It seems like there's something under the water.";
+      } else if (cell.special === "end") {
+        return "A mysterious obelisk.";
+      } else if (cell.special === "start") {
+        return "My hometown.";
       }
     }
 
+    if (cell.terrain === "snow") {
+      return "Snowy mountains.";
+    } else if (cell.terrain === "water") {
+      return "A body of water.";
+    } else if (cell.terrain === "grass") {
+      return "A grassy field.";
+    }
+
+    return "";
+  }
+
+  render(): JSX.Element {
+    const selection = this.gameState.map.world.getCellAt(this.state.selX, this.state.selY);
+
+    const description = this.getDescription(selection);
     let height = "";
 
     if (selection.height < 0.20) {

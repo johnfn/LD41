@@ -106,7 +106,7 @@ type WorldCell = {
 }
 
 class World extends PIXI.Graphics {
-  static Size = 17;
+  static Size = 33;
 
   app: PIXI.Application;
   map: WorldCell[][];
@@ -136,7 +136,13 @@ class World extends PIXI.Graphics {
   }
 
   recalculateFogOfWar(): void {
-    const start = this.getStartCell();
+    const start       = this.getStartCell();
+    const iceTemple   = this.getIceSpecial();
+    const waterTemple = this.getWaterSpecial();
+    const endTemple   = this.getEndCell();
+
+    debugger;
+
     const buildings = [
       ...this.getCells()
         .filter(c => !!c.building)
@@ -150,7 +156,17 @@ class World extends PIXI.Graphics {
         x     : start.xIndex,
         y     : start.yIndex,
         vision: 5,
-      }
+      },
+
+      ...[
+        iceTemple,
+        waterTemple,
+        endTemple,
+      ].map(c => ({
+        x     : c.xIndex,
+        y     : c.yIndex,
+        vision: 2,
+      }))
     ];
 
     for (let i = 0; i < World.Size; i++) {
@@ -252,10 +268,10 @@ class World extends PIXI.Graphics {
       const waterCells = cells.filter(c => c.height <= 0.4);
 
       if (
-        iceCells.length   > 8  && 
-        waterCells.length > 14 &&
-        iceCells.length   < 20 && 
-        waterCells.length < 20
+        iceCells.length   > 50  && 
+        waterCells.length > 200 &&
+        iceCells.length   < 400 && 
+        waterCells.length < 400
       ) { break; }
     }
 
@@ -430,6 +446,8 @@ class World extends PIXI.Graphics {
   }
 
   renderWorld(): void {
+    this.clear();
+
     for (let i = 0; i < this.map.length; i++) {
       for (let j = 0; j < this.map[i].length; j++) {
         const cell = this.map[i][j];

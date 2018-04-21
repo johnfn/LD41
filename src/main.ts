@@ -1,6 +1,6 @@
 const Constants = {
-  TILE_WIDTH : 32,
-  TILE_HEIGHT: 32,
+  TILE_WIDTH : 16,
+  TILE_HEIGHT: 16,
 }
 
 interface Updatable {
