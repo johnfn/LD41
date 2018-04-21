@@ -26,12 +26,24 @@
   </head>
 
   <body>
+    <div>
+      <canvas style="float: left" id="main"></canvas>
+      <div id="toolbar" style="float: left; padding-top: 20px">
+        blah
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
     <script src="./node_modules/pixi.js/dist/pixi.js"></script>
     <script src="./lib/pixi-multistyle-text.js"></script>
 
     <script src="./src/hud.js"></script>
     <script src="./src/keyboard.js"></script>
+    <script src="./src/world.js"></script>
 
     <script src="./src/main.js"></script>
+    <script src="./src/toolbar.js"></script>
   </body>
 </html>

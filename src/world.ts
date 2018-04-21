@@ -1,6 +1,88 @@
+type BuildingName = "Road"
+                   | "Village"
+                   | "Town"
+                   | "City"
+                   | "Factory"
+                   | "Dock"
+
+type TerrainName = "snow" | "grass" | "water";
+type SpecialName = "none" | "ice" | "water" | "start" | "end";
+
+type Building = {
+  name       : BuildingName;
+  description: string;
+  cost       : { wood?: number; meat?: number }
+  requirement: {
+    on    ?: TerrainName[];
+    near  ?: TerrainName[];
+    higher?: number;
+    lower ?: number;
+  }
+};
+
+const CanAfford = (b: Building, state: { wood: number, meat: number }): boolean => {
+  return (
+    (b.cost.wood ? b.cost.wood < state.wood : true) &&
+    (b.cost.meat ? b.cost.meat < state.meat : true)
+  );
+}
+
+const Buildings: Building[] = [
+  {
+    name       : "Road",
+    description: "Allows you to travel and build more.",
+    cost       : { wood: 3 },
+    requirement: {
+      on: ["snow", "grass"],
+    },
+  },
+  {
+    name       : "Village",
+    description: "Sells basic adventuring supplies. Has an Inn to rest at.",
+    cost       : { wood: 5, meat: 3 },
+    requirement: {
+      on: ["grass"],
+    },
+  },
+  {
+    name       : "Town",
+    description: "Sells stronger weapons and armor.",
+    cost       : { wood: 8, meat: 6 },
+    requirement: {
+      on: ["grass"],
+    },
+  },
+  {
+    name       : "City",
+    description: "Sells even better weapons and armor.",
+    cost       : { wood: 15, meat: 10 },
+    requirement: {
+      on: ["grass"],
+    },
+  },
+  {
+    name       : "Factory",
+    description: "Makes something idk.",
+    cost       : { wood: 15, meat: 10 },
+    requirement: {
+      on: ["grass"],
+    },
+  },
+  {
+    name       : "Dock",
+    description: "Builds ships to sail the water.",
+    cost       : { wood: 15, meat: 10 },
+    requirement: {
+      on: ["grass"],
+      near: ["water"],
+    },
+  },
+]
+
 type WorldCell = {
   height: number;
 
+  terrain: TerrainName;
   special: "none" | "ice" | "water" | "start" | "end";
 
   xIndex: number;
@@ -28,6 +110,19 @@ class World extends PIXI.Graphics {
 
     this.buildWorld();
     this.renderWorld();
+  }
+
+  static InBounds(x: number, y: number): boolean {
+    return (
+      x >= 0         &&
+      y >= 0         &&
+      x < World.Size &&
+      y < World.Size
+    );
+  }
+
+  getCellAt(x: number, y: number) {
+    return this.map[x][y];
   }
 
   getStartCell(): WorldCell {
@@ -86,6 +181,7 @@ class World extends PIXI.Graphics {
 
     this.normalizeTerrain();
     this.buildSpecialLocations();
+    this.nameTerrain();
   }
 
   buildTerrain(): void {
@@ -94,6 +190,7 @@ class World extends PIXI.Graphics {
         this.map[i][j] = {
           height : 0,
           special: "none",
+          terrain: "grass",
           xIndex : i,
           yIndex : j,
           xAbs   : i * Constants.TILE_WIDTH,
@@ -189,13 +286,35 @@ class World extends PIXI.Graphics {
     }
   }
 
+  nameTerrain(): void {
+    // give names for all terrain
+
+    for (let i = 0; i < World.Size; i++) {
+      for (let j = 0; j < World.Size; j++) {
+        const cell = this.map[i][j];
+        let name: "snow" | "grass" | "water";
+
+        if (cell.height <= 0.4) {
+          name = "water";
+        } else if (cell.height <= 0.8) {
+          name = "grass";
+        } else {
+          name = "snow";
+        }
+        
+        this.map[i][j].terrain = name;
+      }
+    }
+  }
+
   buildSpecialLocations(): void {
     // find special locations
 
     const cells = this.getCells();
 
-    const iceCells   = cells.filter(c => c.height >= 0.9);
-    const waterCells = cells.filter(c => c.height <= 0.4);
+    const iceCells    = cells.filter(c => c.height >= 0.9);
+    const waterCells  = cells.filter(c => c.height <= 0.4);
+    const normalCells = cells.filter(c => c.height < 0.9 && c.height > 0.4);
 
     // try to find locations far apart
 
@@ -203,10 +322,10 @@ class World extends PIXI.Graphics {
 
     for (let i = 0; i < 20; i++) {
       candidatePairs.push([
-        Util.RandElem(iceCells),
-        Util.RandElem(waterCells),
-        Util.RandElem(cells),
-        Util.RandElem(cells),
+        Util.RandElem(iceCells), // ice
+        Util.RandElem(waterCells), // water
+        Util.RandElem(cells), // end
+        Util.RandElem(normalCells), // start
       ]);
     }
 
@@ -236,7 +355,7 @@ class World extends PIXI.Graphics {
 
         if (cell.height < 0.4) {
           this.beginFill(0x0000ff, 1);
-        } else if (cell.height < 0.9) {
+        } else if (cell.height < 0.8) {
           this.beginFill(0x00ff00, cell.height);
         } else {
           this.beginFill(0xffffff, 1);

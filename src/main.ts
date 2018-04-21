@@ -25,8 +25,8 @@ class State {
     this.updaters = [];
     this.keyboard = new Keyboard(this);
 
-    this.wood = 100;
-    this.meat = 25;
+    this.wood = 20;
+    this.meat = 5;
 
     const app = new PIXI.Application(600, 600, { 
       antialias: true,
@@ -135,13 +135,18 @@ class MapSelection extends PIXI.Graphics implements Updatable {
     if (wantsToMove) {
       this.lastMove++;
 
-      let willMove = justPressed || this.lastMove > 10;
+      let willMove = justPressed || this.lastMove > 5;
 
       if (willMove && state.keyboard.down.A) { this.relX -= 1; }
       if (willMove && state.keyboard.down.D) { this.relX += 1; }
 
       if (willMove && state.keyboard.down.W) { this.relY -= 1; }
       if (willMove && state.keyboard.down.S) { this.relY += 1; }
+
+      if (this.relX < 0) this.relX = 0;
+      if (this.relY < 0) this.relY = 0;
+      if (this.relX >= World.Size) this.relX = World.Size - 1;
+      if (this.relY >= World.Size) this.relY = World.Size - 1;
 
       if (willMove) {
         this.lastMove = 0;
@@ -235,6 +240,6 @@ class PlayerInWorld extends PIXI.Graphics implements Updatable {
   }
 }
 
-window.state = new State();
+(window as any).state = new State();
 
 // PIXI.loader.load(main);
