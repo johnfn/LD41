@@ -1,16 +1,21 @@
 class MicroWorld extends PIXI.Graphics implements Updatable {
-  world : World;
-  tiled : TiledTilemap;
-  player: MicroPlayer;
+  world     : World;
+  tiled     : TiledTilemap;
+  player    : MicroPlayer;
   activeMode: Mode = "Micro";
 
   constructor(state: State) {
     super();
 
     state.add(this);
+
     this.tiled = new TiledTilemap(PIXI.loader.resources["town"].data, state);
     this.world = state.map.world;
 
+    this.addChild(this.player = new MicroPlayer(state));
+  }
+
+  loadRegion(state: State): void {
     const mapregion = this.tiled.loadRegion(new Rect({
       x: 0,
       y: 0,
@@ -20,7 +25,32 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
     this.addChild(mapregion);
 
-    this.addChild(this.player = new MicroPlayer(state));
+    const mapx = state.playersWorldX;
+    const mapy = state.playersWorldY;
+
+    const dxdy: [number, number][] = ([
+      [mapx +  1, mapy +  0],
+      [mapx + -1, mapy +  0],
+      [mapx +  0, mapy +  1],
+      [mapx +  0, mapy + -1],
+    ] as [number, number][]).filter(([dx, dy]) => {
+      const nx = dx;
+      const ny = dy;
+
+      if (!World.InBounds(nx, ny)) {
+        return false;
+      }
+
+      const neighbor = this.world.map[nx][ny];
+
+      if (neighbor.isFogged) {
+        return false;
+      }
+
+      return true;
+    });
+
+    console.log(dxdy);
   }
 
   update(_state: State): void {

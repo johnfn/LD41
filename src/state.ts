@@ -67,6 +67,8 @@ class State {
     if (this.keyboard.justDown.Z) {
       if (this.mode === "Macro") {
         this.mode = "Micro";
+
+        this.microworld.loadRegion(this);
       } else {
         this.mode = "Macro";
       }

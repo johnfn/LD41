@@ -1,9 +1,9 @@
 type BuildingName = "Road"
-                   | "Village"
-                   | "Town"
-                   | "City"
-                   | "Factory"
-                   | "Dock"
+                  | "Village"
+                  | "Town"
+                  | "City"
+                  | "Factory"
+                  | "Dock"
 
 type TerrainName = "snow" | "grass" | "water";
 type SpecialName = "none" | "ice" | "water" | "start" | "end";
