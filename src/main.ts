@@ -13,8 +13,9 @@ class State {
 
   updaters: Updatable[];
 
-  map  : Map;
-  hud  : HUD;
+  map   : Map;
+  hud   : HUD;
+  player: PlayerInWorld;
 
   wood : number;
   meat : number;
@@ -28,12 +29,13 @@ class State {
     this.wood = 100;
     this.meat = 25;
 
-    const app = new PIXI.Application(800, 800, { antialias: true });
+    const app = new PIXI.Application(600, 600, { antialias: true });
     document.body.appendChild(app.view);
 
     this.app = app;
-    this.map = new Map(this)
-    this.hud = new HUD(this);
+
+    this.app.stage.addChild(this.map = new Map(this));
+    this.app.stage.addChild(this.hud = new HUD(this));
 
     this.gameLoop();
   }
@@ -51,6 +53,10 @@ class State {
       u.update(this);
     }
   }
+}
+
+class Player extends PIXI.Graphics {
+
 }
 
 class Util {
@@ -87,30 +93,27 @@ type WorldCell = {
   yMap: number;
 }
 
-class MapSelection implements Updatable {
-  graphics : PIXI.Graphics;
-  x        : number;
-  y        : number;
+class MapSelection extends PIXI.Graphics implements Updatable {
+  relX     : number;
+  relY     : number;
   selState : "up" | "down";
 
   constructor(state: State) {
+    super();
+
     state.add(this);
 
-    this.x = 0;
-    this.y = 0;
+    this.relX = 0;
+    this.relY = 0;
     this.selState = "down";
 
-    this.graphics = new PIXI.Graphics();
-
-    this.graphics.beginFill(0xffffff, 1);
-    this.graphics.drawRect(
+    this.beginFill(0xffffff, 1);
+    this.drawRect(
       this.x, 
       this.y, 
       Constants.TILE_WIDTH, 
       Constants.TILE_HEIGHT
     );
-
-    state.app.stage.addChild(this.graphics);
   }
 
   lastMove = 0;
@@ -135,11 +138,11 @@ class MapSelection implements Updatable {
 
       let willMove = justPressed || this.lastMove > 10;
 
-      if (willMove && state.keyboard.down.A) { this.x -= 1; }
-      if (willMove && state.keyboard.down.D) { this.x += 1; }
+      if (willMove && state.keyboard.down.A) { this.relX -= 1; }
+      if (willMove && state.keyboard.down.D) { this.relX += 1; }
 
-      if (willMove && state.keyboard.down.W) { this.y -= 1; }
-      if (willMove && state.keyboard.down.S) { this.y += 1; }
+      if (willMove && state.keyboard.down.W) { this.relY -= 1; }
+      if (willMove && state.keyboard.down.S) { this.relY += 1; }
 
       if (willMove) {
         this.lastMove = 0;
@@ -153,57 +156,88 @@ class MapSelection implements Updatable {
 
     this.updatePosition(state);
 
-    const [x, y] = state.map.world.relToAbs(this.x, this.y)
+    const [x, y] = state.map.world.relToAbs(this.relX, this.relY)
 
-    this.graphics.x = x;
-    this.graphics.y = y;
+    this.x = x;
+    this.y = y;
 
     if (startingState === "up") {
-      this.graphics.alpha += speed;
+      this.alpha += speed;
 
-      if (this.graphics.alpha >= 1.00) {
+      if (this.alpha >= 1.00) {
         this.selState = "down";
       }
     }
 
     if (startingState === "down") {
-      this.graphics.alpha -= speed;
+      this.alpha -= speed;
 
-      if (this.graphics.alpha <= 0) {
+      if (this.alpha <= 0.40) {
         this.selState = "up";
       }
     }
   }
 }
 
-class Map implements Updatable {
+class Map extends PIXI.Graphics implements Updatable {
   world: World;
   selection: MapSelection;
 
   constructor(state: State) {
+    super();
+
     state.add(this);
 
     this.world = new World(state.app);
     this.selection = new MapSelection(state);
 
-    state.add(this);
+    this.addChild(this.world);
+    this.addChild(this.selection);
+
+    this.x = 0;
+    this.y = 40;
   }
 
   update(_state: State): void {
   }
 }
 
-class World {
+class PlayerInWorld implements Updatable {
+  graphics: PIXI.Graphics;
+  xMap = 5;
+  yMap = 5;
+
+  constructor(state: State) {
+    state.add(this);
+
+    this.graphics = new PIXI.Graphics();
+
+    this.graphics.beginFill(0xffffff, 1);
+    this.graphics.drawRect(
+      this.xMap, 
+      this.yMap, 
+      Constants.TILE_WIDTH, 
+      Constants.TILE_HEIGHT
+    );
+  }
+
+  update(state: State): void {
+    const [x, y] = state.map.world.relToAbs(this.xMap, this.yMap);
+
+    this.graphics.x = x;
+    this.graphics.y = y;
+  }
+}
+
+class World extends PIXI.Graphics {
   static Size = 17;
 
   app: PIXI.Application;
   map: WorldCell[][];
-  graphics: PIXI.Graphics;
-
-  yOffset = 40;
-  xOffset = 0;
 
   constructor(app: PIXI.Application) {
+    super();
+
     this.map = [];
     this.app = app;
 
@@ -212,17 +246,13 @@ class World {
     }
 
     this.buildWorld();
-    this.graphics = this.renderWorld();
-
-    this.app.stage.addChild(this.graphics);
-
-    this.graphics.y = this.yOffset;
+    this.renderWorld();
   }
 
   relToAbs(x: number, y: number): [number, number] {
     return [
-      this.xOffset + x * Constants.TILE_WIDTH ,
-      this.yOffset + y * Constants.TILE_HEIGHT,
+      x * Constants.TILE_WIDTH ,
+      y * Constants.TILE_HEIGHT,
     ];
   }
 
@@ -402,38 +432,36 @@ class World {
     candidatePairs[0][3].special = "start";
   }
 
-  renderWorld(): PIXI.Graphics {
-    const graphics = new PIXI.Graphics();
-
+  renderWorld(): void {
     for (let i = 0; i < this.map.length; i++) {
       for (let j = 0; j < this.map[i].length; j++) {
         const cell = this.map[i][j];
 
         if (cell.height < 0.4) {
-          graphics.beginFill(0x0000ff, 1);
+          this.beginFill(0x0000ff, 1);
         } else if (cell.height < 0.9) {
-          graphics.beginFill(0x00ff00, cell.height);
+          this.beginFill(0x00ff00, cell.height);
         } else {
-          graphics.beginFill(0xffffff, 1);
+          this.beginFill(0xffffff, 1);
         }
 
         if (cell.special === "ice") {
-          graphics.beginFill(0xffff00, 1);
+          this.beginFill(0xffff00, 1);
         }
 
         if (cell.special === "water") {
-          graphics.beginFill(0xff0000, 1);
+          this.beginFill(0xff0000, 1);
         }
 
         if (cell.special === "end") {
-          graphics.beginFill(0x000000, 1);
+          this.beginFill(0x000000, 1);
         }
 
         if (cell.special === "start") {
-          graphics.beginFill(0x000000, 1);
+          this.beginFill(0x000000, 1);
         }
 
-        graphics.drawRect(
+        this.drawRect(
           cell.xMap, 
           cell.yMap, 
           Constants.TILE_WIDTH, 
@@ -441,8 +469,6 @@ class World {
         );
       }
     }
-
-    return graphics;
   }
 }
 

@@ -1,8 +1,10 @@
-class HUD implements Updatable {
+class HUD extends PIXI.Graphics implements Updatable {
   woodText: PIXI.Text;
   meatText: PIXI.Text;
 
   constructor(state: State) {
+    super();
+
     state.add(this);
 
     this.woodText = new PIXI.Text(
@@ -14,7 +16,7 @@ class HUD implements Updatable {
       }
     );
 
-    state.app.stage.addChild(this.woodText);
+    this.addChild(this.woodText);
 
     this.meatText = new PIXI.Text(
       `Meat: ${ state.meat }`, {
@@ -25,7 +27,7 @@ class HUD implements Updatable {
       }
     );
 
-    state.app.stage.addChild(this.meatText);
+    this.addChild(this.meatText);
 
     this.meatText.x = 200;
   }
