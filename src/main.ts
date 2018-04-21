@@ -71,9 +71,16 @@ class World {
 
     let stepSize = World.Size - 1;
 
-    let randomness = 0.6;
+    let randomness = 1;
 
-    const nudge = () => (randomness * Math.random() - randomness / 2);
+    const nudge = (val: number) => {
+      const res = val + (randomness * Math.random() - randomness / 2);
+
+      if (res > 1) return 1;
+      if (res < 0) return 0;
+
+      return res;
+    }
 
     while (stepSize > 1) {
       // Do diamond step
@@ -81,12 +88,12 @@ class World {
       for (let x = 0; x < World.Size - 1; x += stepSize) {
         for (let y = 0; y < World.Size - 1; y += stepSize) {
 
-          this.map[x + stepSize / 2][y + stepSize / 2].height = (
+          this.map[x + stepSize / 2][y + stepSize / 2].height = nudge((
             this.map[x           ][y           ].height +
             this.map[x + stepSize][y           ].height +
             this.map[x           ][y + stepSize].height +
             this.map[x + stepSize][y + stepSize].height
-          ) / 4 + nudge();
+          ) / 4);
         }
       }
 
@@ -94,8 +101,8 @@ class World {
 
       const halfStepSize = stepSize / 2;
 
-      for (let x = 0; x < World.Size - 1; x += halfStepSize) {
-        for (let y = 0; y < World.Size - 1; y += halfStepSize) {
+      for (let x = 0; x < World.Size; x += halfStepSize) {
+        for (let y = 0; y < World.Size; y += halfStepSize) {
           const xi = x / (stepSize / 2);
           const yi = y / (stepSize / 2);
 
@@ -110,16 +117,36 @@ class World {
             .filter(([x, y]) => this.inBounds(x, y))
             .map(([x, y]) => this.map[x][y].height);
 
-          this.map[x][y].height = (coordinates
+          this.map[x][y].height = nudge((coordinates
             .reduce((x, y) => x + y, 0) / coordinates.length
-          ) + nudge();
+          ));
         }
       }
 
       stepSize /= 2;
     }
 
-    console.log(this.map);
+    // normalize out map
+
+    let low  = Number.POSITIVE_INFINITY;
+    let high = Number.NEGATIVE_INFINITY;
+
+    for (let i = 0; i < World.Size; i++) {
+      for (let j = 0; j < World.Size; j++) {
+        const height = this.map[i][j].height;
+
+        if (height < low) low = height;
+        if (height > high) high = height;
+      }
+    }
+
+    for (let i = 0; i < World.Size; i++) {
+      for (let j = 0; j < World.Size; j++) {
+        const height = this.map[i][j].height;
+
+        this.map[i][j].height = (height - low) / (high - low);
+      }
+    }
   }
 
   renderWorld(): PIXI.Graphics {
