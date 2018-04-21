@@ -86,6 +86,27 @@ class World {
   }
 
   buildWorld(): void {
+    while (true) {
+      this.buildTerrain();
+
+      const cells      = this.getCells();
+
+      const iceCells   = cells.filter(c => c.height >= 0.9);
+      const waterCells = cells.filter(c => c.height <= 0.4);
+
+      if (
+        iceCells.length   > 50  && 
+        waterCells.length > 200 &&
+        iceCells.length   < 400 && 
+        waterCells.length < 400
+      ) { break; }
+    }
+
+    this.normalizeTerrain();
+    this.buildSpecialLocations();
+  }
+
+  buildTerrain(): void {
     for (let i = 0; i < World.Size; i++) {
       for (let j = 0; j < World.Size; j++) {
         this.map[i][j] = {
@@ -106,7 +127,7 @@ class World {
 
     let stepSize = World.Size - 1;
 
-    let randomness = 0.6;
+    let randomness = 0.4;
 
     const nudge = (val: number) => {
       const res = val + (randomness * Math.random() - randomness / 2);
@@ -160,7 +181,9 @@ class World {
 
       stepSize /= 2;
     }
+  }
 
+  normalizeTerrain(): void {
     // normalize out map
 
     let low  = Number.POSITIVE_INFINITY;
@@ -182,7 +205,9 @@ class World {
         this.map[i][j].height = (height - low) / (high - low);
       }
     }
+  }
 
+  buildSpecialLocations(): void {
     // find special locations
 
     const cells = this.getCells();
