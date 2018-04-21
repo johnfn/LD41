@@ -114,6 +114,13 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       return;
     }
 
+    if (b.building.cost.wood) {
+      this.gameState.wood -= b.building.cost.wood;
+    }
+    if (b.building.cost.meat) {
+      this.gameState.meat -= b.building.cost.meat;
+    }
+
     this.gameState.map.world.addBuilding({
       building: b.building,
       x       : this.state.selX,
