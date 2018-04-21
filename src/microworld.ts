@@ -27,16 +27,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.addChild(this.darkAreas = new DarkAreas());
   }
 
-  loadRegion(state: State): void {
-    const mapregion = this.tiled.loadRegion(new Rect({
-      x: 0,
-      y: 0,
-      w: Constants.MAP_WIDTH,
-      h: Constants.MAP_HEIGHT,
-    }));
-
-    this.addChild(mapregion);
-
+  getDarkAreaRects(state: State): Rect[] {
     const mapx = state.playersWorldX;
     const mapy = state.playersWorldY;
 
@@ -62,46 +53,65 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       return false;
     });
 
-    this.darkAreas.clear();
+    let result: Rect[] = [];
 
     for (const [x, y] of dxdyBlockedAreas) {
-      this.darkAreas.beginFill(0x000000, 1);
 
       if (x === 1) {
-        this.darkAreas.drawRect(
-          (Constants.MAP_TILE_WIDTH - 3) * Constants.TILE_WIDTH,
-          0,
-          3 * Constants.TILE_WIDTH,
-          Constants.MAP_HEIGHT,
-        );
+        result.push(new Rect({
+          x: (Constants.MAP_TILE_WIDTH - 3) * Constants.TILE_WIDTH,
+          y: 0,
+          w: 3 * Constants.TILE_WIDTH,
+          h: Constants.MAP_HEIGHT,
+        }));
       }
 
       if (x === -1) {
-        this.darkAreas.drawRect(
-          0,
-          0,
-          3 * Constants.TILE_WIDTH,
-          Constants.MAP_HEIGHT,
-        );
+        result.push(new Rect({
+          x: 0,
+          y: 0,
+          w: 3 * Constants.TILE_WIDTH,
+          h: Constants.MAP_HEIGHT,
+        }))
       }
 
       if (y === 1) {
-        this.darkAreas.drawRect(
-          0,
-          (Constants.MAP_TILE_WIDTH - 3) * Constants.TILE_WIDTH,
-          Constants.MAP_WIDTH,
-          3 * Constants.TILE_WIDTH,
-        );
+        result.push(new Rect({
+          x: 0,
+          y: (Constants.MAP_TILE_WIDTH - 3) * Constants.TILE_WIDTH,
+          w: Constants.MAP_WIDTH,
+          h: 3 * Constants.TILE_WIDTH,
+        }));
       }
 
       if (y === -1) {
-        this.darkAreas.drawRect(
-          0,
-          0,
-          Constants.MAP_WIDTH,
-          3 * Constants.TILE_WIDTH,
-        );
+        result.push(new Rect({
+          x: 0,
+          y: 0,
+          w: Constants.MAP_WIDTH,
+          h: 3 * Constants.TILE_WIDTH,
+        }));
       }
+    }
+
+    return result;
+  }
+
+  loadRegion(state: State): void {
+    const mapregion = this.tiled.loadRegion(new Rect({
+      x: 0,
+      y: 0,
+      w: Constants.MAP_WIDTH,
+      h: Constants.MAP_HEIGHT,
+    }));
+
+    this.addChild(mapregion);
+
+    this.darkAreas.clear();
+    this.darkAreas.beginFill(0x000000, 1);
+
+    for (const rect of this.getDarkAreaRects(state)) {
+      this.darkAreas.drawRect(rect.x, rect.y, rect.w, rect.h);
     }
 
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0);
