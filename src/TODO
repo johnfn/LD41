@@ -1,6 +1,3 @@
-- remove toolbar
-- show dark unwalkable areas
-
 - there should be "monster" cells that need to be cleared
 - you can travel anywhere roads can get you
 
@@ -16,3 +13,4 @@
 
 BUGS
 - you shouldn't be able to start in the middle of an ocean lol
+- diagonal kinda poses some problemz. hmm

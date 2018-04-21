@@ -69,7 +69,7 @@ class State {
       if (this.mode === "Macro") {
         this.mode = "Micro";
 
-        this.microworld.loadRegion(this);
+        this.microworld.loadNewMapRegion(this);
       } else {
         this.mode = "Macro";
       }

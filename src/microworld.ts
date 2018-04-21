@@ -8,12 +8,13 @@ class DarkAreas extends PIXI.Graphics implements Updatable {
 }
 
 class MicroWorld extends PIXI.Graphics implements Updatable {
-  world     : World;
-  tiled     : TiledTilemap;
-  player    : MicroPlayer;
-  activeMode: Mode = "Micro";
-  z         = 0;
-  darkAreas : PIXI.Graphics;
+  world           : World;
+  tiled           : TiledTilemap;
+  player          : MicroPlayer;
+  activeMode      : Mode = "Micro";
+  z               = 0;
+  darkAreas       : PIXI.Graphics;
+  currentMapRegion: PIXI.Sprite | undefined;
 
   constructor(state: State) {
     super();
@@ -109,15 +110,19 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     return result;
   }
 
-  loadRegion(state: State): void {
-    const mapregion = this.tiled.loadRegion(new Rect({
+  loadNewMapRegion(state: State): void {
+    if (this.currentMapRegion) {
+      this.currentMapRegion.parent.removeChild(this.currentMapRegion);
+    }
+
+    this.currentMapRegion = this.tiled.loadRegion(new Rect({
       x: 0,
       y: 0,
       w: Constants.MAP_WIDTH,
       h: Constants.MAP_HEIGHT,
     }));
 
-    this.addChild(mapregion);
+    this.addChild(this.currentMapRegion);
 
     this.darkAreas.clear();
     this.darkAreas.beginFill(0x000000, 1);
@@ -129,7 +134,22 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0);
   }
 
-  update(_state: State): void {
+  update(state: State): void {
+    if (
+      this.currentMapRegion &&
+      !World.InBounds(state.playersMapX, state.playersMapY)
+    ) {
+      const dx = Math.floor(state.playersMapX / Constants.MAP_WIDTH );
+      const dy = Math.floor(state.playersMapY / Constants.MAP_HEIGHT);
+
+      state.playersWorldX += dx;
+      state.playersWorldY += dy;
+
+      state.playersMapX += - dx * (Constants.MAP_TILE_WIDTH  - 1) * Constants.TILE_WIDTH;
+      state.playersMapY += - dy * (Constants.MAP_TILE_HEIGHT - 1) * Constants.TILE_HEIGHT;
+
+      this.loadNewMapRegion(state);
+    }
   }
 }
 
