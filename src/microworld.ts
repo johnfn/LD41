@@ -23,8 +23,20 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.tiled = new TiledTilemap(PIXI.loader.resources["town"].data, state);
     this.world = state.map.world;
 
-    this.addChild(this.player = new MicroPlayer(state));
+    this.addChild(this.player = new MicroPlayer(state, this));
     this.addChild(this.darkAreas = new DarkAreas());
+  }
+
+  isCollision(state: State, x: number, y: number): boolean {
+    const darkAreas = this.getDarkAreaRects(state);
+
+    for (const da of darkAreas) {
+      if (da.contains({ x, y })) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   getDarkAreaRects(state: State): Rect[] {
@@ -122,24 +134,38 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 }
 
 class MicroPlayer extends PIXI.Graphics implements Updatable {
-  speed = 5;
+  speed            = 5;
+  microworld: MicroWorld;
   activeMode: Mode = "Micro";
-  z = 5;
+  z                = 5;
 
-  constructor(state: State) {
+  constructor(state: State, mw: MicroWorld) {
     super();
 
     state.add(this);
+
+    this.microworld = mw;
 
     this.beginFill(0x0000ff, 1);
     this.drawRect(0, 0, Constants.TILE_WIDTH, Constants.TILE_HEIGHT);
   }
 
   update(state: State): void {
-    if (state.keyboard.down.A) state.playersMapX -= this.speed;
-    if (state.keyboard.down.D) state.playersMapX += this.speed;
-    if (state.keyboard.down.W) state.playersMapY -= this.speed;
-    if (state.keyboard.down.S) state.playersMapY += this.speed;
+    let newx = state.playersMapX;
+    let newy = state.playersMapY;
+
+    if (state.keyboard.down.A) newx -= this.speed;
+    if (state.keyboard.down.D) newx += this.speed;
+    if (state.keyboard.down.W) newy -= this.speed;
+    if (state.keyboard.down.S) newy += this.speed;
+
+    if (!this.microworld.isCollision(state, newx, state.playersMapY)) {
+      state.playersMapX = newx;
+    }
+
+    if (!this.microworld.isCollision(state, state.playersMapX, newy)) {
+      state.playersMapY = newy;
+    }
 
     this.x = state.playersMapX;
     this.y = state.playersMapY;
