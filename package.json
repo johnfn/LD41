@@ -1,0 +1,16 @@
+{
+  "name": "ld41",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/pixi.js": "^4.7.3",
+    "pixi.js": "^4.7.3"
+  },
+  "devDependencies": {},
+  "description": ""
+}
