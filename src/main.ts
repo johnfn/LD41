@@ -125,9 +125,6 @@ class GameMap extends PIXI.Graphics implements Updatable {
 
     this.selection.relX = start.xIndex;
     this.selection.relY = start.yIndex;
-
-    this.x = 0;
-    this.y = 40;
   }
 
   update(state: State): void {

@@ -10,7 +10,6 @@ class State {
   updaters: Updatable[];
 
   map   : GameMap;
-  hud   : HUD;
 
   wood : number;
   meat : number;
@@ -41,7 +40,6 @@ class State {
     this.app = app;
 
     this.app.stage.addChild(this.map = new GameMap(this));
-    this.app.stage.addChild(this.hud = new HUD(this));
 
     this.app.stage.addChild(this.microworld = new MicroWorld(this));
 

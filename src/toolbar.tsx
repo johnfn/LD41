@@ -38,6 +38,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     this.setState({
       selX: gameState.map.selection.relX,
       selY: gameState.map.selection.relY,
+
       wood: gameState.wood,
       meat: gameState.meat,
     });
@@ -200,7 +201,9 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
     return (
       <div style={{ color: "white" }}>
-        <div>{ this.state.selX } { this.state.selY }</div>
+        <div>
+          Meat: { this.state.meat } | Wood: { this.state.wood }
+        </div>
 
         <div>
           { description }

@@ -27,7 +27,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.addChild(this.darkAreas = new DarkAreas());
   }
 
-  loadRegion(_state: State): void {
+  loadRegion(state: State): void {
     const mapregion = this.tiled.loadRegion(new Rect({
       x: 0,
       y: 0,
@@ -37,8 +37,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
     this.addChild(mapregion);
 
-    // const mapx = state.playersWorldX;
-    // const mapy = state.playersWorldY;
+    const mapx = state.playersWorldX;
+    const mapy = state.playersWorldY;
 
     const dxdyBlockedAreas: [number, number][] = ([
       [ 1,  0],
@@ -46,8 +46,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       [ 0,  1],
       [ 0, -1],
     ] as [number, number][]).filter(([dx, dy]) => {
-      const nx = dx;
-      const ny = dy;
+      const nx = mapx + dx;
+      const ny = mapy + dy;
 
       if (!World.InBounds(nx, ny)) {
         return true;

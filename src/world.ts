@@ -107,6 +107,7 @@ type WorldCell = {
 
 class World extends PIXI.Graphics implements Updatable {
   static Size = 33;
+  z = 0;
 
   activeMode: Mode = "Macro";
 
@@ -132,10 +133,10 @@ class World extends PIXI.Graphics implements Updatable {
 
   static InBounds(x: number, y: number): boolean {
     return (
-      x >= 0         &&
-      y >= 0         &&
-      x < World.Size &&
-      y < World.Size
+      x >= 0             &&
+      y >= 0             &&
+      x < World.Size - 1 &&
+      y < World.Size - 1
     );
   }
 
@@ -499,6 +500,7 @@ class World extends PIXI.Graphics implements Updatable {
 
 class BuildingGraphic extends PIXI.Graphics implements Updatable {
   activeMode: Mode = "Macro";
+  z = 20;
 
   constructor(state: State) {
     super();
