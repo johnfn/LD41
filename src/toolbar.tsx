@@ -78,6 +78,13 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       result.push(obj);
 
+      if (selection.building) {
+        obj.canBuild = false;
+        obj.whyNot   = "There is already something there!"
+
+        continue;
+      }
+
       if (!CanAfford(b, this.state)) {
         obj.canBuild = false;
         obj.whyNot   = "Too expensive!"
@@ -117,6 +124,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     if (b.building.cost.wood) {
       this.gameState.wood -= b.building.cost.wood;
     }
+
     if (b.building.cost.meat) {
       this.gameState.meat -= b.building.cost.meat;
     }
@@ -133,21 +141,25 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     const selection = this.gameState.map.world.getCellAt(this.state.selX, this.state.selY);
     let description = "";
 
-    if (selection.special === "ice") {
-      description = "A mysterious-looking ice temple.";
-    } else if (selection.special === "water") {
-      description = "It seems like there's something under the water.";
-    } else if (selection.special === "end") {
-      description = "A mysterious obelisk.";
-    } else if (selection.special === "start") {
-      description = "My hometown.";
-    } else if (selection.special === "none") {
-      if (selection.terrain === "snow") {
-        description = "Snowy mountains.";
-      } else if (selection.terrain === "water") {
-        description = "A body of water.";
-      } else if (selection.terrain === "grass") {
-        description = "A grassy field.";
+    if (selection.isFogged) {
+      description = "I can't see anything there";
+    } else {
+      if (selection.special === "ice") {
+        description = "A mysterious-looking ice temple.";
+      } else if (selection.special === "water") {
+        description = "It seems like there's something under the water.";
+      } else if (selection.special === "end") {
+        description = "A mysterious obelisk.";
+      } else if (selection.special === "start") {
+        description = "My hometown.";
+      } else if (selection.special === "none") {
+        if (selection.terrain === "snow") {
+          description = "Snowy mountains.";
+        } else if (selection.terrain === "water") {
+          description = "A body of water.";
+        } else if (selection.terrain === "grass") {
+          description = "A grassy field.";
+        }
       }
     }
 

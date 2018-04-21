@@ -11,6 +11,7 @@ type SpecialName = "none" | "ice" | "water" | "start" | "end";
 type Building = {
   name       : BuildingName;
   description: string;
+  vision     : number;
   cost       : { wood?: number; meat?: number }
   requirement: {
     on    ?: TerrainName[];
@@ -30,6 +31,7 @@ const CanAfford = (b: Building, state: { wood: number, meat: number }): boolean 
 const Buildings: Building[] = [
   {
     name       : "Road",
+    vision     : 2,
     description: "Allows you to travel and build more.",
     cost       : { wood: 3 },
     requirement: {
@@ -38,6 +40,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Village",
+    vision     : 4,
     description: "Sells basic adventuring supplies. Has an Inn to rest at.",
     cost       : { wood: 5, meat: 3 },
     requirement: {
@@ -46,6 +49,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Town",
+    vision     : 5,
     description: "Sells stronger weapons and armor.",
     cost       : { wood: 8, meat: 6 },
     requirement: {
@@ -54,6 +58,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "City",
+    vision     : 7,
     description: "Sells even better weapons and armor.",
     cost       : { wood: 15, meat: 10 },
     requirement: {
@@ -62,6 +67,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Factory",
+    vision     : 3,
     description: "Makes something idk.",
     cost       : { wood: 15, meat: 10 },
     requirement: {
@@ -70,7 +76,8 @@ const Buildings: Building[] = [
   },
   {
     name       : "Dock",
-    description: "Builds ships to sail the water.",
+    vision     : 3,
+    description: "Builds ships to sail the seas.",
     cost       : { wood: 15, meat: 10 },
     requirement: {
       on: ["grass"],
@@ -94,6 +101,8 @@ type WorldCell = {
 
   xAbs: number;
   yAbs: number;
+
+  isFogged: boolean;
 }
 
 class World extends PIXI.Graphics {
@@ -113,6 +122,7 @@ class World extends PIXI.Graphics {
     }
 
     this.buildWorld();
+    this.recalculateFogOfWar();
     this.renderWorld();
   }
 
@@ -123,6 +133,47 @@ class World extends PIXI.Graphics {
       x < World.Size &&
       y < World.Size
     );
+  }
+
+  recalculateFogOfWar(): void {
+    const start = this.getStartCell();
+    const buildings = [
+      ...this.getCells()
+        .filter(c => !!c.building)
+        .map(c => ({
+          x: c.xIndex,
+          y: c.yIndex,
+          vision: c.building!.building.vision
+        })),
+
+      {
+        x     : start.xIndex,
+        y     : start.yIndex,
+        vision: 5,
+      }
+    ];
+
+    for (let i = 0; i < World.Size; i++) {
+      for (let j = 0; j < World.Size; j++) {
+        this.map[i][j].isFogged = true;
+      }
+    }
+
+    for (const b of buildings) {
+      for (let i = 0; i < World.Size; i++) {
+        for (let j = 0; j < World.Size; j++) {
+          if (!this.map[i][j].isFogged) { continue; }
+
+          if (Util.ManhattanDistance(
+              { xIndex: b.x, yIndex: b.y },
+              { xIndex: i  , yIndex: j }
+            ) <= b.vision) {
+            
+            this.map[i][j].isFogged = false;
+          }
+        }
+      }
+    }
   }
 
   addBuilding(props: {
@@ -145,6 +196,9 @@ class World extends PIXI.Graphics {
     graphics.y = absY;
 
     this.addChild(graphics)
+
+    this.recalculateFogOfWar();
+    this.renderWorld();
   }
 
   getCellAt(x: number, y: number) {
@@ -214,13 +268,14 @@ class World extends PIXI.Graphics {
     for (let i = 0; i < World.Size; i++) {
       for (let j = 0; j < World.Size; j++) {
         this.map[i][j] = {
-          height : 0,
-          special: "none",
-          terrain: "grass",
-          xIndex : i,
-          yIndex : j,
-          xAbs   : i * Constants.TILE_WIDTH,
-          yAbs   : j * Constants.TILE_HEIGHT,
+          height    : 0,
+          special   : "none",
+          terrain   : "grass",
+          xIndex    : i,
+          yIndex    : j,
+          xAbs      : i * Constants.TILE_WIDTH,
+          yAbs      : j * Constants.TILE_HEIGHT,
+          isFogged: true,
         };
       }
     }
@@ -400,6 +455,10 @@ class World extends PIXI.Graphics {
         }
 
         if (cell.special === "start") {
+          this.beginFill(0x000000, 1);
+        }
+
+        if (cell.isFogged) {
           this.beginFill(0x000000, 1);
         }
 

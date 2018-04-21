@@ -84,7 +84,7 @@ class Util {
     });
   }
 
-  public static ManhattanDistance(c1: WorldCell, c2: WorldCell): number {
+  public static ManhattanDistance(c1: { xIndex: number, yIndex: number }, c2: { xIndex: number, yIndex: number }): number {
     return (
       Math.abs(c1.xIndex - c2.xIndex) + 
       Math.abs(c1.yIndex - c2.yIndex)
