@@ -8,7 +8,7 @@ interface Updatable {
 }
 
 class State {
-  app  : PIXI.Application;
+  app     : PIXI.Application;
   keyboard: Keyboard;
 
   updaters: Updatable[];

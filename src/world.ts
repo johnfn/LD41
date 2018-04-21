@@ -84,6 +84,10 @@ type WorldCell = {
 
   terrain: TerrainName;
   special: "none" | "ice" | "water" | "start" | "end";
+  building?: {
+    building: Building;
+    graphics: PIXI.Graphics;
+  };
 
   xIndex: number;
   yIndex: number;
@@ -119,6 +123,28 @@ class World extends PIXI.Graphics {
       x < World.Size &&
       y < World.Size
     );
+  }
+
+  addBuilding(props: {
+    building: Building;
+    x       : number;
+    y       : number;
+    state   : State;
+  }): void {
+    const { building, x, y, state } = props;
+    const graphics = new BuildingGraphic(state);
+
+    this.map[x][y].building = {
+      building,
+      graphics,
+    };
+
+    const [absX, absY] = this.relToAbs(x, y);
+
+    graphics.x = absX;
+    graphics.y = absY;
+
+    this.addChild(graphics)
   }
 
   getCellAt(x: number, y: number) {
@@ -385,5 +411,25 @@ class World extends PIXI.Graphics {
         );
       }
     }
+  }
+}
+
+class BuildingGraphic extends PIXI.Graphics implements Updatable {
+  constructor(state: State) {
+    super();
+
+    state.add(this);
+
+    this.beginFill(0x666666, 1);
+    this.drawRect(
+      this.x, 
+      this.y, 
+      Constants.TILE_WIDTH, 
+      Constants.TILE_HEIGHT
+    );
+  }
+
+  update(_state: State): void {
+
   }
 }

@@ -41,6 +41,8 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       wood: gameState.wood,
       meat: gameState.meat,
     });
+
+    this.gameState = gameState;
   }
 
   availableBuildings(): BuildingAndCanAfford[] {
@@ -103,6 +105,21 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     }
 
     return result;
+  }
+
+  build(b: BuildingAndCanAfford): void {
+    if (!b.canBuild) {
+      alert(b.whyNot);
+
+      return;
+    }
+
+    this.gameState.map.world.addBuilding({
+      building: b.building,
+      x       : this.state.selX,
+      y       : this.state.selY,
+      state   : this.gameState,
+    });
   }
 
   render(): JSX.Element {
@@ -168,9 +185,12 @@ class Toolbar extends React.Component<{}, ToolbarState> {
                 onMouseOver={ () => this.setState({ hover: b }) }
                 onMouseOut ={ () => this.setState({ hover: undefined }) }
               >
-                <a style={{ 
-                  color: b.canBuild ? "white" : "gray"
-                }} href="javascript:;">
+                <a 
+                  style={{ 
+                    color: b.canBuild ? "white" : "gray"
+                  }} 
+                  onClick={ () => this.build(b) }
+                  href="javascript:;">
                   { b.building.name }
                 </a>
               </div>
