@@ -141,8 +141,6 @@ class World extends PIXI.Graphics {
     const waterTemple = this.getWaterSpecial();
     const endTemple   = this.getEndCell();
 
-    debugger;
-
     const buildings = [
       ...this.getCells()
         .filter(c => !!c.building)

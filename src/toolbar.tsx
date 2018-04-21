@@ -266,7 +266,13 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 }
 
-ReactDOM.render(
-  <Toolbar />
-  , document.getElementById("toolbar")
-);
+PIXI.loader.add("map" , `./assets/map.png`);
+PIXI.loader.add("town", `./assets/town.json`);
+PIXI.loader.load(() => {
+  (window as any).state = new State();
+
+  ReactDOM.render(
+    <Toolbar />
+    , document.getElementById("toolbar")
+  );
+});

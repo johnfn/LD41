@@ -7,65 +7,6 @@ interface Updatable {
   update(state: State): void;
 }
 
-class State {
-  app     : PIXI.Application;
-  keyboard: Keyboard;
-
-  updaters: Updatable[];
-
-  map   : GameMap;
-  hud   : HUD;
-
-  wood : number;
-  meat : number;
-
-  tick = 0;
-
-  constructor() {
-    this.updaters = [];
-    this.keyboard = new Keyboard(this);
-
-    this.wood = 20;
-    this.meat = 5;
-
-    const app = new PIXI.Application(600, 600, { 
-      antialias: true,
-      view: document.getElementById("main")! as HTMLCanvasElement,
-    });
-
-    this.app = app;
-
-    this.app.stage.addChild(this.map = new GameMap(this));
-    this.app.stage.addChild(this.hud = new HUD(this));
-
-    this.gameLoop();
-  }
-
-  add(u: Updatable) {
-    this.updaters.push(u);
-  }
-
-  subscriptions: ((state: State) => void)[] = [];
-
-  subscribe(ev: (state: State) => void): void {
-    this.subscriptions.push(ev);
-  }
-
-  gameLoop(): void {
-    this.tick++;
-
-    requestAnimationFrame(() => this.gameLoop());
-
-    for (const u of this.updaters) {
-      u.update(this);
-    }
-
-    for (const c of this.subscriptions) {
-      c(this);
-    }
-  }
-}
-
 class Player extends PIXI.Graphics {
 
 }
@@ -203,11 +144,21 @@ class GameMap extends PIXI.Graphics implements Updatable {
       y: start.yIndex,
     }));
 
+    this.selection.relX = start.xIndex;
+    this.selection.relY = start.yIndex;
+
     this.x = 0;
     this.y = 40;
   }
 
-  update(_state: State): void {
+  update(state: State): void {
+    if (state.mode === "Micro") {
+      this.visible = false;
+
+      return;
+    }
+
+    this.visible = true;
   }
 }
 
@@ -239,7 +190,3 @@ class PlayerInWorld extends PIXI.Graphics implements Updatable {
     this.y = y;
   }
 }
-
-(window as any).state = new State();
-
-// PIXI.loader.load(main);

@@ -1,4 +1,6 @@
-- you shouldn't be able to start in the middle of an ocean lol
+- there should be "monster" cells that need to be cleared
+- you can travel anywhere roads can get you
+
 - generate monster/danger ratio for each square that starts easy 
   close to you and gets harder closer to the end
 
@@ -7,3 +9,7 @@
 - world population
 - you could actually unlock how to build stuff, too
 - destroy a building?
+- probably add mouse controls
+
+BUGS
+- you shouldn't be able to start in the middle of an ocean lol
