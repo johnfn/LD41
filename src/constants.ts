@@ -1,0 +1,10 @@
+const Constants = {
+  TILE_WIDTH : 16,
+  TILE_HEIGHT: 16,
+
+  MAP_TILE_WIDTH: 33,
+  MAP_TILE_HEIGHT: 33,
+
+  MAP_WIDTH  : 16 * 33,
+  MAP_HEIGHT : 16 * 33,
+};

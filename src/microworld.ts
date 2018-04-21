@@ -1,8 +1,19 @@
+class DarkAreas extends PIXI.Graphics implements Updatable {
+  activeMode: Mode = "Micro";
+  z = 10;
+
+  update(_state: State) {
+
+  }
+}
+
 class MicroWorld extends PIXI.Graphics implements Updatable {
   world     : World;
   tiled     : TiledTilemap;
   player    : MicroPlayer;
   activeMode: Mode = "Micro";
+  z         = 0;
+  darkAreas : PIXI.Graphics;
 
   constructor(state: State) {
     super();
@@ -13,9 +24,10 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.world = state.map.world;
 
     this.addChild(this.player = new MicroPlayer(state));
+    this.addChild(this.darkAreas = new DarkAreas());
   }
 
-  loadRegion(state: State): void {
+  loadRegion(_state: State): void {
     const mapregion = this.tiled.loadRegion(new Rect({
       x: 0,
       y: 0,
@@ -25,32 +37,74 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
     this.addChild(mapregion);
 
-    const mapx = state.playersWorldX;
-    const mapy = state.playersWorldY;
+    // const mapx = state.playersWorldX;
+    // const mapy = state.playersWorldY;
 
-    const dxdy: [number, number][] = ([
-      [mapx +  1, mapy +  0],
-      [mapx + -1, mapy +  0],
-      [mapx +  0, mapy +  1],
-      [mapx +  0, mapy + -1],
+    const dxdyBlockedAreas: [number, number][] = ([
+      [ 1,  0],
+      [-1,  0],
+      [ 0,  1],
+      [ 0, -1],
     ] as [number, number][]).filter(([dx, dy]) => {
       const nx = dx;
       const ny = dy;
 
       if (!World.InBounds(nx, ny)) {
-        return false;
+        return true;
       }
 
       const neighbor = this.world.map[nx][ny];
 
       if (neighbor.isFogged) {
-        return false;
+        return true;
       }
 
-      return true;
+      return false;
     });
 
-    console.log(dxdy);
+    this.darkAreas.clear();
+
+    for (const [x, y] of dxdyBlockedAreas) {
+      this.darkAreas.beginFill(0x000000, 1);
+
+      if (x === 1) {
+        this.darkAreas.drawRect(
+          (Constants.MAP_TILE_WIDTH - 3) * Constants.TILE_WIDTH,
+          0,
+          3 * Constants.TILE_WIDTH,
+          Constants.MAP_HEIGHT,
+        );
+      }
+
+      if (x === -1) {
+        this.darkAreas.drawRect(
+          0,
+          0,
+          3 * Constants.TILE_WIDTH,
+          Constants.MAP_HEIGHT,
+        );
+      }
+
+      if (y === 1) {
+        this.darkAreas.drawRect(
+          0,
+          (Constants.MAP_TILE_WIDTH - 3) * Constants.TILE_WIDTH,
+          Constants.MAP_WIDTH,
+          3 * Constants.TILE_WIDTH,
+        );
+      }
+
+      if (y === -1) {
+        this.darkAreas.drawRect(
+          0,
+          0,
+          Constants.MAP_WIDTH,
+          3 * Constants.TILE_WIDTH,
+        );
+      }
+    }
+
+    this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0);
   }
 
   update(_state: State): void {
@@ -60,6 +114,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 class MicroPlayer extends PIXI.Graphics implements Updatable {
   speed = 5;
   activeMode: Mode = "Micro";
+  z = 5;
 
   constructor(state: State) {
     super();

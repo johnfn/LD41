@@ -1,37 +1,11 @@
-const Constants = {
-  TILE_WIDTH : 16,
-  TILE_HEIGHT: 16,
-}
-
 interface Updatable extends PIXI.Graphics {
   activeMode: Mode;
   update(state: State): void;
+  z: number;
 }
 
 class Player extends PIXI.Graphics {
 
-}
-
-class Util {
-  public static RandElem<T>(x: T[]): T {
-    return x[Math.floor(Math.random() * x.length)];
-  }
-
-  public static SortByKey<T>(array: T[], key: (t: T) => number): T[] {
-    return array.sort((a, b) => {
-      const x = key(a);
-      const y = key(b);
-
-      return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-    });
-  }
-
-  public static ManhattanDistance(c1: { xIndex: number, yIndex: number }, c2: { xIndex: number, yIndex: number }): number {
-    return (
-      Math.abs(c1.xIndex - c2.xIndex) + 
-      Math.abs(c1.yIndex - c2.yIndex)
-    );
-  }
 }
 
 class MapSelection extends PIXI.Graphics implements Updatable {
@@ -39,6 +13,7 @@ class MapSelection extends PIXI.Graphics implements Updatable {
   relY       : number;
   selState   : "up" | "down";
   activeMode : Mode = "Macro";
+  z = 0;
 
   constructor(state: State) {
     super();
@@ -131,6 +106,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
   selection  : MapSelection;
   player     : PlayerInWorld;
   activeMode : Mode = "Macro";
+  z = 0;
 
   constructor(state: State) {
     super();
@@ -169,6 +145,7 @@ class PlayerInWorld extends PIXI.Graphics implements Updatable {
   xIndex: number;
   yIndex: number;
   activeMode: Mode = "Macro";
+  z = 0;
 
   constructor(state: State, props: { x: number, y: number }) {
     super();
