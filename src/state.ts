@@ -1,4 +1,4 @@
-type Mode = "Macro" | "Micro";
+type Mode = "Macro" | "Micro" | "All";
 
 class State {
   app       : PIXI.Application;
@@ -17,6 +17,8 @@ class State {
 
   playersWorldX: number;
   playersWorldY: number;
+  playersMapX  : number;
+  playersMapY  : number;
 
   tick = 0;
 
@@ -44,6 +46,9 @@ class State {
 
     this.playersWorldX = startCell.xIndex;
     this.playersWorldY = startCell.yIndex;
+
+    this.playersMapX   = 200;
+    this.playersMapY   = 200;
 
     this.gameLoop();
   }
@@ -73,8 +78,16 @@ class State {
 
     requestAnimationFrame(() => this.gameLoop());
 
+    this.keyboard.update(this);
+
     for (const u of this.updaters) {
-      u.update(this);
+      if (u.activeMode === "All" || u.activeMode == this.mode) {
+        u.update(this);
+
+        u.visible = true;
+      } else {
+        u.visible = false;
+      }
     }
 
     for (const c of this.subscriptions) {

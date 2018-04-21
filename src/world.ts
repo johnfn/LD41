@@ -105,17 +105,21 @@ type WorldCell = {
   isFogged: boolean;
 }
 
-class World extends PIXI.Graphics {
+class World extends PIXI.Graphics implements Updatable {
   static Size = 33;
+
+  activeMode: Mode = "Macro";
 
   app: PIXI.Application;
   map: WorldCell[][];
 
-  constructor(app: PIXI.Application) {
+  constructor(state: State) {
     super();
 
+    state.add(this)
+
     this.map = [];
-    this.app = app;
+    this.app = state.app;
 
     for (let i = 0; i < World.Size; i++) {
       this.map[i] = [];
@@ -133,6 +137,10 @@ class World extends PIXI.Graphics {
       x < World.Size &&
       y < World.Size
     );
+  }
+
+  update(_state: State) {
+
   }
 
   recalculateFogOfWar(): void {
@@ -490,6 +498,8 @@ class World extends PIXI.Graphics {
 }
 
 class BuildingGraphic extends PIXI.Graphics implements Updatable {
+  activeMode: Mode = "Macro";
+
   constructor(state: State) {
     super();
 

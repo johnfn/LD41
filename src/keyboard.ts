@@ -48,15 +48,15 @@ interface QueuedKeyboardEvent {
   event : KeyboardEvent;
 }
 
-class Keyboard implements Updatable {
+class Keyboard {
+  activeMode: Mode = "All";
+
   public down     = new KeyInfo();
   public justDown = new KeyInfo();
 
   private _queuedEvents: QueuedKeyboardEvent[] = [];
 
   constructor(state: State) {
-    state.add(this);
-
     addEventListener("keydown", e => this.keyDown(e), false);
     addEventListener("keyup",   e => this.keyUp(e),   false);
   }

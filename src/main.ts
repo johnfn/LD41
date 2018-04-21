@@ -3,7 +3,8 @@ const Constants = {
   TILE_HEIGHT: 16,
 }
 
-interface Updatable {
+interface Updatable extends PIXI.Graphics {
+  activeMode: Mode;
   update(state: State): void;
 }
 
@@ -34,9 +35,10 @@ class Util {
 }
 
 class MapSelection extends PIXI.Graphics implements Updatable {
-  relX     : number;
-  relY     : number;
-  selState : "up" | "down";
+  relX       : number;
+  relY       : number;
+  selState   : "up" | "down";
+  activeMode : Mode = "Macro";
 
   constructor(state: State) {
     super();
@@ -125,16 +127,17 @@ class MapSelection extends PIXI.Graphics implements Updatable {
 }
 
 class GameMap extends PIXI.Graphics implements Updatable {
-  world    : World;
-  selection: MapSelection;
-  player   : PlayerInWorld;
+  world      : World;
+  selection  : MapSelection;
+  player     : PlayerInWorld;
+  activeMode : Mode = "Macro";
 
   constructor(state: State) {
     super();
 
     state.add(this);
 
-    this.addChild(this.world     = new World(state.app));
+    this.addChild(this.world     = new World(state));
     this.addChild(this.selection = new MapSelection(state));
 
     const start = this.world.getStartCell();
@@ -165,6 +168,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
 class PlayerInWorld extends PIXI.Graphics implements Updatable {
   xIndex: number;
   yIndex: number;
+  activeMode: Mode = "Macro";
 
   constructor(state: State, props: { x: number, y: number }) {
     super();

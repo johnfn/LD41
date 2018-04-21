@@ -1,6 +1,7 @@
 class HUD extends PIXI.Graphics implements Updatable {
   woodText: PIXI.Text;
   meatText: PIXI.Text;
+  activeMode: Mode = "All";
 
   constructor(state: State) {
     super();
