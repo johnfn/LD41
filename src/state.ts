@@ -30,10 +30,13 @@ class State {
     this.wood = 20;
     this.meat = 5;
 
-    const app = new PIXI.Application(600, 600, { 
-      antialias: true,
-      view: document.getElementById("main")! as HTMLCanvasElement,
-    });
+    const app = new PIXI.Application(
+      Constants.MAP_WIDTH, 
+      Constants.MAP_HEIGHT, { 
+        antialias: true,
+        view: document.getElementById("main")! as HTMLCanvasElement,
+      }
+    );
 
     this.app = app;
 

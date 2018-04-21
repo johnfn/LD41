@@ -31,8 +31,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     const mapregion = this.tiled.loadRegion(new Rect({
       x: 0,
       y: 0,
-      w: 32 * 20,
-      h: 32 * 20,
+      w: Constants.MAP_WIDTH,
+      h: Constants.MAP_HEIGHT,
     }));
 
     this.addChild(mapregion);
