@@ -16,8 +16,32 @@ class State {
   }
 }
 
+class Util {
+  public static RandElem<T>(x: T[]): T {
+    return x[Math.floor(Math.random() * x.length)];
+  }
+
+  public static SortByKey<T>(array: T[], key: (t: T) => number): T[] {
+    return array.sort((a, b) => {
+      const x = key(a);
+      const y = key(b);
+
+      return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
+  }
+
+  public static ManhattanDistance(c1: WorldCell, c2: WorldCell): number {
+    return (
+      Math.abs(c1.xIndex - c2.xIndex) + 
+      Math.abs(c1.yIndex - c2.yIndex)
+    );
+  }
+}
+
 type WorldCell = {
   height: number;
+
+  special: "none" | "ice" | "water" | "end";
 
   xIndex: number;
   yIndex: number;
@@ -51,15 +75,26 @@ class World {
     return x >= 0 && y >= 0 && x < World.Size && y < World.Size;
   }
 
+  getCells(): WorldCell[] {
+    let cells: WorldCell[] = [];
+
+    for (let i = 0; i < World.Size; i++) {
+      cells = cells.concat(this.map[i]);
+    }
+
+    return cells;
+  }
+
   buildWorld(): void {
     for (let i = 0; i < World.Size; i++) {
       for (let j = 0; j < World.Size; j++) {
         this.map[i][j] = {
-          height: 0,
-          xIndex: i,
-          yIndex: j,
-          xMap  : i * Constants.TILE_WIDTH,
-          yMap  : j * Constants.TILE_HEIGHT,
+          height : 0,
+          special: "none",
+          xIndex : i,
+          yIndex : j,
+          xMap   : i * Constants.TILE_WIDTH,
+          yMap   : j * Constants.TILE_HEIGHT,
         };
       }
     }
@@ -71,7 +106,7 @@ class World {
 
     let stepSize = World.Size - 1;
 
-    let randomness = 1;
+    let randomness = 0.6;
 
     const nudge = (val: number) => {
       const res = val + (randomness * Math.random() - randomness / 2);
@@ -147,6 +182,37 @@ class World {
         this.map[i][j].height = (height - low) / (high - low);
       }
     }
+
+    // find special locations
+
+    const cells = this.getCells();
+
+    const iceCells   = cells.filter(c => c.height >= 0.9);
+    const waterCells = cells.filter(c => c.height <= 0.4);
+
+    // try to find locations far apart
+
+    let candidatePairs: [WorldCell, WorldCell, WorldCell][] = [];
+
+    for (let i = 0; i < 20; i++) {
+      candidatePairs.push([
+        Util.RandElem(iceCells),
+        Util.RandElem(waterCells),
+        Util.RandElem(cells),
+      ]);
+    }
+
+    candidatePairs = Util.SortByKey(candidatePairs, ([c1, c2, c3]) => {
+      return -(
+        Util.ManhattanDistance(c1, c2) +
+        Util.ManhattanDistance(c1, c3) +
+        Util.ManhattanDistance(c2, c3)
+      );
+    });
+
+    candidatePairs[0][0].special = "ice";
+    candidatePairs[0][1].special = "water";
+    candidatePairs[0][2].special = "end";
   }
 
   renderWorld(): PIXI.Graphics {
@@ -156,10 +222,26 @@ class World {
       for (let j = 0; j < this.map[i].length; j++) {
         const cell = this.map[i][j];
 
-        graphics.beginFill(
-          0x00ff00, 
-          cell.height
-        );
+        if (cell.height < 0.4) {
+          graphics.beginFill(0x0000ff, 1);
+        } else if (cell.height < 0.9) {
+          graphics.beginFill(0x00ff00, cell.height);
+        } else {
+          graphics.beginFill(0xffffff, 1);
+        }
+
+        if (cell.special === "ice") {
+          graphics.beginFill(0xffff00, 1);
+        }
+
+        if (cell.special === "water") {
+          graphics.beginFill(0xff0000, 1);
+        }
+
+        if (cell.special === "end") {
+          graphics.beginFill(0x000000, 1);
+        }
+
         graphics.drawRect(
           cell.xMap, 
           cell.yMap, 
