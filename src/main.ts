@@ -1,18 +1,55 @@
 const Constants = {
-  TILE_WIDTH : 20,
-  TILE_HEIGHT: 20,
+  TILE_WIDTH : 32,
+  TILE_HEIGHT: 32,
+}
+
+interface Updatable {
+  update(state: State): void;
 }
 
 class State {
-  world: World;
   app  : PIXI.Application;
+  keyboard: Keyboard;
+
+  updaters: Updatable[];
+
+  map  : Map;
+  hud  : HUD;
+
+  wood : number;
+  meat : number;
+
+  tick = 0;
 
   constructor() {
+    this.updaters = [];
+    this.keyboard = new Keyboard(this);
+
+    this.wood = 100;
+    this.meat = 25;
+
     const app = new PIXI.Application(800, 800, { antialias: true });
     document.body.appendChild(app.view);
 
     this.app = app;
-    this.world = new World(this.app);
+    this.map = new Map(this)
+    this.hud = new HUD(this);
+
+    this.gameLoop();
+  }
+
+  add(u: Updatable) {
+    this.updaters.push(u);
+  }
+
+  gameLoop(): void {
+    this.tick++;
+
+    requestAnimationFrame(() => this.gameLoop());
+
+    for (const u of this.updaters) {
+      u.update(this);
+    }
   }
 }
 
@@ -41,7 +78,7 @@ class Util {
 type WorldCell = {
   height: number;
 
-  special: "none" | "ice" | "water" | "end";
+  special: "none" | "ice" | "water" | "start" | "end";
 
   xIndex: number;
   yIndex: number;
@@ -50,12 +87,121 @@ type WorldCell = {
   yMap: number;
 }
 
+class MapSelection implements Updatable {
+  graphics : PIXI.Graphics;
+  x        : number;
+  y        : number;
+  selState : "up" | "down";
+
+  constructor(state: State) {
+    state.add(this);
+
+    this.x = 0;
+    this.y = 0;
+    this.selState = "down";
+
+    this.graphics = new PIXI.Graphics();
+
+    this.graphics.beginFill(0xffffff, 1);
+    this.graphics.drawRect(
+      this.x, 
+      this.y, 
+      Constants.TILE_WIDTH, 
+      Constants.TILE_HEIGHT
+    );
+
+    state.app.stage.addChild(this.graphics);
+  }
+
+  lastMove = 0;
+
+  updatePosition(state: State): void {
+    let wantsToMove = (
+      state.keyboard.down.W ||
+      state.keyboard.down.A ||
+      state.keyboard.down.S ||
+      state.keyboard.down.D
+    );
+
+    let justPressed = (
+      state.keyboard.justDown.W ||
+      state.keyboard.justDown.A ||
+      state.keyboard.justDown.S ||
+      state.keyboard.justDown.D
+    );
+
+    if (wantsToMove) {
+      this.lastMove++;
+
+      let willMove = justPressed || this.lastMove > 10;
+
+      if (willMove && state.keyboard.down.A) { this.x -= 1; }
+      if (willMove && state.keyboard.down.D) { this.x += 1; }
+
+      if (willMove && state.keyboard.down.W) { this.y -= 1; }
+      if (willMove && state.keyboard.down.S) { this.y += 1; }
+
+      if (willMove) {
+        this.lastMove = 0;
+      }
+    }
+  }
+
+  update(state: State): void {
+    const speed = 0.02;
+    const startingState = this.selState;
+
+    this.updatePosition(state);
+
+    const [x, y] = state.map.world.relToAbs(this.x, this.y)
+
+    this.graphics.x = x;
+    this.graphics.y = y;
+
+    if (startingState === "up") {
+      this.graphics.alpha += speed;
+
+      if (this.graphics.alpha >= 1.00) {
+        this.selState = "down";
+      }
+    }
+
+    if (startingState === "down") {
+      this.graphics.alpha -= speed;
+
+      if (this.graphics.alpha <= 0) {
+        this.selState = "up";
+      }
+    }
+  }
+}
+
+class Map implements Updatable {
+  world: World;
+  selection: MapSelection;
+
+  constructor(state: State) {
+    state.add(this);
+
+    this.world = new World(state.app);
+    this.selection = new MapSelection(state);
+
+    state.add(this);
+  }
+
+  update(_state: State): void {
+  }
+}
+
 class World {
-  static Size  = 33;
+  static Size = 17;
 
   app: PIXI.Application;
   map: WorldCell[][];
   graphics: PIXI.Graphics;
+
+  yOffset = 40;
+  xOffset = 0;
 
   constructor(app: PIXI.Application) {
     this.map = [];
@@ -69,6 +215,15 @@ class World {
     this.graphics = this.renderWorld();
 
     this.app.stage.addChild(this.graphics);
+
+    this.graphics.y = this.yOffset;
+  }
+
+  relToAbs(x: number, y: number): [number, number] {
+    return [
+      this.xOffset + x * Constants.TILE_WIDTH ,
+      this.yOffset + y * Constants.TILE_HEIGHT,
+    ];
   }
 
   inBounds(x: number, y: number): boolean {
@@ -95,10 +250,10 @@ class World {
       const waterCells = cells.filter(c => c.height <= 0.4);
 
       if (
-        iceCells.length   > 50  && 
-        waterCells.length > 200 &&
-        iceCells.length   < 400 && 
-        waterCells.length < 400
+        iceCells.length   > 8  && 
+        waterCells.length > 14 &&
+        iceCells.length   < 20 && 
+        waterCells.length < 20
       ) { break; }
     }
 
@@ -217,27 +372,34 @@ class World {
 
     // try to find locations far apart
 
-    let candidatePairs: [WorldCell, WorldCell, WorldCell][] = [];
+    let candidatePairs: [WorldCell, WorldCell, WorldCell, WorldCell][] = [];
 
     for (let i = 0; i < 20; i++) {
       candidatePairs.push([
         Util.RandElem(iceCells),
         Util.RandElem(waterCells),
         Util.RandElem(cells),
+        Util.RandElem(cells),
       ]);
     }
 
-    candidatePairs = Util.SortByKey(candidatePairs, ([c1, c2, c3]) => {
+    candidatePairs = Util.SortByKey(candidatePairs, ([c1, c2, c3, c4]) => {
       return -(
         Util.ManhattanDistance(c1, c2) +
+
         Util.ManhattanDistance(c1, c3) +
-        Util.ManhattanDistance(c2, c3)
+        Util.ManhattanDistance(c2, c3) +
+
+        Util.ManhattanDistance(c1, c4) +
+        Util.ManhattanDistance(c2, c4) +
+        Util.ManhattanDistance(c3, c4)
       );
     });
 
     candidatePairs[0][0].special = "ice";
     candidatePairs[0][1].special = "water";
     candidatePairs[0][2].special = "end";
+    candidatePairs[0][3].special = "start";
   }
 
   renderWorld(): PIXI.Graphics {
@@ -267,6 +429,10 @@ class World {
           graphics.beginFill(0x000000, 1);
         }
 
+        if (cell.special === "start") {
+          graphics.beginFill(0x000000, 1);
+        }
+
         graphics.drawRect(
           cell.xMap, 
           cell.yMap, 
@@ -281,19 +447,7 @@ class World {
 }
 
 function main() {
-  gameLoop();
-
   new State();
-}
-
-function gameLoop(): void {
-  requestAnimationFrame(() => gameLoop());
-
-  /*
-  stage.children.sort((a, b) => {
-    return ((a as any).z || 0) - ((b as any).z || 0);
-  });
-  */
 }
 
 PIXI.loader.load(main);
