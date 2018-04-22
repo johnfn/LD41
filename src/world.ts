@@ -1,4 +1,5 @@
 type BuildingName = "Road"
+                  | "Farm"
                   | "Village"
                   | "Town"
                   | "City"
@@ -37,15 +38,25 @@ const Buildings: Building[] = [
     name       : "Road",
     hotkey     : "A",
     vision     : 2,
-    description: "Allows you to travel and build more.",
+    description: "All buildings must be connected by roads.",
     cost       : { wood: 1 },
     requirement: {
       on: ["snow", "grass"],
     },
   },
   {
-    name       : "Village",
+    name       : "Farm",
     hotkey     : "S",
+    vision     : 2,
+    description: "Harvests food, slowly. Can harvest more when closer to water.",
+    cost       : { wood: 5 },
+    requirement: {
+      on: ["snow", "grass"],
+    },
+  },
+  {
+    name       : "Village",
+    hotkey     : "D",
     vision     : 4,
     description: "Sells basic adventuring supplies. Has an Inn to rest at.",
     cost       : { wood: 5, meat: 3 },
@@ -55,7 +66,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Lumber Yard",
-    hotkey     : "D",
+    hotkey     : "F",
     vision     : 3,
     description: "Harvests wood.",
     cost       : { wood: 10 },
@@ -66,7 +77,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Dock",
-    hotkey     : "F",
+    hotkey     : "G",
     vision     : 3,
     description: "Builds ships to sail the seas.",
     cost       : { wood: 15, meat: 10 },
@@ -714,6 +725,8 @@ class BuildingGraphic extends PIXI.Sprite {
       this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 0).texture;
     } else if (building.name === "Lumber Yard") {
       this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 1).texture;
+    } else if (building.name === "Farm") {
+      this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 2).texture;
     }
 
     this.state = state;

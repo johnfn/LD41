@@ -51,10 +51,11 @@ const Constants = {
       "grass3",
     ],
     snow: [
-      "grass1"
+      "snow1",
+      "snow2",
     ],
     water: [
-      "grass1"
+      "water1"
     ],
     town: [
       "town",

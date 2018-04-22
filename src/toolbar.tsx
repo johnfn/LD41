@@ -352,6 +352,14 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 
   renderBuildSomething(): JSX.Element {
+    if (this.gameState.mode === "Micro") {
+      return (
+        <div>
+          Return to world view (Z) to build something here.
+        </div>
+      );
+    }
+
     const availableBuildings = this.availableBuildings();
 
     return (
@@ -466,13 +474,18 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 }
 
+let biome: "grass" | "snow" | "water" | "town";
+
+for (biome of ["grass", "snow", "water", "town"] as (typeof biome)[]) {
+  for (const mapname of Constants.MAPS[biome]) {
+    PIXI.loader.add(mapname, `./assets/${ mapname }.json`);
+  }
+}
+
 PIXI.loader.add("map"   , `./assets/map.png`    );
 PIXI.loader.add("macro" , `./assets/macro.png`  );
 PIXI.loader.add("micro" , `./assets/micro.png`  );
-PIXI.loader.add("town"  , `./assets/town.json`  );
-PIXI.loader.add("grass1", `./assets/grass1.json`);
-PIXI.loader.add("grass2", `./assets/grass2.json`);
-PIXI.loader.add("grass3", `./assets/grass3.json`);
+
 PIXI.loader.load(() => {
   (window as any).state = new State();
 

@@ -1,12 +1,15 @@
+- build a farm to get a small amount of meat, but it destroys the land, no more farms/meat
+
 - this area is not safe, you must SAFEIFY IT
 - when you go over a map boundary you can be pushed into a water/wall
+
+- lumber yard etc should indicate population
 
 - some sort of population (plus yourself) that works at the mines/whatever
 - little +1 when you get a wood or something
 - you should probably start with at least one forest nearby, so you can build a mine on it
 - you could then UPGRADE that mine for faster production
 
-- build a farm to get a small amount of meat, but it destroys the land, no more farms/meat
 - docks could provide a permanent meat supply
 
 - upgrading could also expand population count
@@ -56,7 +59,7 @@ BUGS
 - the town you start should never border anything.
 - when you click somewhere, put the character in the center
 - diagonal kinda poses some problemz. hmm
-- pathfinding doesnt know about water boats and stuff.
+- pathfind should be cancelled when you press Z
 
 DREAMLAND
 - a hierarchy view would be nice
