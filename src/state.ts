@@ -1,5 +1,10 @@
 type Mode = "Macro" | "Micro" | "All";
 
+interface Notification {
+  type: "error" | "warning";
+  msg: string;
+}
+
 class State {
   app       : PIXI.Application;
   keyboard  : Keyboard;
@@ -21,6 +26,8 @@ class State {
   playersMapX  : number;
   playersMapY  : number;
 
+  notifications: Notification[];
+
   tick = 0;
 
   constructor() {
@@ -30,6 +37,8 @@ class State {
 
     this.wood = 20;
     this.meat = 5;
+
+    this.notifications = [];
 
     const app = new PIXI.Application(
       Constants.MAP_WIDTH, 
@@ -54,6 +63,10 @@ class State {
     this.playersMapY   = 200;
 
     this.gameLoop();
+  }
+
+  addNotification(notification: Notification): void {
+    this.notifications.push(notification);
   }
 
   add(u: Updatable) {

@@ -65,43 +65,6 @@ class MapSelection extends PIXI.Graphics implements Updatable {
   }
 }
 
-class GameMap extends PIXI.Graphics implements Updatable {
-  world      : World;
-  selection  : MapSelection;
-  player     : PlayerInWorld;
-  activeMode : Mode = "Macro";
-  z = 0;
-
-  constructor(state: State) {
-    super();
-
-    state.add(this);
-
-    this.addChild(this.world     = new World(state));
-    this.addChild(this.selection = new MapSelection(state));
-
-    const start = this.world.getStartCell();
-
-    this.addChild(this.player    = new PlayerInWorld(state, {
-      x: start.xIndex,
-      y: start.yIndex,
-    }));
-
-    this.selection.relX = start.xIndex;
-    this.selection.relY = start.yIndex;
-  }
-
-  update(state: State): void {
-    if (state.mode === "Micro") {
-      this.visible = false;
-
-      return;
-    }
-
-    this.visible = true;
-  }
-}
-
 class PlayerInWorld extends PIXI.Graphics implements Updatable {
   xIndex: number;
   yIndex: number;
