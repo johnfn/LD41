@@ -12,14 +12,16 @@ type TerrainName = "snow" | "grass" | "water";
 type SpecialName = "none" | "ice" | "water" | "start" | "end";
 
 type Building = {
-  name       : BuildingName;
-  description: string;
-  hotkey     : string;
-  vision     : number;
-  justAUnit ?: boolean;
-  harvester  : boolean;
-  cost       : { wood?: number; meat?: number; ore?: number; }
-  requirement: {
+  name         : BuildingName;
+  description  : string;
+  hotkey       : string;
+  vision       : number;
+  justAUnit ?  : boolean;
+  resourceName?: string;
+
+  harvester    : boolean;
+  cost         : { wood?: number; meat?: number; ore?: number; }
+  requirement  : {
     on        ?: TerrainName[];
     inBuilding?: BuildingName;
     near      ?: TerrainName[];
@@ -74,6 +76,7 @@ const Buildings: Building[] = [
     vision     : 2,
     description: "Harvests food, slowly. Can harvest more when closer to water.",
     harvester  : true,
+    resourceName: "meat",
     cost       : { wood: 5 },
     requirement: {
       on: ["snow", "grass"],
@@ -91,15 +94,16 @@ const Buildings: Building[] = [
     },
   },
   {
-    name       : "Lumber Yard",
-    hotkey     : "F",
-    vision     : 3,
-    harvester  : true,
-    description: "Harvests wood.",
-    cost       : { wood: 10 },
-    requirement: {
-      on       : ["grass"],
-      resources: true
+    name        : "Lumber Yard",
+    hotkey      : "F",
+    vision      : 3,
+    harvester   : true,
+    description : "Harvests wood.",
+    resourceName: "wood",
+    cost        : { wood: 10 },
+    requirement : {
+      on        : ["grass"],
+      resources : true
     },
   },
   {
@@ -107,6 +111,7 @@ const Buildings: Building[] = [
     hotkey     : "G",
     vision     : 3,
     harvester  : true,
+    resourceName: "meat",
     description: "Builds ships to sail the seas.",
     cost       : { wood: 15, meat: 10 },
     requirement: {

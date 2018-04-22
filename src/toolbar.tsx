@@ -311,12 +311,15 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       const name  = cell.building.building.name.toLowerCase();
       const extra = cell.building.extra;
 
-      if (name === "farm") {
+      if (cell.building.building.harvester) {
         return (
           <div>
-            <div>A { name }</div>
+            <div>A { name }.</div>
             <div>
-              { extra.resourcesLeft } meat left.
+              { extra.resourcesLeft } { cell.building.building.resourceName } left.
+            </div>
+            <div>
+              { extra.populationOn || 0 } people harvesting.
             </div>
           </div>
         );
@@ -518,9 +521,17 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 
   render(): JSX.Element {
-    let selection: WorldCell;
+    let onTopOf = this.gameState.map.world.getCellAt(
+      this.state.playerWorldX, 
+      this.state.playerWorldY
+    );
 
-    selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
+    let selection = this.gameState.map.world.getCellAt(
+      this.gameState.mouse.relX,
+      this.gameState.mouse.relY,
+    );
+
+    console.log(this.state.selX);
 
     let height = "";
 
@@ -556,12 +567,12 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         </div>
 
         {
-          !selection.building &&
+          !onTopOf.building &&
             this.renderBuildSomething()
         }
 
         {
-          this.renderBuyAndHarvest(selection)
+          this.renderBuyAndHarvest(onTopOf)
         }
       </div>
     )
