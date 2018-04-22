@@ -1,7 +1,6 @@
 class GameMap extends PIXI.Graphics implements Updatable {
   world       : World;
   selection   : MapSelection;
-  player      : PlayerInWorld;
   activeMode  : Mode = "Macro";
   state       : State;
   mouseGraphic: MouseGraphic;
@@ -20,11 +19,6 @@ class GameMap extends PIXI.Graphics implements Updatable {
 
     const start = this.world.getStartCell();
 
-    this.addChild(this.player    = new PlayerInWorld(state, {
-      x: start.xIndex,
-      y: start.yIndex,
-    }));
-
     this.selection.relX = start.xIndex;
     this.selection.relY = start.yIndex;
 
@@ -38,16 +32,19 @@ class GameMap extends PIXI.Graphics implements Updatable {
   }
 
   update(state: State): void {
-    if (state.mode === "Micro") {
-      this.visible = false;
+    if (this.path && this.path.length > 0) {
+      if (state.tick % 20 === 0) {
+        this.state.playersWorldX = this.path[0].x;
+        this.state.playersWorldY = this.path[0].y;
 
-      return;
+        this.path.shift();
+      }
     }
-
-    this.visible = true;
   }
 
   click(ev: any): void {
+    if (ev.type === "click") { return; } // wtf i didnt ask for u go away
+
     const pt: PIXI.Point = ev.data.getLocalPosition(this);
 
     this.path = this.pathfind(
@@ -60,8 +57,6 @@ class GameMap extends PIXI.Graphics implements Updatable {
         y: Math.floor(pt.y / Constants.TILE_HEIGHT ), 
       },
     );
-
-    console.log(this.path);
   }
 
   pathfind(
@@ -123,7 +118,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
       current = next;
     }
 
-    return path;
+    return path.reverse();
   }
 
   mousemove(ev: any): void {
