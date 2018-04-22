@@ -10,7 +10,7 @@ class FloatUpText extends PIXI.Graphics implements Updatable {
 
     this.addChild(new PIXI.Text(text, {
       fontFamily: 'FreePixel', 
-      fontSize  : 32, 
+      fontSize  : 24, 
       fill      : 0xffffff, 
       align     : 'left'
     }));

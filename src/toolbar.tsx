@@ -593,6 +593,8 @@ PIXI.loader.add("map"   , `./assets/map.png`    );
 PIXI.loader.add("macro" , `./assets/macro.png`  );
 PIXI.loader.add("micro" , `./assets/micro.png`  );
 
+// PIXI.settings.RESOLUTION = 2;
+
 PIXI.loader.load(() => {
   (window as any).state = new State();
 

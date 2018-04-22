@@ -62,6 +62,10 @@ class State {
       }
     );
 
+    PIXI.settings.PRECISION_FRAGMENT = 'highp'; //this makes text looks better
+
+    app.renderer.roundPixels = true;
+
     this.app = app;
 
     this.app.stage.addChild(this.map = new GameMap(this));

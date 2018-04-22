@@ -1,4 +1,4 @@
-interface Updatable extends PIXI.Graphics {
+interface Updatable extends PIXI.DisplayObject {
   activeMode: Mode;
   update(state: State): void;
   z: number;

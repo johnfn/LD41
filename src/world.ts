@@ -343,7 +343,8 @@ class World extends PIXI.Graphics implements Updatable {
     state   : State;
   }): void {
     const { building, x, y, state, extra } = props;
-    const graphics = new BuildingGraphic(state, building);
+
+    const graphics = new BuildingGraphic(state, this.map[x][y]);
 
     this.map[x][y].building = {
       building,
@@ -351,15 +352,17 @@ class World extends PIXI.Graphics implements Updatable {
       graphics,
     };
 
+    graphics.init();
+
     const [absX, absY] = this.relToAbs(x, y);
 
-    graphics.x = absX;
-    graphics.y = absY;
+    this.map[x][y].building!.graphics.x = absX;
+    this.map[x][y].building!.graphics.y = absY;
 
     this.recalculateFogOfWar();
     this.renderWorld();
 
-    this.addChild(graphics);
+    this.addChild(this.map[x][y].building!.graphics);
 
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0)
   }
@@ -750,29 +753,64 @@ class World extends PIXI.Graphics implements Updatable {
   }
 }
 
-class BuildingGraphic extends PIXI.Sprite {
+class BuildingGraphic extends PIXI.Sprite implements Updatable {
   activeMode: Mode = "Macro";
-  building: Building;
-  z = 20;
-  state: State;
+  cell      : WorldCell;
+  state     : State;
+  z         = 20;
+  showPop   = false;
+  pop      ?: PIXI.Text;
+  pop2     ?: PIXI.Text;
 
-  constructor(state: State, building: Building) {
+  constructor(state: State, cell: WorldCell) {
     super();
 
-    this.building = building;
+    this.state = state;
+    this.cell  = cell;
+  }
+
+  init() {
+    this.state.add(this);
+
+    const building = this.cell.building!.building;
 
     if (building.name === "Road") {
       this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 0).texture;
     } else if (building.name === "Lumber Yard") {
       this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 1).texture;
+      this.showPop = true;
     } else if (building.name === "Farm") {
       this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 2).texture;
+      this.showPop = true;
     }
 
-    this.state = state;
+    if (this.showPop) {
+      this.addChild(this.pop2 = new PIXI.Text("0", {
+        fontFamily: 'FreePixel', 
+        fontSize  : 24, 
+        fill      : 0x000000, 
+        align     : 'left'
+      }));
+
+      this.addChild(this.pop = new PIXI.Text("0", {
+        fontFamily: 'FreePixel', 
+        fontSize  : 24, 
+        fill      : 0xffffff, 
+        align     : 'left'
+      }));
+
+      this.pop.x = 2;
+      this.pop.y = 2;
+
+      this.pop2.x = 4;
+      this.pop2.y = 4;
+    }
   }
 
   update(_state: State): void {
-
+    if (this.showPop) {
+      this.pop !.text = String(this.cell.building!.extra.populationOn || 0);
+      this.pop2!.text = String(this.cell.building!.extra.populationOn || 0);
+    }
   }
 }
