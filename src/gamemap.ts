@@ -29,6 +29,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
 
     this.on('pointerdown', (ev: any) => this.click(ev));
     this.on('mousemove', (ev: any) => this.mousemove(ev));
+    this.on('mouseout', (ev: any) => this.mouseGraphic.mouseout(ev));
   }
 
   update(state: State): void {

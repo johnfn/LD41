@@ -137,6 +137,9 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
     state.add(this);
   }
 
+  mouseout(_ev: any): any {
+  }
+
   // on mousemove
   mousemove(ev: any, world: World): void {
     const pt: PIXI.Point = ev.data.getLocalPosition(world);
@@ -164,6 +167,10 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
 
     this.screenMotion = { x: 0, y: 0 };
 
+    if (screenPt.x < 0 || screenPt.y < 0 || screenPt.x > Constants.SCREEN_SIZE || screenPt.y > Constants.SCREEN_SIZE) {
+      return;
+    }
+
     if (screenPt.x <= Constants.MACRO.TILE_WIDTH) {
       this.screenMotion.x = -1;
     }
@@ -182,6 +189,8 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
   }
 
   update(_state: State) {
+    console.log(this.screenMotion);
+
     this.state.macroCamera.setX(this.state.macroCamera.x + this.screenMotion.x * this.screenScrollSpeed);
     this.state.macroCamera.setY(this.state.macroCamera.y + this.screenMotion.y * this.screenScrollSpeed);
   }
