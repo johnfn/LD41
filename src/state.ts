@@ -90,6 +90,10 @@ class State {
     this.updaters.push(u);
   }
 
+  remove(u: Updatable) {
+    this.updaters.splice(this.updaters.indexOf(u), 1);
+  }
+
   subscriptions: ((state: State) => void)[] = [];
 
   subscribe(ev: (state: State) => void): void {
@@ -164,18 +168,34 @@ class State {
       if (currentCell.building.extra.harvestState.progress > currentCell.building.extra.harvestState.required) {
         currentCell.building.extra.harvestState.progress = 0;
 
+        let text = "+1";
+        let showText = false;
+
         if (currentCell.building && currentCell.building.building.name === "Farm") {
           this.meat++;
 
           currentCell.building.extra.resourcesLeft! -= 1;
+          showText = true;
         } else {
           if (currentCell.terrain === "grass") {
             this.wood++;
+            showText = true;
           } else if (currentCell.terrain === "snow") {
             this.ore++;
+            showText = true;
           } else if (currentCell.terrain === "water") {
             this.meat++;
+            showText = true;
           }
+        }
+
+        if (showText) {
+          const txtgfx = new FloatUpText(this, text);
+
+          this.app.stage.addChild(txtgfx);
+
+          txtgfx.x = currentCell.xAbs;
+          txtgfx.y = currentCell.yAbs;
         }
       }
     }
