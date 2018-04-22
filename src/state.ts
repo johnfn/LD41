@@ -52,7 +52,7 @@ class State {
     this.wood = 20;
     this.meat = 5;
     this.ore  = 0;
-    this.pop  = 0;
+    this.pop  = Constants.DEBUG.POP_BOOST ? 5 : 0;
 
     this.notifications = [];
 

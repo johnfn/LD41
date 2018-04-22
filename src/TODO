@@ -1,5 +1,14 @@
+- add population to lumber yard
+
+- +1 when you get a resource
+
+- lumber yard etc should indicate population
+  - also resources left
+
 - actually show the areas you built when you zoom
 - farms should change graphics when they die
+
+- travelling enemies to come ruin your guys
 
 - fix hometown so you can walk there
 
@@ -8,7 +17,7 @@
 - this area is not safe, you must SAFEIFY IT
 - when you go over a map boundary you can be pushed into a water/wall
 
-- lumber yard etc should indicate population
+- there should be a tiny sprite where you are...
 
 - some sort of population (plus yourself) that works at the mines/whatever
 - little +1 when you get a wood or something

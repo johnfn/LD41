@@ -163,7 +163,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       if (b.requirement.inBuilding) {
         obj.canBuild = false;
-        obj.whyNot = `Needs to be in a ${ b.requirement.inBuilding } to make one of those.`
+        obj.whyNot = `You need to be in a ${ b.requirement.inBuilding } to make one of those.`
 
         continue;
       }
@@ -206,7 +206,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       if (b.requirement.on && b.requirement.on.indexOf(selection.terrain) === -1) {
         obj.canBuild = false;
-        obj.whyNot = `Needs to be on ${ b.requirement.on.join(" or ") }.`
+        obj.whyNot = `You need to be on ${ b.requirement.on.join(" or ") }.`
 
         continue;
       }
@@ -240,7 +240,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         }
 
         obj.canBuild = false;
-        obj.whyNot = `Needs to be on a ${ name }.`
+        obj.whyNot = `You need to be on a ${ name }.`
 
         continue;
       }
@@ -249,7 +249,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         for (const req of b.requirement.near) {
           if (neighborCells.filter(c => c.terrain === req).length === 0) {
             obj.canBuild = false;
-            obj.whyNot = `Needs to be near ${ b.requirement.near }.`
+            obj.whyNot = `You need to be near ${ b.requirement.near }.`
 
             continue;
           }
@@ -279,13 +279,11 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
     if (b.building.name === "Farm") {
       be.resourcesLeft = 10;
+      be.populationOn = 0;
     }
 
     if (b.building.name === "Lumber Yard") {
       be.resourcesLeft = 100;
-    }
-
-    if (b.building.requirement.resources) {
       be.populationOn = 0;
     }
 
@@ -386,13 +384,49 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       const { progress, required } = this.gameState.harvestState;
 
+      const canAddPop = this.gameState.pop > 0;
+      const canSubPop = (cell.building.extra.populationOn || 0) > 0;
+
       return (
         <div>
+          <div>
+            { cell.building.extra.populationOn! + 1 } workers harvesting.
+          </div>
+
           <ProgressBar
             height={ 20 }
             percentage={ progress / required }
             text={ "Harvesting..." }
           />
+
+          <div>
+            {
+              canAddPop &&
+                <a
+                  onClick={ () => {
+                    this.gameState.pop -= 1;
+                    cell.building!.extra.populationOn! += 1;
+                  } }
+                  style={{ color: canAddPop ? "white" : "gray" }}
+                  href="javascript:;"
+                >+1 Worker</a>
+            } 
+          </div>
+
+          <div>
+            {
+              canSubPop &&
+                <a
+                  onClick={ () => {
+                    this.gameState.pop += 1;
+                    cell.building!.extra.populationOn! -= 1;
+                  } }
+                  style={{ color: canSubPop ? "white" : "gray" }}
+                  href="javascript:;"
+                >-1 Worker</a>
+            }
+          </div>
+
         </div>
       );
     }
