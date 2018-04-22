@@ -1,7 +1,7 @@
 const Constants = {
   DEBUG: {
     FOG_OF_WAR       : true,
-    TRAVEL_ON_UNKNOWN: false,
+    TRAVEL_ON_UNKNOWN: true,
     FAST_RESOURCES   : true,
     MANY_RESOURCES   : false,
     POP_BOOST        : false,

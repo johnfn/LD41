@@ -526,12 +526,16 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       this.state.playerWorldY
     );
 
-    let selection = this.gameState.map.world.getCellAt(
-      this.gameState.mouse.relX,
-      this.gameState.mouse.relY,
-    );
+    let selection: WorldCell;
 
-    console.log(this.state.selX);
+    if (this.gameState.mode === "Macro") {
+      selection = this.gameState.map.world.getCellAt(
+        this.gameState.mouse.relX,
+        this.gameState.mouse.relY,
+      );
+    } else {
+      selection = onTopOf;
+    }
 
     let height = "";
 
@@ -582,8 +586,6 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 for (const key in Constants.MAPS) {
   for (const mapname of (Constants.MAPS as any)[key]) {
     PIXI.loader.add(mapname, `./assets/${ mapname }.json`);
-
-    console.log('load ', mapname);
   }
 }
 
