@@ -375,8 +375,6 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         harvestState = "not";
       }
 
-      debugger;
-
       const canAddPop = this.gameState.pop > 0 && (cell.building.extra.resourcesLeft || 0) > 0;
       const canSubPop = (cell.building.extra.populationOn || 0) > 0;
 

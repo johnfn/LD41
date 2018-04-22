@@ -1,9 +1,10 @@
 const Constants = {
   DEBUG: {
-    FOG_OF_WAR: true,
-    FAST_RESOURCES: true,
-    MANY_RESOURCES: false,
-    POP_BOOST: false,
+    FOG_OF_WAR       : true,
+    TRAVEL_ON_UNKNOWN: false,
+    FAST_RESOURCES   : true,
+    MANY_RESOURCES   : false,
+    POP_BOOST        : false,
   },
 
   SCREEN_SIZE: 32 * 16,
@@ -42,7 +43,7 @@ const Constants = {
   FISH_RESOURCE_COUNT: 20,
 
   UNKNOWN_COLOR: 0x000000,
-  WATER_COLOR  : 0x0000ff,
+  WATER_COLOR  : 0x82f6ff,
   SNOW_COLOR   : 0xffffff,
   GRASS_COLOR  : 0x00ff00,
 

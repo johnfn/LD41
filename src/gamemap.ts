@@ -95,6 +95,10 @@ class GameMap extends PIXI.Graphics implements Updatable {
         if (parent[hash(next)]) { continue; }
         if (this.world.map[next.x][next.y].terrain   === "water") { continue; }
         if (this.world.map[next.x][next.y].fogStatus === "unknown") { continue; }
+        if (
+          !Constants.DEBUG.TRAVEL_ON_UNKNOWN &&
+          this.world.map[next.x][next.y].fogStatus === "seen"
+        ) { continue; }
 
         queue.push(next);
         parent[hash(next)] = current;

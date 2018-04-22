@@ -27,7 +27,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.addChild(this.player = new MicroPlayer(state, this));
     this.addChild(this.darkAreas = new DarkAreas());
 
-    this.darkAreas.alpha = 0.4;
+    this.darkAreas.alpha = 1.0;
   }
 
   isCollisionHelper(state: State, x: number, y: number): boolean {
