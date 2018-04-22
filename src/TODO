@@ -1,5 +1,3 @@
-- the cam should start centered on the guy
-
 - resource harvesting
   - have enemies
     - have you be able to kill them
@@ -37,6 +35,7 @@
 
 BUGS
 - the town you start should never border anything.
+- when you click somewhere, put the character in the center
 - diagonal kinda poses some problemz. hmm
 - pathfinding doesnt know about water boats and stuff.
 

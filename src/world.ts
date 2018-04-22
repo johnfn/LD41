@@ -621,12 +621,15 @@ class World extends PIXI.Graphics implements Updatable {
         if (tex) {
           tex.x = i * Constants.MACRO.TILE_WIDTH;
           tex.y = j * Constants.MACRO.TILE_HEIGHT;
+          tex.alpha = alpha;
 
           this.state.app.renderer.render(
             tex, 
             renderer,
             false,
           );
+
+          tex.alpha = 1;
         } else {
           this.drawRect(
             cell.xAbs, 
