@@ -123,6 +123,6 @@ class GameMap extends PIXI.Graphics implements Updatable {
   }
 
   mousemove(ev: any): void {
-    this.mouseGraphic.move(ev, this.world);
+    this.mouseGraphic.mousemove(ev, this.world);
   }
 }

@@ -117,8 +117,6 @@ class State {
 
     this.update();
 
-    this.camera.setX(this.camera.x + 1);
-
     this.app.stage.x = this.camera.desiredStageX;
     this.app.stage.y = this.camera.desiredStageY;
   }

@@ -115,8 +115,14 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
   relX = 0;
   relY = 0;
 
+  screenMotion = { x: 0, y: 0 };
+  state: State;
+  screenScrollSpeed = 5;
+
   constructor(state: State) {
     super();
+
+    this.state = state;
 
     this.lineStyle(2, 0xffffff);
 
@@ -127,10 +133,12 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
     this.lineTo(0, 0);
 
     state.mouse = this;
+
+    state.add(this);
   }
 
   // on mousemove
-  move(ev: any, world: World): void {
+  mousemove(ev: any, world: World): void {
     const pt: PIXI.Point = ev.data.getLocalPosition(world);
 
     this.relX = Math.floor(pt.x / Constants.MACRO.TILE_WIDTH);
@@ -146,10 +154,36 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
 
     this.absX = pt.x;
     this.absY = pt.y;
+
+    // should we move camera too?
+
+    const screenPt: PIXI.Point = ev.data.getLocalPosition(this.state.app.stage);
+
+    screenPt.x += this.state.app.stage.x;
+    screenPt.y += this.state.app.stage.y;
+
+    this.screenMotion = { x: 0, y: 0 };
+
+    if (screenPt.x <= Constants.MACRO.TILE_WIDTH) {
+      this.screenMotion.x = -1;
+    }
+
+    if (screenPt.y <= Constants.MACRO.TILE_WIDTH) {
+      this.screenMotion.y = -1;
+    }
+
+    if (screenPt.x > Constants.SCREEN_SIZE - Constants.MACRO.TILE_WIDTH) {
+      this.screenMotion.x = +1;
+    }
+
+    if (screenPt.y > Constants.SCREEN_SIZE - Constants.MACRO.TILE_WIDTH) {
+      this.screenMotion.y = +1;
+    }
   }
 
   update(_state: State) {
-
+    this.state.camera.setX(this.state.camera.x + this.screenMotion.x * this.screenScrollSpeed);
+    this.state.camera.setY(this.state.camera.y + this.screenMotion.y * this.screenScrollSpeed);
   }
 }
 
