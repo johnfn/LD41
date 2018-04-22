@@ -14,7 +14,7 @@ type Building = {
   description: string;
   hotkey     : string;
   vision     : number;
-  cost       : { wood?: number; meat?: number }
+  cost       : { wood?: number; meat?: number; ore?: number; }
   requirement: {
     on        ?: TerrainName[];
     near      ?: TerrainName[];

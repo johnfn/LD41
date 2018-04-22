@@ -4,6 +4,7 @@ interface ToolbarState {
 
   wood: number;
   meat: number;
+  ore : number;
 
   playerWorldX: number;
   playerWorldY: number;
@@ -32,6 +33,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       wood : 0,
       meat : 0,
+      ore  : 0,
 
       hover: undefined,
     };
@@ -271,44 +273,34 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     return "";
   }
 
-  render(): JSX.Element {
-    let selection: WorldCell;
-
-    selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
-
-    const description = this.getDescription(selection);
-    let height = "";
-
-    if (selection.height < 0.20) {
-      height = "Deep";
-    } else if (selection.height < 0.4) {
-      height = "Shallow";
-    } else if (selection.height < 0.5) {
-      height = "Low";
-    } else if (selection.height < 0.7) {
-      height = "Moderate";
-    } else if (selection.height < 0.8) {
-      height = "High";
-    } else {
-      height = "Treacherous";
+  renderBuildingDescription(cell: WorldCell): JSX.Element {
+    if (!cell.building) {
+      return <></>;
     }
 
+    if (!this.gameState.harvestState) {
+      return (
+        <div>
+          Not harvesting.
+        </div>
+      );
+    }
+
+    const { progress, required } = this.gameState.harvestState;
+
+    return (
+      <div>
+        Harvesting: 
+        { progress } / { required }
+      </div>
+    );
+  }
+
+  renderBuildSomething(): JSX.Element {
     const availableBuildings = this.availableBuildings();
 
     return (
-      <div style={{ color: "white" }}>
-        <div>
-          Meat: { this.state.meat } | Wood: { this.state.wood }
-        </div>
-
-        <div>
-          { description }
-        </div>
-
-        <div>
-          Elevation: { height }
-        </div>
-
+      <>
         <div style={{ paddingTop: "20px" }}>
           Build:
         </div>
@@ -348,7 +340,10 @@ class Toolbar extends React.Component<{}, ToolbarState> {
                     this.state.hover.building.cost.wood ? `${ this.state.hover.building.cost.wood } wood` : " "
                   } {
                     this.state.hover.building.cost.meat ? `${ this.state.hover.building.cost.meat } food` : " "
+                  } {
+                    this.state.hover.building.cost.ore  ? `${ this.state.hover.building.cost.ore } ore`   : " "
                   }
+
                 </div>
 
                 {
@@ -360,6 +355,55 @@ class Toolbar extends React.Component<{}, ToolbarState> {
               </div>
           }
         </div>
+      </>
+    );
+  }
+
+  render(): JSX.Element {
+    let selection: WorldCell;
+
+    selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
+
+    const description = this.getDescription(selection);
+    let height = "";
+
+    if (selection.height < 0.20) {
+      height = "Deep";
+    } else if (selection.height < 0.4) {
+      height = "Shallow";
+    } else if (selection.height < 0.5) {
+      height = "Low";
+    } else if (selection.height < 0.7) {
+      height = "Moderate";
+    } else if (selection.height < 0.8) {
+      height = "High";
+    } else {
+      height = "Treacherous";
+    }
+
+    return (
+      <div style={{ color: "white" }}>
+        <div>
+          Meat: { this.state.meat } | Wood: { this.state.wood } | Ore: { this.state.ore }
+        </div>
+
+        <div>
+          { description }
+        </div>
+
+        <div>
+          Elevation: { height }
+        </div>
+
+        {
+          !selection.building &&
+            this.renderBuildSomething()
+        }
+
+        {
+          selection.building && selection.hasResources &&
+            this.renderBuildingDescription(selection)
+        }
       </div>
     )
   }

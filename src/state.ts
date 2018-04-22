@@ -5,10 +5,17 @@ interface Notification {
   msg: string;
 }
 
+interface HarvestState {
+  progress: number;
+  required: number;
+}
+
 class State {
   app       : PIXI.Application;
   keyboard  : Keyboard;
   microworld: MicroWorld;
+
+  harvestState: HarvestState | undefined;
 
   mode: Mode;
 
@@ -23,6 +30,7 @@ class State {
 
   wood : number;
   meat : number;
+  ore  : number;
 
   playersWorldX: number;
   playersWorldY: number;
@@ -42,6 +50,7 @@ class State {
 
     this.wood = 20;
     this.meat = 5;
+    this.ore  = 0;
 
     this.notifications = [];
 
@@ -88,6 +97,11 @@ class State {
   }
 
   update(): void {
+    this.checkSwitchStates();
+    this.checkHarvest();
+  }
+
+  checkSwitchStates(): void {
     if (this.keyboard.justDown.Z) {
       if (this.mode === "Macro") {
         this.mode = "Micro";
@@ -95,6 +109,48 @@ class State {
         this.microworld.loadNewMapRegion(this);
       } else {
         this.mode = "Macro";
+      }
+    }
+  }
+
+  checkHarvest(): void {
+    if (this.mode === "Micro") { return; }
+
+    const currentCell = this.map.world.getCellAt(
+      this.playersWorldX,
+      this.playersWorldY,
+    );
+
+    if (!currentCell.hasResources || 
+        (currentCell.hasResources && !currentCell.building)
+    ) {
+      this.harvestState = undefined;
+
+      return;
+    }
+
+    if (this.harvestState === undefined) {
+      // we just started harvesting
+
+      this.harvestState = {
+        progress: 0,
+        required: Constants.HARVEST_TIME[currentCell.terrain],
+      };
+    }
+
+    if (this.tick % 10 === 0) {
+      this.harvestState.progress++;
+    }
+
+    if (this.harvestState.progress > this.harvestState.required) {
+      this.harvestState.progress = 0;
+
+      if (currentCell.terrain === "grass") {
+        this.wood++;
+      } else if (currentCell.terrain === "snow") {
+        this.ore++;
+      } else if (currentCell.terrain === "water") {
+        this.meat++;
       }
     }
   }

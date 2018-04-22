@@ -4,6 +4,13 @@ const Constants = {
   },
 
   SCREEN_SIZE: 32 * 16,
+  BORDER_REGION_WIDTH: 1,
+
+  HARVEST_TIME: {
+    "grass": 20,
+    "water": 40,
+    "snow" : 60,
+  },
 
   MACRO: {
     TILE_WIDTH : 32,

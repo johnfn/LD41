@@ -118,6 +118,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       type: "unknown" | "water" | "snow" | "grass"
     }[] = [];
 
+    const bw = Constants.BORDER_REGION_WIDTH;
+
     for (const obj of dxdyBlockedAreas) {
       if (obj === undefined) { continue; }
 
@@ -126,9 +128,9 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       if (x === 1) {
         result.push({
           rect: new Rect({
-            x: (Constants.MICRO.MAP_WIDTH_IN_TILES - 3) * Constants.MICRO.TILE_WIDTH,
+            x: (Constants.MICRO.MAP_WIDTH_IN_TILES - bw) * Constants.MICRO.TILE_WIDTH,
             y: 0,
-            w: 3 * Constants.MICRO.TILE_WIDTH,
+            w: bw * Constants.MICRO.TILE_WIDTH,
             h: Constants.MICRO.MAP_HEIGHT,
           }),
           type,
@@ -140,7 +142,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
           rect: new Rect({
             x: 0,
             y: 0,
-            w: 3 * Constants.MICRO.TILE_WIDTH,
+            w: bw * Constants.MICRO.TILE_WIDTH,
             h: Constants.MICRO.MAP_HEIGHT,
           }),
           type,
@@ -151,9 +153,9 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
         result.push({
           rect: new Rect({
             x: 0,
-            y: (Constants.MICRO.MAP_WIDTH_IN_TILES - 3) * Constants.MICRO.TILE_WIDTH,
+            y: (Constants.MICRO.MAP_WIDTH_IN_TILES - bw) * Constants.MICRO.TILE_WIDTH,
             w: Constants.MICRO.MAP_WIDTH,
-            h: 3 * Constants.MICRO.TILE_WIDTH,
+            h: bw * Constants.MICRO.TILE_WIDTH,
           }),
           type,
         });
@@ -165,7 +167,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
             x: 0,
             y: 0,
             w: Constants.MICRO.MAP_WIDTH,
-            h: 3 * Constants.MICRO.TILE_WIDTH,
+            h: bw * Constants.MICRO.TILE_WIDTH,
           }),
           type,
         });
