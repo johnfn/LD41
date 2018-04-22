@@ -7,9 +7,9 @@ const Constants = {
   BORDER_REGION_WIDTH: 1,
 
   HARVEST_TIME: {
-    "grass": 20,
-    "water": 40,
-    "snow" : 60,
+    "grass": 30,
+    "water": 60,
+    "snow" : 90,
   },
 
   MACRO: {

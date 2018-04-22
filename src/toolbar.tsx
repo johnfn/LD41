@@ -290,8 +290,11 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
     return (
       <div>
-        Harvesting: 
-        { progress } / { required }
+        <ProgressBar
+          height={ 20 }
+          percentage={ progress / required }
+          text={ "Harvesting..." }
+        />
       </div>
     );
   }
@@ -382,7 +385,10 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     }
 
     return (
-      <div style={{ color: "white" }}>
+      <div style={{ 
+        color: "white",
+        paddingLeft: "20px",
+      }}>
         <div>
           Meat: { this.state.meat } | Wood: { this.state.wood } | Ore: { this.state.ore }
         </div>
