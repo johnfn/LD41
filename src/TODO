@@ -1,6 +1,7 @@
-- build a farm to get a small amount of meat, but it destroys the land, no more farms/meat
 - actually show the areas you built when you zoom
-- roads can be next to anything, not just roads
+- farms should change graphics when they die
+
+- fix hometown so you can walk there
 
 - variable meat from farms
 
@@ -15,6 +16,8 @@
 - you could then UPGRADE that mine for faster production
 
 - docks could provide a permanent meat supply
+
+- should be some indication that you better get a lumber yard quick or you LOSE THE GAME.
 
 - upgrading could also expand population count
 - shoot deer for meat?
@@ -64,6 +67,7 @@ BUGS
 - when you click somewhere, put the character in the center
 - diagonal kinda poses some problemz. hmm
 - pathfind should be cancelled when you press Z
+- keys can get stuck in wrong mode
 
 DREAMLAND
 - a hierarchy view would be nice

@@ -6,6 +6,7 @@ type BuildingName = "Road"
                   | "Factory"
                   | "Lumber Yard"
                   | "Dock"
+                  | "+1 Population"
 
 type TerrainName = "snow" | "grass" | "water";
 type SpecialName = "none" | "ice" | "water" | "start" | "end";
@@ -15,9 +16,11 @@ type Building = {
   description: string;
   hotkey     : string;
   vision     : number;
+  justAUnit ?: boolean;
   cost       : { wood?: number; meat?: number; ore?: number; }
   requirement: {
     on        ?: TerrainName[];
+    inBuilding?: BuildingName;
     near      ?: TerrainName[];
     higher    ?: number;
     lower     ?: number;
@@ -39,6 +42,18 @@ const CanAfford = (b: { cost: { wood?: number, meat?: number, ore?: number } }, 
 }
 
 const Buildings: Building[] = [
+  {
+    name       : "+1 Population",
+    hotkey     : "X",
+    vision     : 0,
+    justAUnit  : true,
+    description: "A guy who will happily harvest resources for you.",
+    cost       : { meat: 5 },
+    requirement: {
+      inBuilding: "Town",
+    },
+  },
+
   {
     name       : "Road",
     hotkey     : "A",

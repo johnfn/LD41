@@ -123,21 +123,6 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       result.push(obj);
 
-      if (selection.building) {
-        obj.canBuild = false;
-        obj.whyNot   = "There is already something there!"
-
-        continue;
-      }
-
-      if (selection.special === "start") {
-        obj.canBuild = false;
-        obj.whyNot   = "I can't build something on top of my hometown!"
-
-        continue;
-      }
-
-
       if (!CanAfford(b, this.state)) {
         obj.canBuild = false;
         obj.whyNot   = "Too expensive!"
@@ -145,20 +130,69 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         continue;
       }
 
-      let hasNeighbor = false;
+      // if you're on a building, cant build anything, except units.
 
-      for (const n of neighborCells) {
-        if ((n.building && n.building.building.name === "Road") ||
-            n.special === "start") {
-          hasNeighbor = true;
+      if (selection.building || selection.special === "start") {
+        if (b.justAUnit) {
+          if (selection.special === "start") {
+            if (b.requirement.inBuilding !== "Town") {
+              obj.canBuild = false;
+              obj.whyNot   = `You need to be in a ${ b.requirement.inBuilding } to make one of those.`;
+
+              continue;
+            } else {
+              continue;
+            }
+          } else {
+            if (selection.building!.building.name !== b.requirement.inBuilding) {
+              obj.canBuild = false;
+              obj.whyNot   = `You need to be in a ${ b.requirement.inBuilding } to make one of those.`;
+
+              continue;
+            } else {
+              continue;
+            }
+          }
+        } else {
+          obj.canBuild = false;
+          obj.whyNot   = "There is already something there!"
 
           continue;
         }
       }
 
-      if (!hasNeighbor) {
+      if (b.requirement.inBuilding) {
+        obj.canBuild = false;
+        obj.whyNot = `Needs to be in a ${ b.requirement.inBuilding } to make one of those.`
+
+        continue;
+      }
+
+      let hasRoadNeighbor = false;
+      let hasAnyNeighbor  = false;
+
+      for (const n of neighborCells) {
+        if ((n.building && n.building.building.name === "Road") ||
+            n.special === "start") {
+          hasRoadNeighbor = true;
+        }
+
+        if (n.building ||
+            n.special === "start") {
+          hasAnyNeighbor = true;
+        }
+      }
+
+      if (b.name !== "Road" && !hasRoadNeighbor) {
         obj.canBuild = false;
         obj.whyNot   = "I need to build next to another road, or my hometown."
+
+        continue;
+      }
+
+      if (b.name === "Road" && !hasAnyNeighbor) {
+        obj.canBuild = false;
+        obj.whyNot   = "I need to build next to another building, or my hometown."
 
         continue;
       }
@@ -255,13 +289,19 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       be.populationOn = 0;
     }
 
-    this.gameState.map.world.addBuilding({
-      building: b.building,
-      extra   : be,
-      x       : this.state.playerWorldX,
-      y       : this.state.playerWorldY,
-      state   : this.gameState,
-    });
+    if (b.building.justAUnit) {
+      if (b.building.name === "+1 Population") {
+        this.gameState.pop += 1;
+      }
+    } else {
+      this.gameState.map.world.addBuilding({
+        building: b.building,
+        extra   : be,
+        x       : this.state.playerWorldX,
+        y       : this.state.playerWorldY,
+        state   : this.gameState,
+      });
+    }
   }
 
   getDescription(cell: WorldCell): React.ReactNode {
@@ -319,36 +359,6 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 
   renderBuyAndHarvest(cell: WorldCell): JSX.Element {
-    if (cell.special === "start") {
-      const villageThings: Buyable[] = [
-        {
-          name: "+1 Population",
-          cost: { meat: 5 }
-        }
-      ];
-
-      return (
-        <div>
-          <div>Buy</div>
-
-          {
-            villageThings.map(({ name, cost }) => {
-              return (
-                <a 
-                  style={{ 
-                    color: CanAfford({ cost }, this.gameState) ? "white" : "gray"
-                  }} 
-                  href="javascript:;"
-                  onClick={ () => this.buyPop() }
-                >{ name }</a>
-              )
-            })
-          }
-
-        </div>
-      );
-    }
-
     if (!cell.building) {
       return <></>;
     }
