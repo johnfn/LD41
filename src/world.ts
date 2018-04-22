@@ -136,8 +136,8 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
 
     if (this.relX < 0) this.relX = 0;
     if (this.relY < 0) this.relY = 0;
-    if (this.relX >= Constants.MAP_TILE_WIDTH)  this.relX = Constants.MAP_TILE_WIDTH - 1;
-    if (this.relY >= Constants.MAP_TILE_HEIGHT) this.relY = Constants.MAP_TILE_HEIGHT - 1;
+    if (this.relX >= Constants.MAP_WIDTH_IN_TILES)  this.relX = Constants.MAP_WIDTH_IN_TILES - 1;
+    if (this.relY >= Constants.MAP_HEIGHT_IN_TILES) this.relY = Constants.MAP_HEIGHT_IN_TILES - 1;
 
     this.x = this.relX * Constants.TILE_WIDTH;
     this.y = this.relY * Constants.TILE_WIDTH;
@@ -187,26 +187,23 @@ class World extends PIXI.Graphics implements Updatable {
 
     this.on('pointerdown', (ev: any) => this.click(ev));
     this.on('mousemove', (ev: any) => this.mousemove(ev));
-
-    console.log(this.pathfind(
-      {x: 0, y: 0},
-      {x: 5, y: 5}
-    ));
   }
 
   click(ev: any): void {
     const pt: PIXI.Point = ev.data.getLocalPosition(this);
 
-    this.pathfind(
+    const path = this.pathfind(
       { 
         x: this.state.playersWorldX, 
-        y: this.state.playersMapY 
+        y: this.state.playersWorldY, 
       },
       { 
-        x: Math.floor(pt.x / Constants.MAP_TILE_WIDTH ), 
-        y: Math.floor(pt.y / Constants.MAP_TILE_HEIGHT), 
+        x: Math.floor(pt.x / Constants.TILE_WIDTH ), 
+        y: Math.floor(pt.y / Constants.TILE_HEIGHT ), 
       },
-    )
+    );
+
+    console.log(path);
   }
 
   pathfind(
@@ -242,8 +239,7 @@ class World extends PIXI.Graphics implements Updatable {
 
         if (!World.InBounds(next.x, next.y)) { continue; }
         if (parent[hash(next)]) { continue; }
-        // TODO: SEEN 
-        // if (this.map[next.x][next.y].terrain === "water") { continue; }
+        if (this.map[next.x][next.y].terrain === "water") { continue; }
 
         queue.push(next);
         parent[hash(next)] = current;

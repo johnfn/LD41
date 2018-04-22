@@ -72,7 +72,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
       if (x === 1) {
         result.push(new Rect({
-          x: (Constants.MAP_TILE_WIDTH - 3) * Constants.TILE_WIDTH,
+          x: (Constants.MAP_WIDTH_IN_TILES - 3) * Constants.TILE_WIDTH,
           y: 0,
           w: 3 * Constants.TILE_WIDTH,
           h: Constants.MAP_HEIGHT,
@@ -91,7 +91,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       if (y === 1) {
         result.push(new Rect({
           x: 0,
-          y: (Constants.MAP_TILE_WIDTH - 3) * Constants.TILE_WIDTH,
+          y: (Constants.MAP_WIDTH_IN_TILES - 3) * Constants.TILE_WIDTH,
           w: Constants.MAP_WIDTH,
           h: 3 * Constants.TILE_WIDTH,
         }));
@@ -147,8 +147,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       state.playersWorldX += dx;
       state.playersWorldY += dy;
 
-      state.playersMapX += - dx * (Constants.MAP_TILE_WIDTH  - 1) * Constants.TILE_WIDTH;
-      state.playersMapY += - dy * (Constants.MAP_TILE_HEIGHT - 1) * Constants.TILE_HEIGHT;
+      state.playersMapX += - dx * (Constants.MAP_WIDTH_IN_TILES  - 1) * Constants.TILE_WIDTH;
+      state.playersMapY += - dy * (Constants.MAP_HEIGHT_IN_TILES - 1) * Constants.TILE_HEIGHT;
 
       this.loadNewMapRegion(state);
       state.map.world.walkTo(state.playersWorldX, state.playersWorldY);
