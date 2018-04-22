@@ -102,7 +102,7 @@ type WorldCell = {
   xAbs: number;
   yAbs: number;
 
-  isFogged: boolean;
+  fogStatus: "unknown" | "seen" | "walked";
 }
 
 class World extends PIXI.Graphics implements Updatable {
@@ -176,23 +176,20 @@ class World extends PIXI.Graphics implements Updatable {
       }))
     ];
 
-    for (let i = 0; i < World.Size; i++) {
-      for (let j = 0; j < World.Size; j++) {
-        this.map[i][j].isFogged = true;
-      }
-    }
-
     for (const b of buildings) {
       for (let i = 0; i < World.Size; i++) {
         for (let j = 0; j < World.Size; j++) {
-          if (!this.map[i][j].isFogged) { continue; }
+          if (
+            this.map[i][j].fogStatus === "walked" ||
+            this.map[i][j].fogStatus === "seen"
+          ) { continue; }
 
           if (Util.ManhattanDistance(
               { xIndex: b.x, yIndex: b.y },
               { xIndex: i  , yIndex: j }
             ) <= b.vision) {
             
-            this.map[i][j].isFogged = false;
+            this.map[i][j].fogStatus = "seen";
           }
         }
       }
@@ -298,7 +295,7 @@ class World extends PIXI.Graphics implements Updatable {
           yIndex    : j,
           xAbs      : i * Constants.TILE_WIDTH,
           yAbs      : j * Constants.TILE_HEIGHT,
-          isFogged: true,
+          fogStatus : "unknown",
         };
       }
     }
@@ -452,6 +449,12 @@ class World extends PIXI.Graphics implements Updatable {
     candidatePairs[0][3].special = "start";
   }
 
+  walkTo(x: number, y: number) {
+    this.map[x][y].fogStatus = "walked";
+
+    this.renderWorld();
+  }
+
   renderWorld(): void {
     this.clear();
 
@@ -459,32 +462,34 @@ class World extends PIXI.Graphics implements Updatable {
       for (let j = 0; j < this.map[i].length; j++) {
         const cell = this.map[i][j];
 
+        const alpha = ({
+          "unknown": 0  ,
+          "seen"   : 0.2,
+          "walked" : 1.0,
+        })[cell.fogStatus];
+
         if (cell.height < 0.4) {
-          this.beginFill(0x0000ff, 1);
+          this.beginFill(0x0000ff, alpha);
         } else if (cell.height < 0.8) {
-          this.beginFill(0x00ff00, cell.height);
+          this.beginFill(0x00ff00, cell.height * alpha);
         } else {
-          this.beginFill(0xffffff, 1);
+          this.beginFill(0xffffff, alpha);
         }
 
         if (cell.special === "ice") {
-          this.beginFill(0xffff00, 1);
+          this.beginFill(0xffff00, alpha);
         }
 
         if (cell.special === "water") {
-          this.beginFill(0xff0000, 1);
+          this.beginFill(0xff0000, alpha);
         }
 
         if (cell.special === "end") {
-          this.beginFill(0x000000, 1);
+          this.beginFill(0x000000, alpha);
         }
 
         if (cell.special === "start") {
-          this.beginFill(0x000000, 1);
-        }
-
-        if (cell.isFogged) {
-          this.beginFill(0x000000, 1);
+          this.beginFill(0x000000, alpha);
         }
 
         this.drawRect(

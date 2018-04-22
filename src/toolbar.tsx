@@ -93,7 +93,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         continue;
       }
 
-      if (selection.isFogged) {
+      if (selection.fogStatus === "unknown") {
         obj.canBuild = false;
         obj.whyNot   = "I can't see anything there!"
 
@@ -146,7 +146,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 
   getDescription(cell: WorldCell): string {
-    if (cell.isFogged) {
+    if (cell.fogStatus === "unknown") {
       return "I can't see anything there";
     }
 

@@ -33,52 +33,14 @@ class MapSelection extends PIXI.Graphics implements Updatable {
     );
   }
 
-  lastMove = 0;
-
-  updatePosition(state: State): void {
-    let wantsToMove = (
-      state.keyboard.down.W ||
-      state.keyboard.down.A ||
-      state.keyboard.down.S ||
-      state.keyboard.down.D
-    );
-
-    let justPressed = (
-      state.keyboard.justDown.W ||
-      state.keyboard.justDown.A ||
-      state.keyboard.justDown.S ||
-      state.keyboard.justDown.D
-    );
-
-    if (wantsToMove) {
-      this.lastMove++;
-
-      let willMove = justPressed || this.lastMove > 5;
-
-      if (willMove && state.keyboard.down.A) { this.relX -= 1; }
-      if (willMove && state.keyboard.down.D) { this.relX += 1; }
-
-      if (willMove && state.keyboard.down.W) { this.relY -= 1; }
-      if (willMove && state.keyboard.down.S) { this.relY += 1; }
-
-      if (this.relX < 0) this.relX = 0;
-      if (this.relY < 0) this.relY = 0;
-      if (this.relX >= World.Size) this.relX = World.Size - 1;
-      if (this.relY >= World.Size) this.relY = World.Size - 1;
-
-      if (willMove) {
-        this.lastMove = 0;
-      }
-    }
-  }
-
   update(state: State): void {
     const speed = 0.02;
     const startingState = this.selState;
 
-    this.updatePosition(state);
-
-    const [x, y] = state.map.world.relToAbs(this.relX, this.relY)
+    const [x, y] = state.map.world.relToAbs(
+      state.playersWorldX,
+      state.playersWorldY,
+    );
 
     this.x = x;
     this.y = y;

@@ -59,7 +59,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
       const neighbor = this.world.map[nx][ny];
 
-      if (neighbor.isFogged) {
+      if (neighbor.fogStatus === "unknown") {
         return true;
       }
 
@@ -139,6 +139,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       this.currentMapRegion &&
       !World.InBounds(state.playersMapX, state.playersMapY)
     ) {
+      // Just walked to a new region.
+
       const dx = Math.floor(state.playersMapX / Constants.MAP_WIDTH );
       const dy = Math.floor(state.playersMapY / Constants.MAP_HEIGHT);
 
@@ -149,6 +151,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       state.playersMapY += - dy * (Constants.MAP_TILE_HEIGHT - 1) * Constants.TILE_HEIGHT;
 
       this.loadNewMapRegion(state);
+      state.map.world.walkTo(state.playersWorldX, state.playersWorldY);
     }
   }
 }
