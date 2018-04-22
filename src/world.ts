@@ -25,6 +25,11 @@ type Building = {
   }
 };
 
+type BuildingExtra = {
+  resourcesLeft ?: number;
+  populationOn  ?: number;
+}
+
 const CanAfford = (b: { cost: { wood?: number, meat?: number, ore?: number } }, state: { wood: number, meat: number, ore: number }): boolean => {
   return (
     (b.cost.wood ? b.cost.wood <= state.wood : true) &&
@@ -97,6 +102,7 @@ type WorldCell = {
   variant: string;
   building?: {
     building: Building;
+    extra   : BuildingExtra;
     graphics: BuildingGraphic;
   };
 
@@ -303,15 +309,17 @@ class World extends PIXI.Graphics implements Updatable {
 
   addBuilding(props: {
     building: Building;
+    extra   : BuildingExtra;
     x       : number;
     y       : number;
     state   : State;
   }): void {
-    const { building, x, y, state } = props;
+    const { building, x, y, state, extra } = props;
     const graphics = new BuildingGraphic(state, building);
 
     this.map[x][y].building = {
       building,
+      extra,
       graphics,
     };
 

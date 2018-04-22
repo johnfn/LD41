@@ -241,21 +241,50 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       this.gameState.meat -= b.building.cost.meat;
     }
 
+    const be: BuildingExtra = {};
+
+    if (b.building.name === "Farm") {
+      be.resourcesLeft = 10;
+    }
+
+    if (b.building.name === "Lumber Yard") {
+      be.resourcesLeft = 100;
+    }
+
+    if (b.building.requirement.resources) {
+      be.populationOn = 0;
+    }
+
     this.gameState.map.world.addBuilding({
       building: b.building,
+      extra   : be,
       x       : this.state.playerWorldX,
       y       : this.state.playerWorldY,
       state   : this.gameState,
     });
   }
 
-  getDescription(cell: WorldCell): string {
+  getDescription(cell: WorldCell): React.ReactNode {
     if (cell.fogStatus === "unknown") {
       return "I can't see anything there";
     }
 
     if (cell.building) {
-      return `A ${ cell.building.building.name.toLowerCase() }.`;
+      const name  = cell.building.building.name.toLowerCase();
+      const extra = cell.building.extra;
+
+      if (name === "farm") {
+        return (
+          <div>
+            <div>A { name }</div>
+            <div>
+              { extra.resourcesLeft } meat left.
+            </div>
+          </div>
+        );
+      } else {
+        return `A ${ name }.`;
+      }
     } 
 
     if (cell.special !== "none") {
@@ -427,7 +456,6 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
     selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
 
-    const description = this.getDescription(selection);
     let height = "";
 
     if (selection.height < 0.20) {
@@ -454,7 +482,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         </div>
 
         <div>
-          { description }
+          { this.getDescription(selection) }
         </div>
 
         <div>
