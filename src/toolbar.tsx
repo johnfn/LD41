@@ -227,7 +227,11 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     } else if (cell.terrain === "water") {
       return "A body of water.";
     } else if (cell.terrain === "grass") {
-      return "A grassy field.";
+      if (cell.hasResources) {
+        return "A forest.";
+      } else {
+        return "A grassy field.";
+      }
     }
 
     return "";

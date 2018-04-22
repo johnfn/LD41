@@ -308,7 +308,7 @@ class World extends PIXI.Graphics implements Updatable {
     this.recalculateFogOfWar();
     this.renderWorld();
 
-    this.addChild(graphics)
+    this.addChild(graphics);
 
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0)
   }
@@ -618,11 +618,15 @@ class World extends PIXI.Graphics implements Updatable {
 
         const cell = this.map[i][j];
 
-        const alpha = ({
+        let alpha = ({
           "unknown": 0  ,
           "seen"   : 0.6,
           "walked" : 1.0,
         })[cell.fogStatus];
+
+        if (!Constants.DEBUG.FOG_OF_WAR) {
+          alpha = 1.0;
+        }
 
         if (cell.special !== "none") {
           if (cell.special === "ice") {
@@ -651,7 +655,11 @@ class World extends PIXI.Graphics implements Updatable {
             if (cell.hasResources) {
               tex = TextureCache.GetCachedSpritesheetTexture("macro", 1, 0);
             } else {
-              tex = TextureCache.GetCachedSpritesheetTexture("macro", 0, 0);
+              if (cell.height >= 0.6) {
+                tex = TextureCache.GetCachedSpritesheetTexture("macro", 0, 1);
+              } else {
+                tex = TextureCache.GetCachedSpritesheetTexture("macro", 0, 0);
+              }
             }
           } else {
             // Ore
@@ -687,22 +695,14 @@ class World extends PIXI.Graphics implements Updatable {
   }
 }
 
-class BuildingGraphic extends PIXI.Graphics implements Updatable {
+class BuildingGraphic extends PIXI.Sprite {
   activeMode: Mode = "Macro";
   z = 20;
 
   constructor(state: State) {
     super();
 
-    state.add(this);
-
-    this.beginFill(0x666666, 1);
-    this.drawRect(
-      this.x, 
-      this.y, 
-      Constants.MACRO.TILE_WIDTH, 
-      Constants.MACRO.TILE_HEIGHT
-    );
+    this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 0).texture;
   }
 
   update(_state: State): void {

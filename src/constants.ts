@@ -1,4 +1,8 @@
 const Constants = {
+  DEBUG: {
+    FOG_OF_WAR: true,
+  },
+
   SCREEN_SIZE: 32 * 16,
 
   MACRO: {
