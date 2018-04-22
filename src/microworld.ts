@@ -126,10 +126,10 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       if (x === 1) {
         result.push({
           rect: new Rect({
-            x: (Constants.MAP_WIDTH_IN_TILES - 3) * Constants.TILE_WIDTH,
+            x: (Constants.MICRO.MAP_WIDTH_IN_TILES - 3) * Constants.MICRO.TILE_WIDTH,
             y: 0,
-            w: 3 * Constants.TILE_WIDTH,
-            h: Constants.MAP_HEIGHT,
+            w: 3 * Constants.MICRO.TILE_WIDTH,
+            h: Constants.MICRO.MAP_HEIGHT,
           }),
           type,
         });
@@ -140,8 +140,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
           rect: new Rect({
             x: 0,
             y: 0,
-            w: 3 * Constants.TILE_WIDTH,
-            h: Constants.MAP_HEIGHT,
+            w: 3 * Constants.MICRO.TILE_WIDTH,
+            h: Constants.MICRO.MAP_HEIGHT,
           }),
           type,
         });
@@ -151,9 +151,9 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
         result.push({
           rect: new Rect({
             x: 0,
-            y: (Constants.MAP_WIDTH_IN_TILES - 3) * Constants.TILE_WIDTH,
-            w: Constants.MAP_WIDTH,
-            h: 3 * Constants.TILE_WIDTH,
+            y: (Constants.MICRO.MAP_WIDTH_IN_TILES - 3) * Constants.MICRO.TILE_WIDTH,
+            w: Constants.MICRO.MAP_WIDTH,
+            h: 3 * Constants.MICRO.TILE_WIDTH,
           }),
           type,
         });
@@ -164,8 +164,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
           rect: new Rect({
             x: 0,
             y: 0,
-            w: Constants.MAP_WIDTH,
-            h: 3 * Constants.TILE_WIDTH,
+            w: Constants.MICRO.MAP_WIDTH,
+            h: 3 * Constants.MICRO.TILE_WIDTH,
           }),
           type,
         });
@@ -183,8 +183,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.currentMapRegion = this.tiled.loadRegion(new Rect({
       x: 0,
       y: 0,
-      w: Constants.MAP_WIDTH,
-      h: Constants.MAP_HEIGHT,
+      w: Constants.MICRO.MAP_WIDTH,
+      h: Constants.MICRO.MAP_HEIGHT,
     }));
 
     this.addChild(this.currentMapRegion);
@@ -215,14 +215,14 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     ) {
       // Just walked to a new region.
 
-      const dx = Math.floor(state.playersMapX / Constants.MAP_WIDTH );
-      const dy = Math.floor(state.playersMapY / Constants.MAP_HEIGHT);
+      const dx = Math.floor(state.playersMapX / Constants.MICRO.MAP_WIDTH );
+      const dy = Math.floor(state.playersMapY / Constants.MICRO.MAP_HEIGHT);
 
       state.playersWorldX += dx;
       state.playersWorldY += dy;
 
-      state.playersMapX += - dx * (Constants.MAP_WIDTH_IN_TILES  - 1) * Constants.TILE_WIDTH;
-      state.playersMapY += - dy * (Constants.MAP_HEIGHT_IN_TILES - 1) * Constants.TILE_HEIGHT;
+      state.playersMapX += - dx * (Constants.MICRO.MAP_WIDTH_IN_TILES  - 1) * Constants.MICRO.TILE_WIDTH;
+      state.playersMapY += - dy * (Constants.MICRO.MAP_HEIGHT_IN_TILES - 1) * Constants.MICRO.TILE_HEIGHT;
 
       this.loadNewMapRegion(state);
       state.map.world.walkTo(state.playersWorldX, state.playersWorldY);
@@ -244,7 +244,7 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
     this.microworld = mw;
 
     this.beginFill(0x0000ff, 1);
-    this.drawRect(0, 0, Constants.TILE_WIDTH, Constants.TILE_HEIGHT);
+    this.drawRect(0, 0, Constants.MICRO.TILE_WIDTH, Constants.MICRO.TILE_HEIGHT);
   }
 
   update(state: State): void {

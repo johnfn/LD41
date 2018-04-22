@@ -56,7 +56,7 @@ class Keyboard {
 
   private _queuedEvents: QueuedKeyboardEvent[] = [];
 
-  constructor(state: State) {
+  constructor(_state: State) {
     addEventListener("keydown", e => this.keyDown(e), false);
     addEventListener("keyup",   e => this.keyUp(e),   false);
   }

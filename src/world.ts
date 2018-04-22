@@ -120,27 +120,28 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
     this.lineStyle(2, 0xffffff);
 
     this.moveTo(0, 0)
-    this.lineTo(0                   , Constants.TILE_WIDTH);
-    this.lineTo(Constants.TILE_WIDTH, Constants.TILE_WIDTH);
-    this.lineTo(Constants.TILE_WIDTH, 0);
+    this.lineTo(0                         , Constants.MACRO.TILE_WIDTH);
+    this.lineTo(Constants.MACRO.TILE_WIDTH, Constants.MACRO.TILE_WIDTH);
+    this.lineTo(Constants.MACRO.TILE_WIDTH, 0);
     this.lineTo(0, 0);
 
     state.mouse = this;
   }
 
+  // on mousemove
   move(ev: any, world: World): void {
     const pt: PIXI.Point = ev.data.getLocalPosition(world);
 
-    this.relX = Math.floor(pt.x / Constants.TILE_WIDTH);
-    this.relY = Math.floor(pt.y / Constants.TILE_WIDTH);
+    this.relX = Math.floor(pt.x / Constants.MACRO.TILE_WIDTH);
+    this.relY = Math.floor(pt.y / Constants.MACRO.TILE_WIDTH);
 
     if (this.relX < 0) this.relX = 0;
     if (this.relY < 0) this.relY = 0;
-    if (this.relX >= Constants.MAP_WIDTH_IN_TILES)  this.relX = Constants.MAP_WIDTH_IN_TILES - 1;
-    if (this.relY >= Constants.MAP_HEIGHT_IN_TILES) this.relY = Constants.MAP_HEIGHT_IN_TILES - 1;
+    if (this.relX >= Constants.MACRO.MAP_WIDTH_IN_TILES)  this.relX = Constants.MACRO.MAP_WIDTH_IN_TILES - 1;
+    if (this.relY >= Constants.MACRO.MAP_HEIGHT_IN_TILES) this.relY = Constants.MACRO.MAP_HEIGHT_IN_TILES - 1;
 
-    this.x = this.relX * Constants.TILE_WIDTH;
-    this.y = this.relY * Constants.TILE_WIDTH;
+    this.x = this.relX * Constants.MACRO.TILE_WIDTH;
+    this.y = this.relY * Constants.MACRO.TILE_WIDTH;
 
     this.absX = pt.x;
     this.absY = pt.y;
@@ -294,8 +295,8 @@ class World extends PIXI.Graphics implements Updatable {
 
   relToAbs(x: number, y: number): [number, number] {
     return [
-      x * Constants.TILE_WIDTH ,
-      y * Constants.TILE_HEIGHT,
+      x * Constants.MACRO.TILE_WIDTH ,
+      y * Constants.MACRO.TILE_HEIGHT,
     ];
   }
 
@@ -344,8 +345,8 @@ class World extends PIXI.Graphics implements Updatable {
           terrain   : "grass",
           xIndex    : i,
           yIndex    : j,
-          xAbs      : i * Constants.TILE_WIDTH,
-          yAbs      : j * Constants.TILE_HEIGHT,
+          xAbs      : i * Constants.MACRO.TILE_WIDTH,
+          yAbs      : j * Constants.MACRO.TILE_HEIGHT,
           fogStatus : "unknown",
         };
       }
@@ -546,8 +547,8 @@ class World extends PIXI.Graphics implements Updatable {
         this.drawRect(
           cell.xAbs, 
           cell.yAbs, 
-          Constants.TILE_WIDTH, 
-          Constants.TILE_HEIGHT
+          Constants.MACRO.TILE_WIDTH, 
+          Constants.MACRO.TILE_HEIGHT
         );
       }
     }
@@ -567,8 +568,8 @@ class BuildingGraphic extends PIXI.Graphics implements Updatable {
     this.drawRect(
       this.x, 
       this.y, 
-      Constants.TILE_WIDTH, 
-      Constants.TILE_HEIGHT
+      Constants.MACRO.TILE_WIDTH, 
+      Constants.MACRO.TILE_HEIGHT
     );
   }
 

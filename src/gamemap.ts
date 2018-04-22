@@ -53,8 +53,8 @@ class GameMap extends PIXI.Graphics implements Updatable {
         y: this.state.playersWorldY, 
       },
       { 
-        x: Math.floor(pt.x / Constants.TILE_WIDTH ), 
-        y: Math.floor(pt.y / Constants.TILE_HEIGHT), 
+        x: Math.floor(pt.x / Constants.MACRO.TILE_WIDTH ), 
+        y: Math.floor(pt.y / Constants.MACRO.TILE_HEIGHT), 
       },
     );
   }

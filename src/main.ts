@@ -28,8 +28,8 @@ class MapSelection extends PIXI.Graphics implements Updatable {
     this.drawRect(
       this.x, 
       this.y, 
-      Constants.TILE_WIDTH, 
-      Constants.TILE_HEIGHT
+      Constants.MACRO.TILE_WIDTH, 
+      Constants.MACRO.TILE_HEIGHT
     );
 
     this.alpha = 0.7;

@@ -41,8 +41,8 @@ class State {
     this.notifications = [];
 
     const app = new PIXI.Application(
-      Constants.MAP_WIDTH, 
-      Constants.MAP_HEIGHT, { 
+      Constants.MACRO.MAP_WIDTH, 
+      Constants.MACRO.MAP_HEIGHT, { 
         antialias: true,
         view: document.getElementById("main")! as HTMLCanvasElement,
       }
