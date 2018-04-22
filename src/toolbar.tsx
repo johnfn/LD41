@@ -38,6 +38,24 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
     this.gameState = (window as any).state;
     this.gameState.subscribe(gameState => this.onTick(gameState));
+
+    addEventListener("keydown", e => this.keyDown(e), false);
+  }
+
+  private keyDown(e: KeyboardEvent) {
+    if (this.gameState.mode === "Micro") {
+      return;
+    }
+
+    const buildings = this.availableBuildings().filter(b => {
+      return b.building.hotkey.toLowerCase() === e.key.toLowerCase();
+    });
+
+    if (buildings.length === 0) {
+      return;
+    }
+
+    this.build(buildings[0]);
   }
 
   onTick(gameState: State): void {
@@ -56,7 +74,10 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 
   availableBuildings(): BuildingAndCanAfford[] {
-    const selection = this.gameState.map.world.getCellAt(this.state.selX, this.state.selY);
+    const selection = this.gameState.map.world.getCellAt(
+      this.state.playerWorldX, 
+      this.state.playerWorldY
+    );
     const dxdy: [number, number][] = [
       [ 0,  1],
       [ 0, -1],
@@ -67,8 +88,8 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     const neighborCells: WorldCell[] = [];
 
     for (const [x, y] of dxdy) {
-      const nx = this.state.selX + x;
-      const ny = this.state.selY + y;
+      const nx = this.state.playerWorldX + x;
+      const ny = this.state.playerWorldY + y;
 
       if (!World.InBounds(nx, ny)) continue;
 
@@ -95,9 +116,35 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         continue;
       }
 
+      if (selection.special === "start") {
+        obj.canBuild = false;
+        obj.whyNot   = "I can't build something on top of my hometown!"
+
+        continue;
+      }
+
+
       if (!CanAfford(b, this.state)) {
         obj.canBuild = false;
         obj.whyNot   = "Too expensive!"
+
+        continue;
+      }
+
+      let hasNeighbor = false;
+
+      for (const n of neighborCells) {
+        if ((n.building && n.building.building.name === "Road") ||
+            n.special === "start") {
+          hasNeighbor = true;
+
+          continue;
+        }
+      }
+
+      if (!hasNeighbor) {
+        obj.canBuild = false;
+        obj.whyNot   = "I need to build next to another road, or my hometown."
 
         continue;
       }
@@ -249,7 +296,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
                   onClick={ () => this.build(b) }
                   href="javascript:;">
                   { b.building.name }
-                </a>
+                </a> (hotkey: { b.building.hotkey })
               </div>
             );
           })

@@ -23,6 +23,10 @@ const Constants = {
     MAP_HEIGHT : 32 * 16,
   },
 
+  WOOD_RESOURCE_COUNT: 50,
+  ORE_RESOURCE_COUNT : 10,
+  FISH_RESOURCE_COUNT: 20,
+
   UNKNOWN_COLOR: 0x000000,
   WATER_COLOR  : 0x0000ff,
   SNOW_COLOR   : 0xffffff,

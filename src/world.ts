@@ -11,6 +11,7 @@ type SpecialName = "none" | "ice" | "water" | "start" | "end";
 type Building = {
   name       : BuildingName;
   description: string;
+  hotkey     : string;
   vision     : number;
   cost       : { wood?: number; meat?: number }
   requirement: {
@@ -23,23 +24,25 @@ type Building = {
 
 const CanAfford = (b: Building, state: { wood: number, meat: number }): boolean => {
   return (
-    (b.cost.wood ? b.cost.wood < state.wood : true) &&
-    (b.cost.meat ? b.cost.meat < state.meat : true)
+    (b.cost.wood ? b.cost.wood <= state.wood : true) &&
+    (b.cost.meat ? b.cost.meat <= state.meat : true)
   );
 }
 
 const Buildings: Building[] = [
   {
     name       : "Road",
+    hotkey     : "A",
     vision     : 2,
     description: "Allows you to travel and build more.",
-    cost       : { wood: 3 },
+    cost       : { wood: 1 },
     requirement: {
       on: ["snow", "grass"],
     },
   },
   {
     name       : "Village",
+    hotkey     : "S",
     vision     : 4,
     description: "Sells basic adventuring supplies. Has an Inn to rest at.",
     cost       : { wood: 5, meat: 3 },
@@ -48,25 +51,8 @@ const Buildings: Building[] = [
     },
   },
   {
-    name       : "Town",
-    vision     : 5,
-    description: "Sells stronger weapons and armor.",
-    cost       : { wood: 8, meat: 6 },
-    requirement: {
-      on: ["grass"],
-    },
-  },
-  {
-    name       : "City",
-    vision     : 7,
-    description: "Sells even better weapons and armor.",
-    cost       : { wood: 15, meat: 10 },
-    requirement: {
-      on: ["grass"],
-    },
-  },
-  {
     name       : "Factory",
+    hotkey     : "D",
     vision     : 3,
     description: "Makes something idk.",
     cost       : { wood: 15, meat: 10 },
@@ -76,6 +62,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Dock",
+    hotkey     : "F",
     vision     : 3,
     description: "Builds ships to sail the seas.",
     cost       : { wood: 15, meat: 10 },
@@ -91,6 +78,7 @@ type WorldCell = {
 
   terrain: TerrainName;
   special: "none" | "ice" | "water" | "start" | "end";
+  hasResources: boolean;
   variant: string;
   building?: {
     building: Building;
@@ -124,13 +112,21 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
 
     this.state = state;
 
-    this.lineStyle(2, 0xffffff);
+    this.lineStyle(1, 0xffffff);
 
     this.moveTo(0, 0)
     this.lineTo(0                         , Constants.MACRO.TILE_WIDTH);
     this.lineTo(Constants.MACRO.TILE_WIDTH, Constants.MACRO.TILE_WIDTH);
     this.lineTo(Constants.MACRO.TILE_WIDTH, 0);
     this.lineTo(0, 0);
+
+    this.lineStyle(1, 0x000000);
+
+    this.moveTo(-1, -1)
+    this.lineTo(-1                            , Constants.MACRO.TILE_WIDTH + 1);
+    this.lineTo(Constants.MACRO.TILE_WIDTH + 1, Constants.MACRO.TILE_WIDTH + 1);
+    this.lineTo(Constants.MACRO.TILE_WIDTH + 1, -1);
+    this.lineTo(-1                            , -1);
 
     state.mouse = this;
 
@@ -189,8 +185,6 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
   }
 
   update(_state: State) {
-    console.log(this.screenMotion);
-
     this.state.macroCamera.setX(this.state.macroCamera.x + this.screenMotion.x * this.screenScrollSpeed);
     this.state.macroCamera.setY(this.state.macroCamera.y + this.screenMotion.y * this.screenScrollSpeed);
   }
@@ -381,21 +375,50 @@ class World extends PIXI.Graphics implements Updatable {
     this.buildSpecialLocations();
     this.nameTerrain();
     this.chooseVariants();
+    this.addResources();
+  }
+
+  addResources(): void {
+    const grass = this.getCells().filter(x => x.terrain === "grass");
+    const snow  = this.getCells().filter(x => x.terrain === "snow");
+    const water = this.getCells().filter(x => x.terrain === "water");
+
+    for (let i = 0; i < Constants.WOOD_RESOURCE_COUNT; i++) {
+      const next = Util.RandElem(grass);
+      grass.splice(grass.indexOf(next), 1);
+
+      next.hasResources = true;
+    }
+
+    for (let i = 0; i < Constants.ORE_RESOURCE_COUNT; i++) {
+      const next = Util.RandElem(snow);
+      snow.splice(snow.indexOf(next), 1);
+
+      next.hasResources = true;
+    }
+
+    for (let i = 0; i < Constants.FISH_RESOURCE_COUNT; i++) {
+      const next = Util.RandElem(water);
+      water.splice(water.indexOf(next), 1);
+
+      next.hasResources = true;
+    }
   }
 
   buildTerrain(): void {
     for (let i = 0; i < World.Size; i++) {
       for (let j = 0; j < World.Size; j++) {
         this.map[i][j] = {
-          height    : 0,
-          special   : "none",
-          terrain   : "grass",
-          xIndex    : i,
-          yIndex    : j,
-          xAbs      : i * Constants.MACRO.TILE_WIDTH,
-          yAbs      : j * Constants.MACRO.TILE_HEIGHT,
-          fogStatus : "unknown",
-          variant   : "",
+          height      : 0,
+          special     : "none",
+          terrain     : "grass",
+          hasResources: false,
+          xIndex      : i,
+          yIndex      : j,
+          xAbs        : i * Constants.MACRO.TILE_WIDTH,
+          yAbs        : j * Constants.MACRO.TILE_HEIGHT,
+          fogStatus   : "unknown",
+          variant     : "",
         };
       }
     }
@@ -619,10 +642,20 @@ class World extends PIXI.Graphics implements Updatable {
           }
         } else {
           if (cell.height < 0.4) {
+            // Water
+
             tex = TextureCache.GetCachedSpritesheetTexture("macro", 3, 0);
           } else if (cell.height < 0.8) {
-            tex = TextureCache.GetCachedSpritesheetTexture("macro", 0, 0);
+            // Grass
+
+            if (cell.hasResources) {
+              tex = TextureCache.GetCachedSpritesheetTexture("macro", 1, 0);
+            } else {
+              tex = TextureCache.GetCachedSpritesheetTexture("macro", 0, 0);
+            }
           } else {
+            // Ore
+
             tex = TextureCache.GetCachedSpritesheetTexture("macro", 2, 0);
           }
         }

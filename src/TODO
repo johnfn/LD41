@@ -1,3 +1,9 @@
+- you should probably start with at least one forest nearby, so you can build a mine on it
+- you could then upgrade that mine
+- some sort of population (plus yourself)
+
+- shouldnt show building context menu in microworld
+
 - resource harvesting
   - have enemies
     - have you be able to kill them
@@ -5,16 +11,15 @@
   - have resource locations (trees etc)
     - have you be able to "kill" ... "them?" Whatever. 
     - Also you could upgrade your axe or something.
-
-- toolbar is now unusable
-  - it should only scroll if your mouse is still within the canv
-
 - stuff to buy at town
+
+- "i cant traverse this it's too treacherous!" mountains
+  - but then you can buy a thing
+
 - teleporter
 - unattainable areas + treasure
 - render a minimap?
 - hard to see flashing white thing on top of snow.
-- "i cant traverse this it's too treacherous!" mountains
 
 - monster spawns and farming?
 
