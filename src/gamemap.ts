@@ -33,7 +33,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
 
   update(state: State): void {
     if (this.path && this.path.length > 0) {
-      if (state.tick % 20 === 0) {
+      if (state.tick % 10 === 0) {
         this.state.playersWorldX = this.path[0].x;
         this.state.playersWorldY = this.path[0].y;
 
@@ -54,7 +54,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
       },
       { 
         x: Math.floor(pt.x / Constants.TILE_WIDTH ), 
-        y: Math.floor(pt.y / Constants.TILE_HEIGHT ), 
+        y: Math.floor(pt.y / Constants.TILE_HEIGHT), 
       },
     );
   }
@@ -92,7 +92,8 @@ class GameMap extends PIXI.Graphics implements Updatable {
 
         if (!World.InBounds(next.x, next.y)) { continue; }
         if (parent[hash(next)]) { continue; }
-        if (this.world.map[next.x][next.y].terrain === "water") { continue; }
+        if (this.world.map[next.x][next.y].terrain   === "water") { continue; }
+        if (this.world.map[next.x][next.y].fogStatus === "unknown") { continue; }
 
         queue.push(next);
         parent[hash(next)] = current;
