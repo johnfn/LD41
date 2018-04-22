@@ -182,8 +182,8 @@ class MouseGraphic extends PIXI.Graphics implements Updatable {
   }
 
   update(_state: State) {
-    this.state.camera.setX(this.state.camera.x + this.screenMotion.x * this.screenScrollSpeed);
-    this.state.camera.setY(this.state.camera.y + this.screenMotion.y * this.screenScrollSpeed);
+    this.state.macroCamera.setX(this.state.macroCamera.x + this.screenMotion.x * this.screenScrollSpeed);
+    this.state.macroCamera.setY(this.state.macroCamera.y + this.screenMotion.y * this.screenScrollSpeed);
   }
 }
 
@@ -195,6 +195,7 @@ class World extends PIXI.Graphics implements Updatable {
 
   app: PIXI.Application;
   map: WorldCell[][];
+  tilemap: PIXI.Sprite;
   state: State;
 
   constructor(state: State) {
@@ -206,6 +207,7 @@ class World extends PIXI.Graphics implements Updatable {
 
     this.map = [];
     this.app = state.app;
+    this.addChild(this.tilemap = new PIXI.Sprite());
 
     for (let i = 0; i < World.Size; i++) {
       this.map[i] = [];
@@ -571,50 +573,72 @@ class World extends PIXI.Graphics implements Updatable {
   }
 
   renderWorld(): void {
+    const renderer = PIXI.RenderTexture.create(
+      Constants.MACRO.MAP_WIDTH,
+      Constants.MACRO.MAP_HEIGHT,
+    );
+
     this.clear();
 
     for (let i = 0; i < this.map.length; i++) {
       for (let j = 0; j < this.map[i].length; j++) {
+        let tex: PIXI.Sprite | undefined = undefined;
+
         const cell = this.map[i][j];
 
         const alpha = ({
           "unknown": 0  ,
-          "seen"   : 0.2,
+          "seen"   : 0.6,
           "walked" : 1.0,
         })[cell.fogStatus];
 
-        if (cell.height < 0.4) {
-          this.beginFill(0x0000ff, alpha);
-        } else if (cell.height < 0.8) {
-          this.beginFill(0x00ff00, cell.height * alpha);
+        if (cell.special !== "none") {
+          if (cell.special === "ice") {
+            this.beginFill(0xffff00, alpha);
+          }
+
+          if (cell.special === "water") {
+            this.beginFill(0xff0000, alpha);
+          }
+
+          if (cell.special === "end") {
+            this.beginFill(0x000000, alpha);
+          }
+
+          if (cell.special === "start") {
+            this.beginFill(0x000000, alpha);
+          }
         } else {
-          this.beginFill(0xffffff, alpha);
+          if (cell.height < 0.4) {
+            tex = TextureCache.GetCachedSpritesheetTexture("macro", 3, 0);
+          } else if (cell.height < 0.8) {
+            tex = TextureCache.GetCachedSpritesheetTexture("macro", 0, 0);
+          } else {
+            tex = TextureCache.GetCachedSpritesheetTexture("macro", 2, 0);
+          }
         }
 
-        if (cell.special === "ice") {
-          this.beginFill(0xffff00, alpha);
-        }
+        if (tex) {
+          tex.x = i * Constants.MACRO.TILE_WIDTH;
+          tex.y = j * Constants.MACRO.TILE_HEIGHT;
 
-        if (cell.special === "water") {
-          this.beginFill(0xff0000, alpha);
+          this.state.app.renderer.render(
+            tex, 
+            renderer,
+            false,
+          );
+        } else {
+          this.drawRect(
+            cell.xAbs, 
+            cell.yAbs, 
+            Constants.MACRO.TILE_WIDTH, 
+            Constants.MACRO.TILE_HEIGHT
+          );
         }
-
-        if (cell.special === "end") {
-          this.beginFill(0x000000, alpha);
-        }
-
-        if (cell.special === "start") {
-          this.beginFill(0x000000, alpha);
-        }
-
-        this.drawRect(
-          cell.xAbs, 
-          cell.yAbs, 
-          Constants.MACRO.TILE_WIDTH, 
-          Constants.MACRO.TILE_HEIGHT
-        );
       }
     }
+
+    this.tilemap.texture = renderer;
   }
 }
 

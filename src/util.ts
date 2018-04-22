@@ -18,4 +18,17 @@ class Util {
       Math.abs(c1.yIndex - c2.yIndex)
     );
   }
+
+  public static componentToHex(c: number): string {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+
+  public static rgbToHex(r: number, g: number, b: number): string {
+    return "#" + Util.componentToHex(r) + Util.componentToHex(g) + Util.componentToHex(b);
+  }
+
+  public static rgbToHexNumber(r: number, g: number, b: number): number {
+    return ((1 << 24) + (r << 16) + (g << 8) + b);
+  }
 }

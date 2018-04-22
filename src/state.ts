@@ -18,7 +18,8 @@ class State {
 
   mouse !: MouseGraphic;
 
-  camera: Camera;
+  macroCamera: Camera;
+  microCamera: Camera;
 
   wood : number;
   meat : number;
@@ -36,7 +37,8 @@ class State {
     this.mode = "Macro";
     this.updaters = [];
     this.keyboard = new Keyboard(this);
-    this.camera = new Camera();
+    this.macroCamera = new Camera();
+    this.microCamera = new Camera();
 
     this.wood = 20;
     this.meat = 5;
@@ -64,6 +66,9 @@ class State {
 
     this.playersMapX   = 200;
     this.playersMapY   = 200;
+
+    this.macroCamera.centerX = this.playersWorldX * Constants.MACRO.TILE_WIDTH;
+    this.macroCamera.centerY = this.playersWorldY * Constants.MACRO.TILE_HEIGHT;
 
     this.gameLoop();
   }
@@ -117,7 +122,12 @@ class State {
 
     this.update();
 
-    this.app.stage.x = this.camera.desiredStageX;
-    this.app.stage.y = this.camera.desiredStageY;
+    if (this.mode === "Macro") {
+      this.app.stage.x = this.macroCamera.desiredStageX;
+      this.app.stage.y = this.macroCamera.desiredStageY;
+    } else if (this.mode === "Micro") {
+      this.app.stage.x = this.microCamera.desiredStageX;
+      this.app.stage.y = this.microCamera.desiredStageY;
+    }
   }
 }

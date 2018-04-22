@@ -288,6 +288,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 }
 
 PIXI.loader.add("map"   , `./assets/map.png`    );
+PIXI.loader.add("macro" , `./assets/macro.png`  );
 PIXI.loader.add("town"  , `./assets/town.json`  );
 PIXI.loader.add("grass1", `./assets/grass1.json`);
 PIXI.loader.add("grass2", `./assets/grass2.json`);

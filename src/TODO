@@ -1,6 +1,5 @@
-- camera
-  - will be screwed up when you switch modes
-  
+- the cam should start centered on the guy
+
 - resource harvesting
   - have enemies
     - have you be able to kill them
@@ -8,6 +7,9 @@
   - have resource locations (trees etc)
     - have you be able to "kill" ... "them?" Whatever. 
     - Also you could upgrade your axe or something.
+
+- toolbar is now unusable
+  - it should only scroll if your mouse is still within the canv
 
 - stuff to buy at town
 - teleporter
@@ -37,3 +39,6 @@ BUGS
 - the town you start should never border anything.
 - diagonal kinda poses some problemz. hmm
 - pathfinding doesnt know about water boats and stuff.
+
+DREAMLAND
+- a hierarchy view would be nice

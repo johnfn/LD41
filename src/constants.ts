@@ -1,5 +1,5 @@
 const Constants = {
-  SCREEN_SIZE: 600,
+  SCREEN_SIZE: 32 * 16,
 
   MACRO: {
     TILE_WIDTH : 32,
