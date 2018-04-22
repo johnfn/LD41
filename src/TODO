@@ -23,3 +23,4 @@
 BUGS
 - you shouldn't be able to start in the middle of an ocean lol
 - diagonal kinda poses some problemz. hmm
+- pathfinding doesnt know about water boats and stuff.
