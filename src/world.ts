@@ -3,6 +3,7 @@ type BuildingName = "Road"
                   | "Town"
                   | "City"
                   | "Factory"
+                  | "Lumber Yard"
                   | "Dock"
 
 type TerrainName = "snow" | "grass" | "water";
@@ -15,10 +16,11 @@ type Building = {
   vision     : number;
   cost       : { wood?: number; meat?: number }
   requirement: {
-    on    ?: TerrainName[];
-    near  ?: TerrainName[];
-    higher?: number;
-    lower ?: number;
+    on        ?: TerrainName[];
+    near      ?: TerrainName[];
+    higher    ?: number;
+    lower     ?: number;
+    resources ?: boolean;
   }
 };
 
@@ -51,13 +53,14 @@ const Buildings: Building[] = [
     },
   },
   {
-    name       : "Factory",
+    name       : "Lumber Yard",
     hotkey     : "D",
     vision     : 3,
-    description: "Makes something idk.",
-    cost       : { wood: 15, meat: 10 },
+    description: "Harvests wood.",
+    cost       : { wood: 10 },
     requirement: {
-      on: ["grass"],
+      on       : ["grass"],
+      resources: true
     },
   },
   {
@@ -82,7 +85,7 @@ type WorldCell = {
   variant: string;
   building?: {
     building: Building;
-    graphics: PIXI.Graphics;
+    graphics: BuildingGraphic;
   };
 
   xIndex: number;
@@ -293,7 +296,7 @@ class World extends PIXI.Graphics implements Updatable {
     state   : State;
   }): void {
     const { building, x, y, state } = props;
-    const graphics = new BuildingGraphic(state);
+    const graphics = new BuildingGraphic(state, building);
 
     this.map[x][y].building = {
       building,
@@ -697,12 +700,22 @@ class World extends PIXI.Graphics implements Updatable {
 
 class BuildingGraphic extends PIXI.Sprite {
   activeMode: Mode = "Macro";
+  building: Building;
   z = 20;
+  state: State;
 
-  constructor(state: State) {
+  constructor(state: State, building: Building) {
     super();
 
-    this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 0).texture;
+    this.building = building;
+
+    if (building.name === "Road") {
+      this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 0).texture;
+    } else if (building.name === "Lumber Yard") {
+      this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 1).texture;
+    }
+
+    this.state = state;
   }
 
   update(_state: State): void {

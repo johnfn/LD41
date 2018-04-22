@@ -163,6 +163,40 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         continue;
       }
 
+      if (selection.hasResources && !b.requirement.resources) {
+        let name: string = "";
+
+        if (selection.terrain === "grass") {
+          name = "forest";
+        } else if (selection.terrain === "snow") {
+          name = "mine";
+        } else if (selection.terrain === "water") {
+          name = "school of fish";
+        }
+
+        obj.canBuild = false;
+        obj.whyNot = `Can only build harvesting buildings on top of a ${ name }.`
+
+        continue;
+      }
+
+      if (b.requirement.resources && !selection.hasResources) {
+        let name: string = "";
+
+        if (selection.terrain === "grass") {
+          name = "forest";
+        } else if (selection.terrain === "snow") {
+          name = "mine";
+        } else if (selection.terrain === "water") {
+          name = "school of fish";
+        }
+
+        obj.canBuild = false;
+        obj.whyNot = `Needs to be on a ${ name }.`
+
+        continue;
+      }
+
       if (b.requirement.near) {
         for (const req of b.requirement.near) {
           if (neighborCells.filter(c => c.terrain === req).length === 0) {
@@ -240,14 +274,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   render(): JSX.Element {
     let selection: WorldCell;
 
-    if (this.gameState.mode === "Macro") {
-      selection = this.gameState.map.world.getCellAt(
-        this.gameState.mouse.relX,
-        this.gameState.mouse.relY,
-      );
-    } else {
-      selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
-    }
+    selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
 
     const description = this.getDescription(selection);
     let height = "";

@@ -1,6 +1,8 @@
 - you should probably start with at least one forest nearby, so you can build a mine on it
 - you could then upgrade that mine
-- some sort of population (plus yourself)
+- some sort of population (plus yourself) that works at the mines/whatever
+
+- attempts to walk somewhere you cant should at least be explained.
 
 - shouldnt show building context menu in microworld
 
