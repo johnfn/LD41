@@ -180,6 +180,10 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       this.currentMapRegion.parent.removeChild(this.currentMapRegion);
     }
 
+    const newlyLoadedCell = this.world.getCellAt(state.playersWorldX, state.playersWorldY);
+    const variant = newlyLoadedCell.variant;
+
+    this.tiled = new TiledTilemap(PIXI.loader.resources[variant].data, state);
     this.currentMapRegion = this.tiled.loadRegion(new Rect({
       x: 0,
       y: 0,

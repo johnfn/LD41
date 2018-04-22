@@ -91,6 +91,7 @@ type WorldCell = {
 
   terrain: TerrainName;
   special: "none" | "ice" | "water" | "start" | "end";
+  variant: string;
   building?: {
     building: Building;
     graphics: PIXI.Graphics;
@@ -334,6 +335,7 @@ class World extends PIXI.Graphics implements Updatable {
     this.normalizeTerrain();
     this.buildSpecialLocations();
     this.nameTerrain();
+    this.chooseVariants();
   }
 
   buildTerrain(): void {
@@ -348,6 +350,7 @@ class World extends PIXI.Graphics implements Updatable {
           xAbs      : i * Constants.MACRO.TILE_WIDTH,
           yAbs      : j * Constants.MACRO.TILE_HEIGHT,
           fogStatus : "unknown",
+          variant   : "",
         };
       }
     }
@@ -456,6 +459,28 @@ class World extends PIXI.Graphics implements Updatable {
         }
         
         this.map[i][j].terrain = name;
+      }
+    }
+  }
+
+  chooseVariants(): void {
+    for (let i = 0; i < World.Size; i++) {
+      for (let j = 0; j < World.Size; j++) {
+        const cell = this.map[i][j];
+
+        if (cell.special === "ice") {
+          console.log('TODO no variant');
+        } else if (cell.special === "water") {
+          console.log('TODO no variant');
+        } else if (cell.special === "start") {
+          cell.variant = Util.RandElem(Constants.MAPS.town);
+        } else if (cell.special === "end") {
+          console.log('TODO no variant');
+        } else {
+          if (cell.terrain === "grass") {
+            cell.variant = Util.RandElem(Constants.MAPS.grass);
+          }
+        }
       }
     }
   }

@@ -25,4 +25,15 @@ const Constants = {
   WATER_COLOR  : 0x0000ff,
   SNOW_COLOR   : 0xffffff,
   GRASS_COLOR  : 0x00ff00,
+
+  MAPS: {
+    grass: [ 
+      "grass1",
+      "grass2",
+      "grass3",
+    ],
+    town: [
+      "town",
+    ]
+  }
 };
