@@ -1,7 +1,7 @@
 const Constants = {
   DEBUG: {
     FOG_OF_WAR: true,
-    FAST_RESOURCES: false,
+    FAST_RESOURCES: true,
     POP_BOOST: true,
   },
 
@@ -9,9 +9,9 @@ const Constants = {
   BORDER_REGION_WIDTH: 1,
 
   HARVEST_TIME: {
-    "grass": 30,
-    "water": 60,
-    "snow" : 90,
+    "grass": 15,
+    "water": 30,
+    "snow" : 45,
   },
 
   MACRO: {

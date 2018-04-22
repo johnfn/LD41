@@ -1,4 +1,4 @@
-- add population to lumber yard
+- pops should keep working, even when you're away
 
 - +1 when you get a resource
 
@@ -13,6 +13,7 @@
 - fix hometown so you can walk there
 
 - variable meat from farms
+- imagine if the harvesteries actually said the worker count on them
 
 - this area is not safe, you must SAFEIFY IT
 - when you go over a map boundary you can be pushed into a water/wall

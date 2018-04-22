@@ -15,8 +15,6 @@ class State {
   keyboard  : Keyboard;
   microworld: MicroWorld;
 
-  harvestState: HarvestState | undefined;
-
   mode: Mode;
 
   updaters: Updatable[];
@@ -118,55 +116,66 @@ class State {
   checkHarvest(): void {
     if (this.mode === "Micro") { return; }
 
-    const currentCell = this.map.world.getCellAt(
-      this.playersWorldX,
-      this.playersWorldY,
-    );
+    const allCells = this.map.world.getCells();
 
-    if ((!currentCell.hasResources || 
-        (currentCell.hasResources && !currentCell.building)
-      ) && !(currentCell.building && currentCell.building.building.name === "Farm")
-    ) {
-      this.harvestState = undefined;
+    for (const currentCell of allCells) {
+      if (!currentCell.building) { continue; }
 
-      return;
-    }
+      if (!currentCell.building.building.harvester) { continue; }
 
-    if (currentCell.building && 
-        currentCell.building.extra.resourcesLeft !== undefined &&
-        currentCell.building.extra.resourcesLeft <= 0) {
-      this.harvestState = undefined;
+      if (currentCell.building.extra.resourcesLeft !== undefined &&
+          currentCell.building.extra.resourcesLeft <= 0) {
+        // out of resources, die
 
-      return;
-    }
+        currentCell.building.extra.harvestState = undefined;
 
-    if (this.harvestState === undefined) {
-      // we just started harvesting
+        continue;
+      }
 
-      this.harvestState = {
-        progress: 0,
-        required: Constants.HARVEST_TIME[currentCell.terrain],
-      };
-    }
+      if (currentCell.building.extra.harvestState === undefined) {
+        // we just started harvesting
 
-    if (Constants.DEBUG.FAST_RESOURCES || this.tick % 10 === 0) {
-      this.harvestState.progress++;
-    }
+        currentCell.building.extra.harvestState = {
+          progress: 0,
+          required: Constants.HARVEST_TIME[currentCell.terrain],
+        };
+      }
 
-    if (this.harvestState.progress > this.harvestState.required) {
-      this.harvestState.progress = 0;
+      let unitsOn = currentCell.building!.extra.populationOn || 0;
 
-      if (currentCell.building && currentCell.building.building.name === "Farm") {
-        this.meat++;
+      // is the player on the cell
 
-        currentCell.building.extra.resourcesLeft! -= 1;
-      } else {
-        if (currentCell.terrain === "grass") {
-          this.wood++;
-        } else if (currentCell.terrain === "snow") {
-          this.ore++;
-        } else if (currentCell.terrain === "water") {
+      if (this.playersWorldX === currentCell.xIndex &&
+          this.playersWorldY === currentCell.yIndex) {
+        unitsOn++;
+      }
+
+      // no one around to harvest : (
+      if (unitsOn === 0) {
+        continue;
+      }
+
+      if (Constants.DEBUG.FAST_RESOURCES || 
+          this.tick % Math.floor(20 / unitsOn) === 0) {
+
+        currentCell.building.extra.harvestState.progress++;
+      }
+
+      if (currentCell.building.extra.harvestState.progress > currentCell.building.extra.harvestState.required) {
+        currentCell.building.extra.harvestState.progress = 0;
+
+        if (currentCell.building && currentCell.building.building.name === "Farm") {
           this.meat++;
+
+          currentCell.building.extra.resourcesLeft! -= 1;
+        } else {
+          if (currentCell.terrain === "grass") {
+            this.wood++;
+          } else if (currentCell.terrain === "snow") {
+            this.ore++;
+          } else if (currentCell.terrain === "water") {
+            this.meat++;
+          }
         }
       }
     }

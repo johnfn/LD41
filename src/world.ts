@@ -17,6 +17,7 @@ type Building = {
   hotkey     : string;
   vision     : number;
   justAUnit ?: boolean;
+  harvester  : boolean;
   cost       : { wood?: number; meat?: number; ore?: number; }
   requirement: {
     on        ?: TerrainName[];
@@ -30,6 +31,7 @@ type Building = {
 
 type BuildingExtra = {
   resourcesLeft ?: number;
+  harvestState  ?: HarvestState | undefined;
   populationOn  ?: number;
 }
 
@@ -47,6 +49,7 @@ const Buildings: Building[] = [
     hotkey     : "X",
     vision     : 0,
     justAUnit  : true,
+    harvester  : false,
     description: "A guy who will happily harvest resources for you.",
     cost       : { meat: 5 },
     requirement: {
@@ -59,6 +62,7 @@ const Buildings: Building[] = [
     hotkey     : "A",
     vision     : 2,
     description: "All buildings must be connected by roads.",
+    harvester  : false,
     cost       : { wood: 1 },
     requirement: {
       on: ["snow", "grass"],
@@ -69,6 +73,7 @@ const Buildings: Building[] = [
     hotkey     : "S",
     vision     : 2,
     description: "Harvests food, slowly. Can harvest more when closer to water.",
+    harvester  : true,
     cost       : { wood: 5 },
     requirement: {
       on: ["snow", "grass"],
@@ -78,6 +83,7 @@ const Buildings: Building[] = [
     name       : "Village",
     hotkey     : "D",
     vision     : 4,
+    harvester  : false,
     description: "Sells basic adventuring supplies. Has an Inn to rest at.",
     cost       : { wood: 5, meat: 3 },
     requirement: {
@@ -88,6 +94,7 @@ const Buildings: Building[] = [
     name       : "Lumber Yard",
     hotkey     : "F",
     vision     : 3,
+    harvester  : true,
     description: "Harvests wood.",
     cost       : { wood: 10 },
     requirement: {
@@ -99,6 +106,7 @@ const Buildings: Building[] = [
     name       : "Dock",
     hotkey     : "G",
     vision     : 3,
+    harvester  : true,
     description: "Builds ships to sail the seas.",
     cost       : { wood: 15, meat: 10 },
     requirement: {

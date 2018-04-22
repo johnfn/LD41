@@ -278,12 +278,12 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     const be: BuildingExtra = {};
 
     if (b.building.name === "Farm") {
-      be.resourcesLeft = 10;
+      be.resourcesLeft = 10 + (Constants.DEBUG.FAST_RESOURCES ? 10000 : 0);
       be.populationOn = 0;
     }
 
     if (b.building.name === "Lumber Yard") {
-      be.resourcesLeft = 100;
+      be.resourcesLeft = 100 + (Constants.DEBUG.FAST_RESOURCES ? 10000 : 0);
       be.populationOn = 0;
     }
 
@@ -374,7 +374,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         )
       }
 
-      if (!this.gameState.harvestState) {
+      if (!cell.building.extra.harvestState) {
         return (
           <div>
             Not harvesting.
@@ -382,7 +382,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         );
       }
 
-      const { progress, required } = this.gameState.harvestState;
+      const { progress, required } = cell.building.extra.harvestState;
 
       const canAddPop = this.gameState.pop > 0;
       const canSubPop = (cell.building.extra.populationOn || 0) > 0;
