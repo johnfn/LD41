@@ -420,8 +420,8 @@ class World extends PIXI.Graphics implements Updatable {
     this.normalizeTerrain();
     this.buildSpecialLocations();
     this.nameTerrain();
-    this.chooseVariants();
     this.addResources();
+    this.chooseVariants();
   }
 
   addResources(): void {
@@ -592,7 +592,11 @@ class World extends PIXI.Graphics implements Updatable {
           console.log('TODO no variant');
         } else {
           if (cell.terrain === "grass") {
-            cell.variant = Util.RandElem(Constants.MAPS.grass);
+            if (cell.hasResources) {
+              cell.variant = Util.RandElem(Constants.MAPS.forest);
+            } else {
+              cell.variant = Util.RandElem(Constants.MAPS.grass);
+            }
           } else if (cell.terrain === "snow") {
             cell.variant = Util.RandElem(Constants.MAPS.snow);
           } else if (cell.terrain === "water") {
@@ -688,7 +692,7 @@ class World extends PIXI.Graphics implements Updatable {
           }
 
           if (cell.special === "start") {
-            this.beginFill(0x000000, alpha);
+            tex = TextureCache.GetCachedSpritesheetTexture("macro", 5, 0);
           }
         } else {
           if (cell.height < 0.4) {

@@ -53,6 +53,9 @@ const Constants = {
       "grass2",
       "grass3",
     ],
+    forest: [
+      "forest",
+    ],
     snow: [
       "snow1",
       "snow2",

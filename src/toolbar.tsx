@@ -568,11 +568,11 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 }
 
-let biome: "grass" | "snow" | "water" | "town";
-
-for (biome of ["grass", "snow", "water", "town"] as (typeof biome)[]) {
-  for (const mapname of Constants.MAPS[biome]) {
+for (const key in Constants.MAPS) {
+  for (const mapname of (Constants.MAPS as any)[key]) {
     PIXI.loader.add(mapname, `./assets/${ mapname }.json`);
+
+    console.log('load ', mapname);
   }
 }
 
