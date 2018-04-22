@@ -2,7 +2,8 @@ const Constants = {
   DEBUG: {
     FOG_OF_WAR: true,
     FAST_RESOURCES: true,
-    POP_BOOST: true,
+    MANY_RESOURCES: false,
+    POP_BOOST: false,
   },
 
   SCREEN_SIZE: 32 * 16,

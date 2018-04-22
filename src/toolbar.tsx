@@ -278,12 +278,12 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     const be: BuildingExtra = {};
 
     if (b.building.name === "Farm") {
-      be.resourcesLeft = 10 + (Constants.DEBUG.FAST_RESOURCES ? 10000 : 0);
+      be.resourcesLeft = 10 + (Constants.DEBUG.MANY_RESOURCES ? 10000 : 0);
       be.populationOn = 0;
     }
 
     if (b.building.name === "Lumber Yard") {
-      be.resourcesLeft = 100 + (Constants.DEBUG.FAST_RESOURCES ? 10000 : 0);
+      be.resourcesLeft = 100 + (Constants.DEBUG.MANY_RESOURCES ? 10000 : 0);
       be.populationOn = 0;
     }
 
@@ -362,42 +362,54 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     }
 
     if (
-      cell.building.building.name === "Lumber Yard" ||
-      cell.building.building.name === "Farm"
+      cell.building.building.harvester
     ) {
+      let harvestState: "no-resources" | "not" | "yes" = "yes";
+
       if (cell.building.extra.resourcesLeft !== undefined && 
           cell.building.extra.resourcesLeft <= 0) {
-        return (
-          <div>
-            Out of resources to harvest!
-          </div>
-        )
+        harvestState = "no-resources";
       }
 
       if (!cell.building.extra.harvestState) {
-        return (
-          <div>
-            Not harvesting.
-          </div>
-        );
+        harvestState = "not";
       }
 
-      const { progress, required } = cell.building.extra.harvestState;
+      debugger;
 
-      const canAddPop = this.gameState.pop > 0;
+      const canAddPop = this.gameState.pop > 0 && (cell.building.extra.resourcesLeft || 0) > 0;
       const canSubPop = (cell.building.extra.populationOn || 0) > 0;
 
       return (
         <div>
-          <div>
-            { cell.building.extra.populationOn! + 1 } workers harvesting.
-          </div>
+          {
+            harvestState === "yes" && cell.building.extra.harvestState &&
+              <div>
+                <div>
+                  { cell.building.extra.populationOn! + 1 } workers harvesting.
+                </div>
 
-          <ProgressBar
-            height={ 20 }
-            percentage={ progress / required }
-            text={ "Harvesting..." }
-          />
+                <ProgressBar
+                  height={ 20 }
+                  percentage={ cell.building.extra.harvestState.progress / cell.building.extra.harvestState.required }
+                  text={ "Harvesting..." }
+                />
+              </div>
+          }
+
+          {
+            harvestState === "not" && 
+              <div>
+                Not harvesting
+              </div>
+          }
+
+          {
+            harvestState === "no-resources" && 
+              <div>
+                No resources left!
+              </div>
+          }
 
           <div>
             {
