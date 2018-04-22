@@ -11,4 +11,5 @@ const Constants = {
   UNKNOWN_COLOR: 0x000000,
   WATER_COLOR  : 0x0000ff,
   SNOW_COLOR   : 0xffffff,
+  GRASS_COLOR  : 0x00ff00,
 };

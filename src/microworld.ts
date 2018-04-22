@@ -44,13 +44,13 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
   getDarkAreaRects(state: State): { 
     rect: Rect; 
-    type: "unknown" | "water" | "snow" 
+    type: "unknown" | "water" | "snow" | "grass"
   }[] {
     const mapx = state.playersWorldX;
     const mapy = state.playersWorldY;
 
     const dxdyBlockedAreas: (undefined | {
-      type: "unknown" | "water" | "snow";
+      type: "unknown" | "water" | "snow" | "grass";
       x   : number;
       y   : number;
     })[] = ([
@@ -71,6 +71,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       }
 
       const neighbor = this.world.map[nx][ny];
+      const me       = this.world.map[mapx][mapy];
 
       if (neighbor.fogStatus === "unknown") {
         return {
@@ -80,7 +81,9 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
         };
       }
 
-      if (neighbor.terrain === "water") {
+      if (neighbor.terrain === "water" && 
+          me.terrain       !== "water") {
+
         return {
           type: "water" as "water",
           x: dx,
@@ -88,7 +91,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
         };
       }
 
-      if (neighbor.terrain === "snow") {
+      if (neighbor.terrain === "snow" && 
+          me.terrain       !== "snow") {
         return {
           type: "snow" as "snow",
           x: dx,
@@ -96,12 +100,22 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
         };
       }
 
+      if (neighbor.terrain === "grass" && 
+          me.terrain       !== "grass") {
+        return {
+          type: "grass" as "grass",
+          x: dx,
+          y: dy,
+        };
+      }
+
+
       return undefined;
     });
 
     let result: {
       rect: Rect;
-      type: "unknown" | "water" | "snow"
+      type: "unknown" | "water" | "snow" | "grass"
     }[] = [];
 
     for (const obj of dxdyBlockedAreas) {
@@ -183,6 +197,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       } else if (type === "water") {
         this.darkAreas.beginFill(Constants.WATER_COLOR, 1);
       } else if (type === "snow") {
+        this.darkAreas.beginFill(Constants.SNOW_COLOR, 1);
+      } else if (type === "grass") {
         this.darkAreas.beginFill(Constants.SNOW_COLOR, 1);
       }
 
