@@ -123,9 +123,18 @@ class State {
       this.playersWorldY,
     );
 
-    if (!currentCell.hasResources || 
+    if ((!currentCell.hasResources || 
         (currentCell.hasResources && !currentCell.building)
+      ) && !(currentCell.building && currentCell.building.building.name === "Farm")
     ) {
+      this.harvestState = undefined;
+
+      return;
+    }
+
+    if (currentCell.building && 
+        currentCell.building.extra.resourcesLeft !== undefined &&
+        currentCell.building.extra.resourcesLeft <= 0) {
       this.harvestState = undefined;
 
       return;
@@ -147,12 +156,18 @@ class State {
     if (this.harvestState.progress > this.harvestState.required) {
       this.harvestState.progress = 0;
 
-      if (currentCell.terrain === "grass") {
-        this.wood++;
-      } else if (currentCell.terrain === "snow") {
-        this.ore++;
-      } else if (currentCell.terrain === "water") {
+      if (currentCell.building && currentCell.building.building.name === "Farm") {
         this.meat++;
+
+        currentCell.building.extra.resourcesLeft! -= 1;
+      } else {
+        if (currentCell.terrain === "grass") {
+          this.wood++;
+        } else if (currentCell.terrain === "snow") {
+          this.ore++;
+        } else if (currentCell.terrain === "water") {
+          this.meat++;
+        }
       }
     }
   }

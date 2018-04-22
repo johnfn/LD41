@@ -353,7 +353,19 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       return <></>;
     }
 
-    if (cell.hasResources) {
+    if (
+      cell.building.building.name === "Lumber Yard" ||
+      cell.building.building.name === "Farm"
+    ) {
+      if (cell.building.extra.resourcesLeft !== undefined && 
+          cell.building.extra.resourcesLeft <= 0) {
+        return (
+          <div>
+            Out of resources to harvest!
+          </div>
+        )
+      }
+
       if (!this.gameState.harvestState) {
         return (
           <div>
