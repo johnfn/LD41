@@ -215,10 +215,12 @@ class World extends PIXI.Graphics implements Updatable {
     graphics.x = absX;
     graphics.y = absY;
 
-    this.addChild(graphics)
-
     this.recalculateFogOfWar();
     this.renderWorld();
+
+    this.addChild(graphics)
+
+    this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0)
   }
 
   getCellAt(x: number, y: number) {

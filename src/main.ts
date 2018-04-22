@@ -31,10 +31,12 @@ class MapSelection extends PIXI.Graphics implements Updatable {
       Constants.TILE_WIDTH, 
       Constants.TILE_HEIGHT
     );
+
+    this.alpha = 0.7;
   }
 
   update(state: State): void {
-    const speed = 0.02;
+    const speed = 0.01;
     const startingState = this.selState;
 
     const [x, y] = state.map.world.relToAbs(
@@ -48,7 +50,7 @@ class MapSelection extends PIXI.Graphics implements Updatable {
     if (startingState === "up") {
       this.alpha += speed;
 
-      if (this.alpha >= 1.00) {
+      if (this.alpha >= 0.70) {
         this.selState = "down";
       }
     }
@@ -56,7 +58,7 @@ class MapSelection extends PIXI.Graphics implements Updatable {
     if (startingState === "down") {
       this.alpha -= speed;
 
-      if (this.alpha <= 0.40) {
+      if (this.alpha <= 0.20) {
         this.selState = "up";
       }
     }

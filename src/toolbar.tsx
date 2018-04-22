@@ -5,6 +5,9 @@ interface ToolbarState {
   wood: number;
   meat: number;
 
+  playerWorldX: number;
+  playerWorldY: number;
+
   hover: BuildingAndCanAfford | undefined;
 }
 
@@ -24,6 +27,9 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       selX : 0,
       selY : 0,
 
+      playerWorldX: 0,
+      playerWorldY: 0,
+
       wood : 0,
       meat : 0,
 
@@ -41,6 +47,9 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       wood: gameState.wood,
       meat: gameState.meat,
+
+      playerWorldX: gameState.playersWorldX,
+      playerWorldY: gameState.playersWorldY,
     });
 
     this.gameState = gameState;
@@ -139,8 +148,8 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
     this.gameState.map.world.addBuilding({
       building: b.building,
-      x       : this.state.selX,
-      y       : this.state.selY,
+      x       : this.state.playerWorldX,
+      y       : this.state.playerWorldY,
       state   : this.gameState,
     });
   }
@@ -178,7 +187,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 
   render(): JSX.Element {
-    const selection = this.gameState.map.world.getCellAt(this.state.selX, this.state.selY);
+    const selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
 
     const description = this.getDescription(selection);
     let height = "";
