@@ -1,4 +1,11 @@
 - resource harvesting
+  - have enemies
+    - have you be able to kill them
+    - have them drop stuff
+  - have resource locations (trees etc)
+    - have you be able to "kill" ... "them?" Whatever. 
+    - Also you could upgrade your axe or something.
+
 - stuff to buy at town
 - teleporter
 - unattainable areas + treasure
@@ -24,6 +31,6 @@
 - probably add mouse controls
 
 BUGS
-- you shouldn't be able to start in the middle of an ocean lol
+- the town you start should never border anything.
 - diagonal kinda poses some problemz. hmm
 - pathfinding doesnt know about water boats and stuff.

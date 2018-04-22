@@ -479,6 +479,10 @@ class World extends PIXI.Graphics implements Updatable {
         } else {
           if (cell.terrain === "grass") {
             cell.variant = Util.RandElem(Constants.MAPS.grass);
+          } else if (cell.terrain === "snow") {
+            cell.variant = Util.RandElem(Constants.MAPS.snow);
+          } else if (cell.terrain === "water") {
+            cell.variant = Util.RandElem(Constants.MAPS.water);
           }
         }
       }

@@ -1,13 +1,15 @@
 const Constants = {
+  SCREEN_SIZE: 600,
+
   MACRO: {
-    TILE_WIDTH : 16,
-    TILE_HEIGHT: 16,
+    TILE_WIDTH : 32,
+    TILE_HEIGHT: 32,
 
     MAP_WIDTH_IN_TILES: 33,
     MAP_HEIGHT_IN_TILES: 33,
 
-    MAP_WIDTH  : 16 * 33,
-    MAP_HEIGHT : 16 * 33,
+    MAP_WIDTH  : 32 * 33,
+    MAP_HEIGHT : 32 * 33,
   },
 
   MICRO: {
@@ -31,6 +33,12 @@ const Constants = {
       "grass1",
       "grass2",
       "grass3",
+    ],
+    snow: [
+      "grass1"
+    ],
+    water: [
+      "grass1"
     ],
     town: [
       "town",

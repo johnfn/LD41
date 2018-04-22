@@ -18,6 +18,8 @@ class State {
 
   mouse !: MouseGraphic;
 
+  camera: Camera;
+
   wood : number;
   meat : number;
 
@@ -34,6 +36,7 @@ class State {
     this.mode = "Macro";
     this.updaters = [];
     this.keyboard = new Keyboard(this);
+    this.camera = new Camera();
 
     this.wood = 20;
     this.meat = 5;
@@ -41,8 +44,8 @@ class State {
     this.notifications = [];
 
     const app = new PIXI.Application(
-      Constants.MACRO.MAP_WIDTH, 
-      Constants.MACRO.MAP_HEIGHT, { 
+      Constants.SCREEN_SIZE, 
+      Constants.SCREEN_SIZE, { 
         antialias: true,
         view: document.getElementById("main")! as HTMLCanvasElement,
       }
@@ -113,5 +116,10 @@ class State {
     }
 
     this.update();
+
+    this.camera.setX(this.camera.x + 1);
+
+    this.app.stage.x = this.camera.desiredStageX;
+    this.app.stage.y = this.camera.desiredStageY;
   }
 }
