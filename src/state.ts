@@ -11,6 +11,8 @@ class State {
 
   map   : GameMap;
 
+  mouse !: MouseGraphic;
+
   wood : number;
   meat : number;
 

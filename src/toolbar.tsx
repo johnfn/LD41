@@ -187,7 +187,16 @@ class Toolbar extends React.Component<{}, ToolbarState> {
   }
 
   render(): JSX.Element {
-    const selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
+    let selection: WorldCell;
+
+    if (this.gameState.mode === "Macro") {
+      selection = this.gameState.map.world.getCellAt(
+        this.gameState.mouse.relX,
+        this.gameState.mouse.relY,
+      );
+    } else {
+      selection = this.gameState.map.world.getCellAt(this.state.playerWorldX, this.state.playerWorldY);
+    }
 
     const description = this.getDescription(selection);
     let height = "";

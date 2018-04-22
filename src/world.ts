@@ -105,6 +105,52 @@ type WorldCell = {
   fogStatus: "unknown" | "seen" | "walked";
 }
 
+class MouseGraphic extends PIXI.Graphics implements Updatable {
+  z = 100;
+  activeMode: Mode = "Macro";
+
+  absX = 0;
+  absY = 0;
+  relX = 0;
+  relY = 0;
+
+  constructor(state: State) {
+    super();
+
+    this.lineStyle(2, 0xffffff);
+
+    this.moveTo(0, 0)
+    this.lineTo(0                   , Constants.TILE_WIDTH);
+    this.lineTo(Constants.TILE_WIDTH, Constants.TILE_WIDTH);
+    this.lineTo(Constants.TILE_WIDTH, 0);
+    this.lineTo(0, 0);
+
+    state.mouse = this;
+  }
+
+  move(ev: any, world: World): void {
+    const pt: PIXI.Point = ev.data.getLocalPosition(world);
+
+    this.relX = Math.floor(pt.x / Constants.TILE_WIDTH);
+    this.relY = Math.floor(pt.y / Constants.TILE_WIDTH);
+
+    if (this.relX < 0) this.relX = 0;
+    if (this.relY < 0) this.relY = 0;
+    if (this.relX >= Constants.MAP_TILE_WIDTH)  this.relX = Constants.MAP_TILE_WIDTH - 1;
+    if (this.relY >= Constants.MAP_TILE_HEIGHT) this.relY = Constants.MAP_TILE_HEIGHT - 1;
+
+    this.x = this.relX * Constants.TILE_WIDTH;
+    this.y = this.relY * Constants.TILE_WIDTH;
+
+    this.absX = pt.x;
+    this.absY = pt.y;
+  }
+
+  update(_state: State) {
+
+  }
+}
+
 class World extends PIXI.Graphics implements Updatable {
   static Size = 33;
   z = 0;
@@ -113,6 +159,7 @@ class World extends PIXI.Graphics implements Updatable {
 
   app: PIXI.Application;
   map: WorldCell[][];
+  mouseGraphic: MouseGraphic;
 
   constructor(state: State) {
     super();
@@ -129,6 +176,22 @@ class World extends PIXI.Graphics implements Updatable {
     this.buildWorld();
     this.recalculateFogOfWar();
     this.renderWorld();
+
+    this.interactive = true;
+    this.buttonMode  = false;
+
+    this.addChild(this.mouseGraphic = new MouseGraphic(state));
+
+    this.on('pointerdown', (ev: any) => this.click(ev));
+    this.on('mousemove', (ev: any) => this.mousemove(ev));
+  }
+
+  click(ev: any): void {
+    const pt: PIXI.Point = ev.data.getLocalPosition(this);
+  }
+
+  mousemove(ev: any): void {
+    this.mouseGraphic.move(ev, this);
   }
 
   static InBounds(x: number, y: number): boolean {
