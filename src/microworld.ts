@@ -26,9 +26,11 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
     this.addChild(this.player = new MicroPlayer(state, this));
     this.addChild(this.darkAreas = new DarkAreas());
+
+    this.darkAreas.alpha = 0.4;
   }
 
-  isCollision(state: State, x: number, y: number): boolean {
+  isCollisionHelper(state: State, x: number, y: number): boolean {
     const darkAreas = this.getDarkAreaRects(state);
 
     for (const { rect, type } of darkAreas) {
@@ -39,7 +41,28 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       }
     }
 
+    // get tile
+
+    const tile = this.tiled.getTileAt(x, y);
+
+    if (tile) {
+      const { tile: { spritesheetx: sx } } = tile;
+
+      if (sx === 1) {
+        return true;
+      }
+    }
+
     return false;
+  }
+
+  isCollision(state: State, x: number, y: number, size: number): boolean {
+    return (
+      this.isCollisionHelper(state, x       , y)        || 
+      this.isCollisionHelper(state, x + size, y)        || 
+      this.isCollisionHelper(state, x       , y + size) || 
+      this.isCollisionHelper(state, x + size, y + size)
+    );
   }
 
   getDarkAreaRects(state: State): { 
@@ -241,6 +264,7 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
   microworld: MicroWorld;
   activeMode: Mode = "Micro";
   z                = 5;
+  size             = 32;
 
   constructor(state: State, mw: MicroWorld) {
     super();
@@ -250,7 +274,7 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
     this.microworld = mw;
 
     this.beginFill(0x0000ff, 1);
-    this.drawRect(0, 0, Constants.MICRO.TILE_WIDTH, Constants.MICRO.TILE_HEIGHT);
+    this.drawRect(0, 0, this.size, this.size);
   }
 
   update(state: State): void {
@@ -262,11 +286,11 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
     if (state.keyboard.down.W) newy -= this.speed;
     if (state.keyboard.down.S) newy += this.speed;
 
-    if (!this.microworld.isCollision(state, newx, state.playersMapY)) {
+    if (!this.microworld.isCollision(state, newx, state.playersMapY, this.size - 5)) {
       state.playersMapX = newx;
     }
 
-    if (!this.microworld.isCollision(state, state.playersMapX, newy)) {
+    if (!this.microworld.isCollision(state, state.playersMapX, newy, this.size - 5)) {
       state.playersMapY = newy;
     }
 

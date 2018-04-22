@@ -283,8 +283,14 @@ class TiledTilemap {
     const tileWidth  = this.data.tilewidth;
     const tileHeight = this.data.tileheight;
 
-    const tile = this.tiles[Math.floor(x / tileWidth)][Math.floor(y / tileHeight)];
+    if (x < 0 || 
+        y < 0 || 
+        Math.floor(x / tileWidth ) >= this.tiles.length ||
+        Math.floor(y / tileHeight) >= this.tiles[0].length
+      ) {
+      return undefined;
+    }
 
-    return tile;
+    return this.tiles[Math.floor(x / tileWidth)][Math.floor(y / tileHeight)];
   }
 }
