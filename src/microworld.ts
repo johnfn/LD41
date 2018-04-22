@@ -31,8 +31,10 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
   isCollision(state: State, x: number, y: number): boolean {
     const darkAreas = this.getDarkAreaRects(state);
 
-    for (const da of darkAreas) {
-      if (da.contains({ x, y })) {
+    for (const { rect, type } of darkAreas) {
+      if ((type === "unknown" || type === "water") && 
+          rect.contains({ x, y })) {
+
         return true;
       }
     }
@@ -40,70 +42,119 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     return false;
   }
 
-  getDarkAreaRects(state: State): Rect[] {
+  getDarkAreaRects(state: State): { 
+    rect: Rect; 
+    type: "unknown" | "water" | "snow" 
+  }[] {
     const mapx = state.playersWorldX;
     const mapy = state.playersWorldY;
 
-    const dxdyBlockedAreas: [number, number][] = ([
+    const dxdyBlockedAreas: (undefined | {
+      type: "unknown" | "water" | "snow";
+      x   : number;
+      y   : number;
+    })[] = ([
       [ 1,  0],
       [-1,  0],
       [ 0,  1],
       [ 0, -1],
-    ] as [number, number][]).filter(([dx, dy]) => {
+    ] as [number, number][]).map(([dx, dy]) => {
       const nx = mapx + dx;
       const ny = mapy + dy;
 
       if (!World.InBounds(nx, ny)) {
-        return true;
+        return {
+          type: "unknown" as "unknown",
+          x: dx,
+          y: dy,
+        };
       }
 
       const neighbor = this.world.map[nx][ny];
 
       if (neighbor.fogStatus === "unknown") {
-        return true;
+        return {
+          type: "unknown" as "unknown",
+          x: dx,
+          y: dy,
+        };
       }
 
-      return false;
+      if (neighbor.terrain === "water") {
+        return {
+          type: "water" as "water",
+          x: dx,
+          y: dy,
+        };
+      }
+
+      if (neighbor.terrain === "snow") {
+        return {
+          type: "snow" as "snow",
+          x: dx,
+          y: dy,
+        };
+      }
+
+      return undefined;
     });
 
-    let result: Rect[] = [];
+    let result: {
+      rect: Rect;
+      type: "unknown" | "water" | "snow"
+    }[] = [];
 
-    for (const [x, y] of dxdyBlockedAreas) {
+    for (const obj of dxdyBlockedAreas) {
+      if (obj === undefined) { continue; }
+
+      const { x, y, type } = obj;
 
       if (x === 1) {
-        result.push(new Rect({
-          x: (Constants.MAP_WIDTH_IN_TILES - 3) * Constants.TILE_WIDTH,
-          y: 0,
-          w: 3 * Constants.TILE_WIDTH,
-          h: Constants.MAP_HEIGHT,
-        }));
+        result.push({
+          rect: new Rect({
+            x: (Constants.MAP_WIDTH_IN_TILES - 3) * Constants.TILE_WIDTH,
+            y: 0,
+            w: 3 * Constants.TILE_WIDTH,
+            h: Constants.MAP_HEIGHT,
+          }),
+          type,
+        });
       }
 
       if (x === -1) {
-        result.push(new Rect({
-          x: 0,
-          y: 0,
-          w: 3 * Constants.TILE_WIDTH,
-          h: Constants.MAP_HEIGHT,
-        }))
+        result.push({
+          rect: new Rect({
+            x: 0,
+            y: 0,
+            w: 3 * Constants.TILE_WIDTH,
+            h: Constants.MAP_HEIGHT,
+          }),
+          type,
+        });
       }
 
       if (y === 1) {
-        result.push(new Rect({
-          x: 0,
-          y: (Constants.MAP_WIDTH_IN_TILES - 3) * Constants.TILE_WIDTH,
-          w: Constants.MAP_WIDTH,
-          h: 3 * Constants.TILE_WIDTH,
-        }));
+        result.push({
+          rect: new Rect({
+            x: 0,
+            y: (Constants.MAP_WIDTH_IN_TILES - 3) * Constants.TILE_WIDTH,
+            w: Constants.MAP_WIDTH,
+            h: 3 * Constants.TILE_WIDTH,
+          }),
+          type,
+        });
       }
 
       if (y === -1) {
-        result.push(new Rect({
-          x: 0,
-          y: 0,
-          w: Constants.MAP_WIDTH,
-          h: 3 * Constants.TILE_WIDTH,
-        }));
+        result.push({
+          rect: new Rect({
+            x: 0,
+            y: 0,
+            w: Constants.MAP_WIDTH,
+            h: 3 * Constants.TILE_WIDTH,
+          }),
+          type,
+        });
       }
     }
 
@@ -125,9 +176,16 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.addChild(this.currentMapRegion);
 
     this.darkAreas.clear();
-    this.darkAreas.beginFill(0x000000, 1);
 
-    for (const rect of this.getDarkAreaRects(state)) {
+    for (const { rect, type } of this.getDarkAreaRects(state)) {
+      if (type === "unknown") {
+        this.darkAreas.beginFill(Constants.UNKNOWN_COLOR, 1);
+      } else if (type === "water") {
+        this.darkAreas.beginFill(Constants.WATER_COLOR, 1);
+      } else if (type === "snow") {
+        this.darkAreas.beginFill(Constants.SNOW_COLOR, 1);
+      }
+
       this.darkAreas.drawRect(rect.x, rect.y, rect.w, rect.h);
     }
 

@@ -7,4 +7,8 @@ const Constants = {
 
   MAP_WIDTH  : 16 * 33,
   MAP_HEIGHT : 16 * 33,
+
+  UNKNOWN_COLOR: 0x000000,
+  WATER_COLOR  : 0x0000ff,
+  SNOW_COLOR   : 0xffffff,
 };
