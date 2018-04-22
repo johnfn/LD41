@@ -24,10 +24,11 @@ type Building = {
   }
 };
 
-const CanAfford = (b: Building, state: { wood: number, meat: number }): boolean => {
+const CanAfford = (b: { cost: { wood?: number, meat?: number, ore?: number } }, state: { wood: number, meat: number, ore: number }): boolean => {
   return (
     (b.cost.wood ? b.cost.wood <= state.wood : true) &&
-    (b.cost.meat ? b.cost.meat <= state.meat : true)
+    (b.cost.meat ? b.cost.meat <= state.meat : true) &&
+    (b.cost.ore  ? b.cost.ore  <= state.ore  : true)
   );
 }
 

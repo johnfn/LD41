@@ -31,6 +31,7 @@ class State {
   wood : number;
   meat : number;
   ore  : number;
+  pop  : number;
 
   playersWorldX: number;
   playersWorldY: number;
@@ -51,6 +52,7 @@ class State {
     this.wood = 20;
     this.meat = 5;
     this.ore  = 0;
+    this.pop  = 0;
 
     this.notifications = [];
 
@@ -138,7 +140,7 @@ class State {
       };
     }
 
-    if (this.tick % 10 === 0) {
+    if (Constants.DEBUG.FAST_RESOURCES || this.tick % 10 === 0) {
       this.harvestState.progress++;
     }
 

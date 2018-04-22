@@ -5,6 +5,7 @@ interface ToolbarState {
   wood: number;
   meat: number;
   ore : number;
+  pop : number;
 
   playerWorldX: number;
   playerWorldY: number;
@@ -16,6 +17,15 @@ type BuildingAndCanAfford = {
   building: Building;
   canBuild: boolean;
   whyNot  : string;
+}
+
+type Buyable = {
+  name: string;
+  cost: { 
+    meat?: number;
+    wood?: number;
+    ore ?: number;
+  };
 }
 
 class Toolbar extends React.Component<{}, ToolbarState> {
@@ -34,6 +44,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       wood : 0,
       meat : 0,
       ore  : 0,
+      pop  : 0,
 
       hover: undefined,
     };
@@ -67,6 +78,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       wood: gameState.wood,
       meat: gameState.meat,
+      pop : gameState.pop,
 
       playerWorldX: gameState.playersWorldX,
       playerWorldY: gameState.playersWorldY,
@@ -273,29 +285,69 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     return "";
   }
 
-  renderBuildingDescription(cell: WorldCell): JSX.Element {
-    if (!cell.building) {
-      return <></>;
-    }
+  buyPop(): void {
 
-    if (!this.gameState.harvestState) {
+  }
+
+  renderBuyAndHarvest(cell: WorldCell): JSX.Element {
+    if (cell.special === "start") {
+      const villageThings: Buyable[] = [
+        {
+          name: "+1 Population",
+          cost: { meat: 5 }
+        }
+      ];
+
       return (
         <div>
-          Not harvesting.
+          <div>Buy</div>
+
+          {
+            villageThings.map(({ name, cost }) => {
+              return (
+                <a 
+                  style={{ 
+                    color: CanAfford({ cost }, this.gameState) ? "white" : "gray"
+                  }} 
+                  href="javascript:;"
+                  onClick={ () => this.buyPop() }
+                >{ name }</a>
+              )
+            })
+          }
+
         </div>
       );
     }
 
-    const { progress, required } = this.gameState.harvestState;
+    if (!cell.building) {
+      return <></>;
+    }
+
+    if (cell.hasResources) {
+      if (!this.gameState.harvestState) {
+        return (
+          <div>
+            Not harvesting.
+          </div>
+        );
+      }
+
+      const { progress, required } = this.gameState.harvestState;
+
+      return (
+        <div>
+          <ProgressBar
+            height={ 20 }
+            percentage={ progress / required }
+            text={ "Harvesting..." }
+          />
+        </div>
+      );
+    }
 
     return (
-      <div>
-        <ProgressBar
-          height={ 20 }
-          percentage={ progress / required }
-          text={ "Harvesting..." }
-        />
-      </div>
+      <></>
     );
   }
 
@@ -390,7 +442,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         paddingLeft: "20px",
       }}>
         <div>
-          Meat: { this.state.meat } | Wood: { this.state.wood } | Ore: { this.state.ore }
+          Meat: { this.state.meat } | Wood: { this.state.wood } | Ore: { this.state.ore } | Pop: { this.state.pop }
         </div>
 
         <div>
@@ -407,8 +459,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         }
 
         {
-          selection.building && selection.hasResources &&
-            this.renderBuildingDescription(selection)
+          this.renderBuyAndHarvest(selection)
         }
       </div>
     )
@@ -417,6 +468,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
 PIXI.loader.add("map"   , `./assets/map.png`    );
 PIXI.loader.add("macro" , `./assets/macro.png`  );
+PIXI.loader.add("micro" , `./assets/micro.png`  );
 PIXI.loader.add("town"  , `./assets/town.json`  );
 PIXI.loader.add("grass1", `./assets/grass1.json`);
 PIXI.loader.add("grass2", `./assets/grass2.json`);
