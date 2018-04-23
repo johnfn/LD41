@@ -25,14 +25,14 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
   }
 
   update(state: State): void {
-    if (state.tick % 100 === 0) {
+    if (state.tick % Constants.ENEMY_SPEED === 0) {
       const validNextPos = ([
         [this.worldX +  0, this.worldY +  1],
         [this.worldX +  0, this.worldY + -1],
         [this.worldX +  1, this.worldY +  0],
         [this.worldX + -1, this.worldY +  0]
       ] as [number, number][]).filter(([x, y]) => {
-        if (!World.InBounds(x, y)) {
+        if (!World.InBoundsRel(x, y)) {
           return false;
         }
 
@@ -59,30 +59,18 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
 }
 
 class MicroEnemy extends PIXI.Sprite implements Updatable {
-  activeMode: Mode = "Macro";
-  z = 20;
+  activeMode: Mode = "Micro";
+  z = 100;
 
-  worldX: number;
-  worldY: number;
-
-  type  : "normal";
-
-  constructor(state: State, worldX: number, worldY: number) {
+  constructor(state: State) {
     super();
 
     state.add(this);
 
-    this.worldX = worldX;
-    this.worldY = worldY;
-
-    this.type = "normal";
-
     this.texture = TextureCache.GetCachedSpritesheetTexture(
-      "macro", 6, 0).texture;
+      "micro", 3, 0).texture;
   }
 
   update(_state: State): void {
-    this.x = this.worldX * Constants.MACRO.TILE_WIDTH;
-    this.y = this.worldY * Constants.MACRO.TILE_HEIGHT;
   }
 }

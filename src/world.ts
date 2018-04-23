@@ -272,7 +272,7 @@ class World extends PIXI.Graphics implements Updatable {
     this.renderWorld();
   }
 
-  static InBounds(x: number, y: number): boolean {
+  static InBoundsRel(x: number, y: number): boolean {
     return (
       x >= 0         &&
       y >= 0         &&
@@ -280,6 +280,16 @@ class World extends PIXI.Graphics implements Updatable {
       y < World.Size
     );
   }
+
+  static InBoundsAbs(x: number, y: number): boolean {
+    return (
+      x >= 0         &&
+      y >= 0         &&
+      x < Constants.MICRO.MAP_WIDTH &&
+      y < Constants.MICRO.MAP_HEIGHT
+    );
+  }
+
 
   update(_state: State) {
 
@@ -380,7 +390,7 @@ class World extends PIXI.Graphics implements Updatable {
         const nx = x + dx;
         const ny = y + dy;
 
-        if (World.InBounds(nx, ny) && 
+        if (World.InBoundsRel(nx, ny) && 
             this.map[nx][ny].building && 
             this.map[nx][ny].building!.building.name === "Road"
           ) {
@@ -403,7 +413,7 @@ class World extends PIXI.Graphics implements Updatable {
       const nx = x + dx;
       const ny = y + dy;
 
-      if (!World.InBounds(nx, ny)) {
+      if (!World.InBoundsRel(nx, ny)) {
         roadVariant += "0"
 
         continue;
@@ -509,8 +519,6 @@ class World extends PIXI.Graphics implements Updatable {
           { xIndex: wx, yIndex: wy },
           start
         );
-
-        console.log(distToStart);
 
         if (
           Constants.DEBUG.JUST_ONE_ENEMY

@@ -14,6 +14,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
   activeMode      : Mode = "Micro";
   z               = 0;
   darkAreas       : PIXI.Graphics;
+  microEnemies    : MicroEnemy[];
   currentMapRegion: PIXI.Sprite | undefined;
 
   constructor(state: State) {
@@ -21,6 +22,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
     state.add(this);
 
+    this.microEnemies = [];
     this.tiled = new TiledTilemap(PIXI.loader.resources["town"].data, state);
     this.world = state.map.world;
 
@@ -85,7 +87,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       const nx = mapx + dx;
       const ny = mapy + dy;
 
-      if (!World.InBounds(nx, ny)) {
+      if (!World.InBoundsRel(nx, ny)) {
         return {
           type: "unknown" as "unknown",
           x: dx,
@@ -205,6 +207,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       this.currentMapRegion.parent.removeChild(this.currentMapRegion);
     }
 
+    // Load new tilemap
+
     const newlyLoadedCell = this.world.getCellAt(state.playersWorldX, state.playersWorldY);
     const variant = newlyLoadedCell.variant;
 
@@ -217,6 +221,8 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     }));
 
     this.addChild(this.currentMapRegion);
+
+    // add border regions
 
     this.darkAreas.clear();
 
@@ -234,13 +240,63 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       this.darkAreas.drawRect(rect.x, rect.y, rect.w, rect.h);
     }
 
+    this.checkShouldAddEnemies(state);
+
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0);
+  }
+
+  chooseRandomValidMapPos(state: State): { x: number, y: number } {
+    let valid = true;
+    let x = 0;
+    let y = 0;
+
+    do {
+      valid = true;
+
+      x = Math.floor(Math.random() * Constants.MICRO.MAP_WIDTH);
+      y = Math.floor(Math.random() * Constants.MICRO.MAP_HEIGHT);
+
+      if (Util.ManhattanDistance(
+        { xIndex: x                 , yIndex: y },
+        { xIndex: state.playersMapX , yIndex: state.playersMapY }
+      ) < 100) { valid = false; continue; }
+
+      if (this.isCollision(state, x, y, 32)) {
+        valid = false; continue;
+      }
+
+    } while (!valid);
+
+    return { x, y };
+  }
+
+  // TODO clean up any old enemy batch if there is one
+
+  checkShouldAddEnemies(state: State): void {
+    const enemy = this.world.enemies.filter(e => 
+      e.worldX === state.playersWorldX &&
+      e.worldY === state.playersWorldY
+    );
+
+    if (enemy.length === 0) {
+      return;
+    }
+
+    for (let i = 0; i < 5; i++) {
+      const e = new MicroEnemy(state);
+      const { x, y } = this.chooseRandomValidMapPos(state);
+
+      e.x = x;
+      e.y = y;
+
+      this.addChild(e);
+    }
   }
 
   update(state: State): void {
     if (
       this.currentMapRegion &&
-      !World.InBounds(state.playersMapX, state.playersMapY)
+      !World.InBoundsAbs(state.playersMapX, state.playersMapY)
     ) {
       // Just walked to a new region.
 

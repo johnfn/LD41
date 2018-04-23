@@ -9,6 +9,7 @@ const Constants = {
   },
 
   NUM_START_ENEMIES: 20,
+  ENEMY_SPEED: 500,
 
   SCREEN_SIZE: 32 * 16,
   BORDER_REGION_WIDTH: 1,

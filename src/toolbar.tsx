@@ -105,7 +105,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       const nx = this.state.playerWorldX + x;
       const ny = this.state.playerWorldY + y;
 
-      if (!World.InBounds(nx, ny)) continue;
+      if (!World.InBoundsRel(nx, ny)) continue;
 
       neighborCells.push(
         this.gameState.map.world.getCellAt(nx, ny)

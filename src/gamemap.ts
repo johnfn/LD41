@@ -91,7 +91,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
           y: dy + current.y,
         };
 
-        if (!World.InBounds(next.x, next.y)) { continue; }
+        if (!World.InBoundsRel(next.x, next.y)) { continue; }
         if (parent[hash(next)]) { continue; }
         if (this.world.map[next.x][next.y].terrain   === "water") { continue; }
         if (this.world.map[next.x][next.y].fogStatus === "unknown") { continue; }

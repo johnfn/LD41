@@ -7,6 +7,8 @@
   - enemy destroying buildings and vague macro AI
   - ways to heal
   - walls
+  - shouldn't enemy groups have sizes
+  - should move slowly, but deliberately
 - win condition
 - you have a graphic now
 
@@ -68,6 +70,8 @@
 - probably add mouse controls
 
 BUGS
+- you can get stuck when zooming
+  - chooseRandomValidMapPos should help.
 - the town you start should never border anything.
 - when you click somewhere, put the character in the center
 - diagonal kinda poses some problemz. hmm
