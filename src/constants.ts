@@ -7,6 +7,8 @@ const Constants = {
     POP_BOOST        : false,
   },
 
+  NUM_START_ENEMIES: 20,
+
   SCREEN_SIZE: 32 * 16,
   BORDER_REGION_WIDTH: 1,
 
@@ -39,7 +41,7 @@ const Constants = {
   },
 
   WOOD_RESOURCE_COUNT: 50,
-  ORE_RESOURCE_COUNT : 10,
+  GOLD_RESOURCE_COUNT: 10,
   FISH_RESOURCE_COUNT: 20,
 
   UNKNOWN_COLOR: 0x000000,

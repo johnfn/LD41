@@ -28,7 +28,7 @@ class State {
 
   wood : number;
   meat : number;
-  ore  : number;
+  gold : number;
   pop  : number;
 
   playersWorldX: number;
@@ -49,7 +49,7 @@ class State {
 
     this.wood = 20;
     this.meat = 5;
-    this.ore  = 0;
+    this.gold = 0;
     this.pop  = Constants.DEBUG.POP_BOOST ? 5 : 0;
 
     this.notifications = [];
@@ -185,7 +185,7 @@ class State {
             this.wood++;
             showText = true;
           } else if (currentCell.terrain === "snow") {
-            this.ore++;
+            this.gold++;
             showText = true;
           } else if (currentCell.terrain === "water") {
             this.meat++;

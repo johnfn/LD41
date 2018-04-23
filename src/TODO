@@ -1,5 +1,18 @@
+- two inaccessible areas - snow and water
+  - start out not able to access
+  - gain access somehow
+- enemies?
+  - stuff to buy at town
+  - like better weapons.
+  - enemy destroying buildings and vague macro AI
+  - ways to heal
+  - walls
+- win condition
+- you have a graphic now
+
+
+
 - lumber yard etc should indicate population
-  - (5/5)
   - also resources left
 
 - could upgrade number of workers on a thing.
@@ -14,15 +27,12 @@
 - fix hometown so you can walk there
 
 - variable meat from farms
-- imagine if the harvesteries actually said the worker count on them
 
 - this area is not safe, you must SAFEIFY IT
 - when you go over a map boundary you can be pushed into a water/wall
 
 - there should be a tiny sprite where you are...
 
-- some sort of population (plus yourself) that works at the mines/whatever
-- little +1 when you get a wood or something
 - you should probably start with at least one forest nearby, so you can build a mine on it
 - you could then UPGRADE that mine for faster production
 
@@ -30,23 +40,8 @@
 
 - should be some indication that you better get a lumber yard quick or you LOSE THE GAME.
 
-- upgrading could also expand population count
-- shoot deer for meat?
-- which you can use to get more population
-- micro collisions are bad
-
 - attempts to walk somewhere you cant should at least be explained.
 
-- shouldnt show building context menu in microworld
-
-- resource harvesting
-  - have enemies
-    - have you be able to kill them
-    - have them drop stuff
-  - have resource locations (trees etc)
-    - have you be able to "kill" ... "them?" Whatever. 
-    - Also you could upgrade your axe or something.
-- stuff to buy at town
 
 - "i cant traverse this it's too treacherous!" mountains
   - but then you can buy a thing

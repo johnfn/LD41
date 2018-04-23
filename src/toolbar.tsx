@@ -24,7 +24,7 @@ type Buyable = {
   cost: { 
     meat?: number;
     wood?: number;
-    ore ?: number;
+    gold?: number;
   };
 }
 
@@ -43,7 +43,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       wood : 0,
       meat : 0,
-      ore  : 0,
+      gold : 0,
       pop  : 0,
 
       hover: undefined,
@@ -502,7 +502,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
                   } {
                     this.state.hover.building.cost.meat ? `${ this.state.hover.building.cost.meat } food` : " "
                   } {
-                    this.state.hover.building.cost.ore  ? `${ this.state.hover.building.cost.ore } ore`   : " "
+                    this.state.hover.building.cost.gold ? `${ this.state.hover.building.cost.gold } gold`  : " "
                   }
 
                 </div>
@@ -559,7 +559,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         paddingLeft: "20px",
       }}>
         <div>
-          Meat: { this.state.meat } | Wood: { this.state.wood } | Ore: { this.state.ore } | Pop: { this.state.pop }
+          Meat: { this.state.meat } | Wood: { this.state.wood } | Gold: { this.state.gold } | Pop: { this.state.pop }
         </div>
 
         <div>

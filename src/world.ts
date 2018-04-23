@@ -20,7 +20,7 @@ type Building = {
   resourceName?: string;
 
   harvester    : boolean;
-  cost         : { wood?: number; meat?: number; ore?: number; }
+  cost         : { wood?: number; meat?: number; gold?: number; }
   requirement  : {
     on        ?: TerrainName[];
     inBuilding?: BuildingName;
@@ -37,11 +37,11 @@ type BuildingExtra = {
   populationOn  ?: number;
 }
 
-const CanAfford = (b: { cost: { wood?: number, meat?: number, ore?: number } }, state: { wood: number, meat: number, ore: number }): boolean => {
+const CanAfford = (b: { cost: { wood?: number, meat?: number, gold?: number } }, state: { wood: number, meat: number, gold: number }): boolean => {
   return (
     (b.cost.wood ? b.cost.wood <= state.wood : true) &&
     (b.cost.meat ? b.cost.meat <= state.meat : true) &&
-    (b.cost.ore  ? b.cost.ore  <= state.ore  : true)
+    (b.cost.gold ? b.cost.gold <= state.gold : true)
   );
 }
 
@@ -245,8 +245,9 @@ class World extends PIXI.Graphics implements Updatable {
 
   activeMode: Mode = "Macro";
 
-  app: PIXI.Application;
-  map: WorldCell[][];
+  app    : PIXI.Application;
+  map    : WorldCell[][];
+  enemies: MacroEnemy[];
   tilemap: PIXI.Sprite;
   state: State;
 
@@ -254,6 +255,7 @@ class World extends PIXI.Graphics implements Updatable {
     super();
 
     this.state = state;
+    this.enemies = [];
 
     state.add(this)
 
@@ -482,6 +484,45 @@ class World extends PIXI.Graphics implements Updatable {
     this.nameTerrain();
     this.addResources();
     this.chooseVariants();
+    this.addEnemies();
+  }
+
+  addEnemies(): void {
+    const start = this.getStartCell();
+
+    for (let i = 0; i < Constants.NUM_START_ENEMIES; i++) {
+      let wx = 0, wy = 0;
+      let valid = true;
+
+      do {
+        valid = true;
+
+        wx = Math.floor(Math.random() * World.Size);
+        wy = Math.floor(Math.random() * World.Size);
+
+        const cell = this.map[wx][wy];
+
+        if (cell.terrain === "water") { valid = false; continue; }
+
+        const distToStart = Util.ManhattanDistance(
+          { xIndex: wx, yIndex: wy },
+          start
+        );
+
+        console.log(distToStart);
+
+        if (distToStart < 15) { valid = false; continue; }
+      } while (!valid);
+
+      const newEnemy = new MacroEnemy(
+        this.state,
+        wx,
+        wy
+      );
+
+      this.enemies.push(newEnemy);
+      this.addChild(newEnemy);
+    }
   }
 
   addResources(): void {
@@ -496,7 +537,7 @@ class World extends PIXI.Graphics implements Updatable {
       next.hasResources = true;
     }
 
-    for (let i = 0; i < Constants.ORE_RESOURCE_COUNT; i++) {
+    for (let i = 0; i < Constants.GOLD_RESOURCE_COUNT; i++) {
       const next = Util.RandElem(snow);
       snow.splice(snow.indexOf(next), 1);
 
@@ -772,7 +813,7 @@ class World extends PIXI.Graphics implements Updatable {
               }
             }
           } else {
-            // Ore
+            // Snow
 
             tex = TextureCache.GetCachedSpritesheetTexture("macro", 2, 0);
           }
