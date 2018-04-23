@@ -489,8 +489,9 @@ class World extends PIXI.Graphics implements Updatable {
 
   addEnemies(): void {
     const start = this.getStartCell();
+    const num = Constants.DEBUG.JUST_ONE_ENEMY ? 1 : Constants.NUM_START_ENEMIES;
 
-    for (let i = 0; i < Constants.NUM_START_ENEMIES; i++) {
+    for (let i = 0; i < num; i++) {
       let wx = 0, wy = 0;
       let valid = true;
 
@@ -511,7 +512,11 @@ class World extends PIXI.Graphics implements Updatable {
 
         console.log(distToStart);
 
-        if (distToStart < 15) { valid = false; continue; }
+        if (
+          Constants.DEBUG.JUST_ONE_ENEMY
+            ? distToStart > 5
+            : distToStart < 15
+        ) { valid = false; continue; }
       } while (!valid);
 
       const newEnemy = new MacroEnemy(

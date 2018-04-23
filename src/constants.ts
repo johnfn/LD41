@@ -5,6 +5,7 @@ const Constants = {
     FAST_RESOURCES   : true,
     MANY_RESOURCES   : false,
     POP_BOOST        : false,
+    JUST_ONE_ENEMY   : true,
   },
 
   NUM_START_ENEMIES: 20,
