@@ -269,7 +269,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       this.darkAreas.drawRect(rect.x, rect.y, rect.w, rect.h);
     }
 
-    this.clearOldEnemies(state);
+    this.clearOldStuff(state);
     this.checkShouldAddEnemies(state);
     this.removeBullets(state);
 
@@ -309,12 +309,18 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     return { x, y };
   }
 
-  clearOldEnemies(state: State): void {
+  clearOldStuff(state: State): void {
     const enemies = state.updaters.filter(x => x instanceof MicroEnemy) as MicroEnemy[];
 
     for (const e of enemies) {
       state.remove(e);
       e.parent.removeChild(e);
+    }
+
+    const gold = state.updaters.filter(x => x instanceof Coin) as Coin[];
+
+    for (const c of gold) {
+      c.remove(state);
     }
   }
 
