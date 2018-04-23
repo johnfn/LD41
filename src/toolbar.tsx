@@ -66,7 +66,9 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       return;
     }
 
-    const buildings = this.availableBuildings().filter(b => {
+    const buildings = this.availablePurchases().filter(b => {
+      if (!b.building.hotkey) { return false; }
+
       return b.building.hotkey.toLowerCase() === e.key.toLowerCase();
     });
 
@@ -97,7 +99,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     this.gameState = gameState;
   }
 
-  availableBuildings(): BuildingAndCanAfford[] {
+  availablePurchases(): BuildingAndCanAfford[] {
     const selection = this.gameState.map.world.getCellAt(
       this.state.playerWorldX, 
       this.state.playerWorldY
@@ -133,13 +135,6 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       result.push(obj);
 
-      if (!CanAfford(b, this.state)) {
-        obj.canBuild = false;
-        obj.whyNot   = "Too expensive!"
-
-        continue;
-      }
-
       // if you're on a building, cant build anything, except units.
 
       if (selection.building || selection.special === "start") {
@@ -174,6 +169,13 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       if (b.requirement.inBuilding) {
         obj.canBuild = false;
         obj.whyNot = `You need to be in a ${ b.requirement.inBuilding } to make one of those.`
+
+        continue;
+      }
+
+      if (!CanAfford(b, this.state)) {
+        obj.canBuild = false;
+        obj.whyNot   = "Too expensive!"
 
         continue;
       }
@@ -498,7 +500,32 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       );
     }
 
-    const availableBuildings = this.availableBuildings();
+    const availablePurchases = this.availablePurchases();
+
+    const availableBuildings = availablePurchases.filter(x => !x.building.hideWhenCantBuy);
+    const availableOther     = availablePurchases.filter(x =>  x.building.hideWhenCantBuy);
+
+    const renderThing = (b: BuildingAndCanAfford) => {
+      return (
+        <div
+          onMouseOver={ () => this.setState({ hover: b }) }
+          onMouseOut ={ () => this.setState({ hover: undefined }) }
+        >
+          <a 
+            style={{ 
+              color: b.canBuild ? "white" : "gray"
+            }} 
+            onClick={ () => this.build(b) }
+            href="javascript:;">
+            { b.building.name }
+          </a> {
+            b.building.hotkey &&
+              <span>(hotkey: { b.building.hotkey })</span>
+          }
+        </div>
+      );
+    };
+
 
     return (
       <>
@@ -507,24 +534,17 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         </div>
 
         {
-          availableBuildings.map(b => {
-            return (
-              <div
-                onMouseOver={ () => this.setState({ hover: b }) }
-                onMouseOut ={ () => this.setState({ hover: undefined }) }
-              >
-                <a 
-                  style={{ 
-                    color: b.canBuild ? "white" : "gray"
-                  }} 
-                  onClick={ () => this.build(b) }
-                  href="javascript:;">
-                  { b.building.name }
-                </a> (hotkey: { b.building.hotkey })
-              </div>
-            );
-          })
+          availableBuildings.map(b => renderThing(b))
         }
+
+        <div style={{ paddingTop: "20px" }}>
+          Buy:
+        </div>
+
+        {
+          availableOther.map(b => renderThing(b))
+        }
+
 
         <div style={{ paddingTop: "20px" }}>
           {

@@ -7,6 +7,7 @@ type BuildingName = "Road"
                   | "Lumber Yard"
                   | "Dock"
                   | "+1 Population"
+                  | "+3 Health"
 
 type TerrainName = "snow" | "grass" | "water";
 type SpecialName = "none" | "ice" | "water" | "start" | "end";
@@ -14,7 +15,7 @@ type SpecialName = "none" | "ice" | "water" | "start" | "end";
 type Building = {
   name         : BuildingName;
   description  : string;
-  hotkey       : string;
+  hotkey      ?: string;
   vision       : number;
   hideWhenCantBuy   
               ?: boolean;
@@ -46,19 +47,33 @@ const CanAfford = (b: { cost: { wood?: number, meat?: number, gold?: number } },
   );
 }
 
-const Buildings: Building[] = [{
+const Buildings: Building[] = [
+  {
     name       : "+1 Population",
-    hotkey     : "X",
     vision     : 0,
     hideWhenCantBuy  
                : true,
     harvester  : false,
     description: "A guy who will happily harvest resources for you.",
-    cost       : { meat: 5 },
+    cost       : { meat: 3 },
     requirement: {
       inBuilding: "Town",
     },
   },
+
+  {
+    name       : "+3 Health",
+    vision     : 0,
+    hideWhenCantBuy  
+               : true,
+    harvester  : false,
+    description: "The town's priest will heal you, for a small fee.",
+    cost       : { meat: 5, gold: 1 },
+    requirement: {
+      inBuilding: "Town",
+    },
+  },
+
 
   {
     name       : "Road",
