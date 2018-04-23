@@ -63,83 +63,91 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
     this.health.text = String(this.size);
   }
 
+  move(state: State): void {
+    // try to find building to destroy
+
+    let buildingTargets = this.state.map.world.getCells()
+      .filter(cell => cell.building)
+      .filter(cell => Util.ManhattanDistance(
+        cell,
+        { xIndex: this.worldX, yIndex: this.worldY }
+      ) < Constants.ENEMY_BUILDING_SIGHT)
+    ;
+
+    buildingTargets = Util.SortByKey(buildingTargets, k => (
+      ((k.building!.building.cost.gold || 0) * 3) + 
+      ( k.building!.building.cost.wood || 0)      + 
+      ( k.building!.building.cost.meat || 0)
+    )).reverse();
+
+    const buildingTarget = buildingTargets[0];
+
+    let nextPosChoices: [number, number][] 
+
+    const fourDirections: [number, number][] = [
+      [this.worldX +  0, this.worldY +  1],
+      [this.worldX +  0, this.worldY + -1],
+      [this.worldX +  1, this.worldY +  0],
+      [this.worldX + -1, this.worldY +  0]
+    ];
+
+    if (buildingTarget) {
+      if (
+        this.worldX === buildingTarget.xIndex &&
+        this.worldY === buildingTarget.yIndex
+      ) {
+        return;
+      }
+
+      const path = state.map.pathfind(
+        { x: this.worldX, y: this.worldY },
+        { x: buildingTarget.xIndex, y: buildingTarget.yIndex }, {
+          water  : true ,
+          unknown: false, // enemies op
+          unseen : false,
+        }
+      );
+
+      if (path) {
+        nextPosChoices = [
+          [path[0].x, path[0].y],
+        ];
+      } else {
+        nextPosChoices = fourDirections;
+      }
+    } else {
+      nextPosChoices = fourDirections;
+    }
+
+    const validNextPos = nextPosChoices.filter(([x, y]) => {
+      if (!World.InBoundsRel(x, y)) {
+        return false;
+      }
+
+      const cell = state.map.world.map[x][y];
+
+      if (cell.terrain === "water") {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (validNextPos.length > 0) {
+      const movement = Util.RandElem(validNextPos);
+
+      this.worldX = movement[0];
+      this.worldY = movement[1];
+    }
+  }
+
   update(state: State): void {
     if ((state.tick % Constants.ENEMY_SPEED === 0) || (
         Constants.DEBUG.FAST_ENEMY &&
         state.tick % 100 === 0
       )
     ) {
-
-      // try to find building to destroy
-
-      let buildingTargets = this.state.map.world.getCells()
-        .filter(cell => cell.building)
-        .filter(cell => Util.ManhattanDistance(
-          cell,
-          { xIndex: this.worldX, yIndex: this.worldY }
-        ) < Constants.ENEMY_BUILDING_SIGHT)
-      ;
-
-      // TODO if you're on top of any building, dont move!
-
-      buildingTargets = Util.SortByKey(buildingTargets, k => (
-        ((k.building!.building.cost.gold || 0) * 3) + 
-        ( k.building!.building.cost.wood || 0) + 
-        ( k.building!.building.cost.meat || 0)
-      ));
-
-      const buildingTarget = buildingTargets[0];
-
-      let nextPosChoices: [number, number][] 
-
-      const fourDirections: [number, number][] = [
-        [this.worldX +  0, this.worldY +  1],
-        [this.worldX +  0, this.worldY + -1],
-        [this.worldX +  1, this.worldY +  0],
-        [this.worldX + -1, this.worldY +  0]
-      ];
-
-      if (buildingTarget) {
-        const path = state.map.pathfind(
-          { x: this.worldX, y: this.worldY },
-          { x: buildingTarget.xIndex, y: buildingTarget.yIndex }, {
-            water  : true,
-            unknown: false, // enemies op
-            unseen : false,
-          }
-        );
-
-        if (path) {
-          nextPosChoices = [
-            [path[0].x, path[0].y],
-          ];
-        } else {
-          nextPosChoices = fourDirections;
-        }
-      } else {
-        nextPosChoices = fourDirections;
-      }
-
-      const validNextPos = nextPosChoices.filter(([x, y]) => {
-        if (!World.InBoundsRel(x, y)) {
-          return false;
-        }
-
-        const cell = state.map.world.map[x][y];
-
-        if (cell.terrain === "water") {
-          return false;
-        }
-
-        return true;
-      });
-
-      if (validNextPos.length > 0) {
-        const movement = Util.RandElem(validNextPos);
-
-        this.worldX = movement[0];
-        this.worldY = movement[1];
-      }
+      this.move(state);
     }
 
     this.x = this.worldX * Constants.MACRO.TILE_WIDTH;

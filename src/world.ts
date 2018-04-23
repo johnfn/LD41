@@ -5,6 +5,7 @@ type BuildingName = "Road"
                   | "City"
                   | "Factory"
                   | "Lumber Yard"
+                  | "Guard Tower"
                   | "Dock"
                   | "+1 Population"
                   | "+3 Health"
@@ -20,6 +21,7 @@ type Building = {
   hideWhenCantBuy   
               ?: boolean;
   resourceName?: string;
+  spritesheet  : [number, number];
 
   harvester    : boolean;
   cost         : { wood?: number; meat?: number; gold?: number; }
@@ -79,6 +81,7 @@ const Buildings: Building[] = [
     name       : "Road",
     hotkey     : "X",
     vision     : 2,
+    spritesheet: [4, 0],
     description: "All buildings must be connected by roads.",
     harvester  : false,
     cost       : { wood: 1 },
@@ -90,18 +93,20 @@ const Buildings: Building[] = [
     name       : "Farm",
     hotkey     : "C",
     vision     : 2,
+    spritesheet: [4, 2],
     description: "Harvests food, slowly. Can harvest more when closer to water.",
     harvester  : true,
     resourceName: "meat",
     cost       : { wood: 5 },
     requirement: {
-      on: ["snow", "grass"],
+      on: ["grass"],
     },
   },
   {
     name       : "Village",
     hotkey     : "V",
     vision     : 4,
+    spritesheet: [5, 0],
     harvester  : false,
     description: "Sells basic adventuring supplies. Has an Inn to rest at.",
     cost       : { wood: 5, meat: 3 },
@@ -113,6 +118,7 @@ const Buildings: Building[] = [
     name        : "Lumber Yard",
     hotkey      : "B",
     vision      : 3,
+    spritesheet: [4, 1],
     harvester   : true,
     description : "Harvests wood.",
     resourceName: "wood",
@@ -133,6 +139,19 @@ const Buildings: Building[] = [
     requirement: {
       on: ["grass"],
       near: ["water"],
+    },
+  },
+
+  {
+    name       : "Guard Tower",
+    hotkey     : "M",
+    vision     : 12,
+    harvester  : false,
+    spritesheet: [4, 3],
+    description: "Allows you to see enemies from a far distance.",
+    cost       : { wood: 10 },
+    requirement: {
+      on: ["grass"],
     },
   },
 ];
@@ -934,14 +953,17 @@ class BuildingGraphic extends PIXI.Sprite implements Updatable {
     const building = this.cell.building!.building;
 
     if (building.name === "Road") {
-      this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 0).texture;
     } else if (building.name === "Lumber Yard") {
-      this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 1).texture;
       this.showPop = true;
     } else if (building.name === "Farm") {
-      this.texture = TextureCache.GetCachedSpritesheetTexture("macro", 4, 2).texture;
       this.showPop = true;
     }
+
+    this.texture = TextureCache.GetCachedSpritesheetTexture(
+      "macro", 
+      building.spritesheet[0],
+      building.spritesheet[1]
+    ).texture;
 
     if (this.showPop) {
       this.addChild(this.pop2 = new PIXI.Text("0", {
