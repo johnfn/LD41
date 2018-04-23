@@ -62,6 +62,7 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
   activeMode: Mode = "Micro";
   z     = 100;
   speed = 1;
+  bar: HealthBar;
 
   dest: { x: number, y: number } | undefined;
 
@@ -72,6 +73,11 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
 
     this.texture = TextureCache.GetCachedSpritesheetTexture(
       "micro", 3, 0).texture;
+
+    this.bar = new HealthBar(state);
+    this.addChild(this.bar);
+
+    this.bar.y = -8;
   }
 
   chooseNewDest(): void {
@@ -108,5 +114,39 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     ) < 5) {
       this.dest = undefined;
     }
+  }
+}
+
+class HealthBar extends PIXI.Graphics implements Updatable {
+  activeMode: Mode = "Micro";
+  z     = 100;
+  state: State;
+  perc  = 0.5;
+
+  constructor(state: State) {
+    super();
+
+    this.state = state;
+    this.state.add(this);
+
+    this.render();
+  }
+
+  setPercentage(perc: number) {
+    this.perc = perc;
+
+    this.render();
+  }
+
+  render(): void {
+    this.beginFill(0xffffff);
+    this.drawRect(0, 0, 32, 6);
+
+    this.beginFill(0x00ff00);
+    this.drawRect(2, 2, 28 * this.perc, 4);
+  }
+
+  update(_state: State): void {
+
   }
 }
