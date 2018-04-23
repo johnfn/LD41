@@ -1,6 +1,6 @@
 class MacroEnemy extends PIXI.Sprite implements Updatable {
   activeMode: Mode = "Macro";
-  z = 20;
+  z = 50;
 
   worldX: number;
   worldY: number;
@@ -99,8 +99,6 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
         [this.worldX +  1, this.worldY +  0],
         [this.worldX + -1, this.worldY +  0]
       ];
-
-      debugger;
 
       if (buildingTarget) {
         const buildingDir: [number, number] = [
