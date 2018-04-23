@@ -240,6 +240,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       this.darkAreas.drawRect(rect.x, rect.y, rect.w, rect.h);
     }
 
+    this.clearOldEnemies(state);
     this.checkShouldAddEnemies(state);
 
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0);
@@ -272,6 +273,15 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
   // TODO clean up any old enemy batch if there is one
 
+  clearOldEnemies(state: State): void {
+    for (const e of this.microEnemies) {
+      state.remove(e);
+      e.parent.removeChild(e);
+    }
+
+    this.microEnemies = [];
+  }
+
   checkShouldAddEnemies(state: State): void {
     const enemy = this.world.enemies.filter(e => 
       e.worldX === state.playersWorldX &&
@@ -290,6 +300,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       e.y = y;
 
       this.addChild(e);
+      this.microEnemies.push(e);
     }
   }
 
