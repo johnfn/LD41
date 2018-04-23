@@ -120,6 +120,30 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     ].filter(({ x, y }) => World.InBoundsAbs(x, y)));
   }
 
+  considerShootingBullet(state: State): void {
+    const xdiff = state.playersMapX - this.x;
+    const ydiff = state.playersMapY - this.y;
+
+    const wantToShoot = (
+      Math.abs(xdiff) < 50 ||
+      Math.abs(ydiff) < 50
+    ) && (state.tick % 50 === 0);
+
+    if (!wantToShoot) { return; }
+
+    let dir: [number, number] = [0, 0];
+
+    dir[0] = Math.abs(xdiff) > Math.abs(ydiff) ? Util.Sign(xdiff) : 0;
+    dir[1] = Math.abs(xdiff) > Math.abs(ydiff) ? 0                : Util.Sign(ydiff);
+
+    const bullet = new Bullet(state, dir);
+
+    bullet.x = (this.x + 16) + dir[0] * 32;
+    bullet.y = (this.y + 16) + dir[1] * 32;
+
+    this.parent.addChild(bullet);
+  }
+
   update(state: State): void {
     if (this.dest === undefined && state.tick % 50 === 0) {
       this.chooseNewDest();
@@ -145,6 +169,8 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     ) < 5) {
       this.dest = undefined;
     }
+
+    this.considerShootingBullet(state);
   }
 
   remove(): void {
