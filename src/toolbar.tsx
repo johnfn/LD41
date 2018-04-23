@@ -299,6 +299,10 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       this.gameState.meat -= b.building.cost.meat;
     }
 
+    if (b.building.cost.gold) {
+      this.gameState.gold -= b.building.cost.gold;
+    }
+
     const be: BuildingExtra = {};
 
     if (b.building.name === "Farm") {
@@ -315,6 +319,15 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       if (b.building.name === "+1 Population") {
         this.gameState.pop += 1;
       }
+
+      if (b.building.name === "+3 Health") {
+        this.gameState.health += 3;
+
+        if (this.gameState.health > this.gameState.maxHealth) {
+          this.gameState.health = this.gameState.maxHealth;
+        }
+      }
+
     } else {
       this.gameState.map.world.addBuilding({
         building: b.building,

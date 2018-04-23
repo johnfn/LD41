@@ -55,7 +55,7 @@ const Buildings: Building[] = [
                : true,
     harvester  : false,
     description: "A guy who will happily harvest resources for you.",
-    cost       : { meat: 3 },
+    cost       : { meat: 5 },
     requirement: {
       inBuilding: "Town",
     },

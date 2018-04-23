@@ -53,9 +53,10 @@ class State {
     this.health    = 5;
     this.maxHealth = 5;
 
-    this.wood = 20;
-    this.meat = 5;
-    this.gold = 0;
+    this.wood = 20 + (Constants.DEBUG.MANY_RESOURCES ? 100 : 0);
+    this.meat = 5  + (Constants.DEBUG.MANY_RESOURCES ? 100 : 0);
+    this.gold = 0  + (Constants.DEBUG.MANY_RESOURCES ? 100 : 0);
+
     this.pop  = Constants.DEBUG.POP_BOOST ? 5 : 0;
 
     this.notifications = [];
