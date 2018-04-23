@@ -44,7 +44,6 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
       align     : 'left'
     }));
 
-
     this.health.x  = 2;
     this.health.y  = 2;
 
@@ -101,23 +100,22 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
       ];
 
       if (buildingTarget) {
-        const buildingDir: [number, number] = [
-          this.worldX + Util.Sign(buildingTarget.xIndex - this.worldX),
-          this.worldY + Util.Sign(buildingTarget.yIndex - this.worldY),
-        ];
+        const path = state.map.pathfind(
+          { x: this.worldX, y: this.worldY },
+          { x: buildingTarget.xIndex, y: buildingTarget.yIndex }, {
+            water  : true,
+            unknown: false, // enemies op
+            unseen : false,
+          }
+        );
 
-        // generally walk in the building dir but introduce a lil randomness
-
-        // TODO could use pathfind algo here
-
-        nextPosChoices = [
-          buildingDir,
-          buildingDir,
-          buildingDir,
-          buildingDir,
-          buildingDir,
-          Util.RandElem(fourDirections),
-        ]
+        if (path) {
+          nextPosChoices = [
+            [path[0].x, path[0].y],
+          ];
+        } else {
+          nextPosChoices = fourDirections;
+        }
       } else {
         nextPosChoices = fourDirections;
       }
