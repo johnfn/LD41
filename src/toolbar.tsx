@@ -31,6 +31,22 @@ type Buyable = {
   };
 }
 
+function RenderCost(props: { cost: { wood?: number, gold?: number, meat?: number } }) {
+  const { cost } = props;
+
+  return (
+    <span>
+      {
+        cost.wood ? `${ cost.wood } wood` : " "
+      } {
+        cost.meat ? `${ cost.meat } food` : " "
+      } {
+        cost.gold ? `${ cost.gold } gold`  : " "
+      }
+    </span>
+  );
+}
+
 class Toolbar extends React.Component<{}, ToolbarState> {
   gameState: State;
 
@@ -382,7 +398,11 @@ class Toolbar extends React.Component<{}, ToolbarState> {
           </div>
         );
       } else {
-        return `A ${ name } (${ cell.building.building.health }/${ cell.building.building.maxHealth }).`;
+        return (
+          <div>
+            A { name } ({ cell.building.building.health }/{ cell.building.building.maxHealth }).
+          </div>
+        );
       }
     } 
 
@@ -608,7 +628,6 @@ class Toolbar extends React.Component<{}, ToolbarState> {
                   } {
                     this.state.hover.building.cost.gold ? `${ this.state.hover.building.cost.gold } gold`  : " "
                   }
-
                 </div>
 
                 {
@@ -679,6 +698,19 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       height = "Treacherous";
     }
 
+    const upgrades = (
+      onTopOf.building &&
+      onTopOf.building.building.upgrade && 
+        <div>
+          Upgrade to <a 
+            href="javascript:;"
+            style={{ color: CanAfford(onTopOf.building.building.upgrade[0], this.state) ? "white" : "gray" }}
+            >{ onTopOf.building.building.upgrade[0].name }
+          </a> (<RenderCost cost={ onTopOf.building.building.upgrade[0].cost } />)
+
+        </div>
+    );
+
     return (
       <div style={{ 
         color: "white",
@@ -699,6 +731,10 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
           {
             this.renderBuildSomething(this.gameState.map.world.enemyAt({ x: onTopOf.xIndex, y: onTopOf.yIndex }))
+          }
+
+          {
+            upgrades
           }
 
           {

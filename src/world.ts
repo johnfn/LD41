@@ -19,6 +19,10 @@ type Building = {
   name         : BuildingName;
   description  : string;
   hotkey      ?: string;
+  upgrade     ?: {
+    name: string;
+    cost: { wood?: number; meat?: number; gold?: number; }
+  }[];
   health       : number;
   maxHealth    : number;
   vision       : number;
@@ -99,6 +103,7 @@ const Buildings: Building[] = [
       inBuilding: ["Town", "Village"],
     },
   },
+
   {
     name       : "Road",
     hotkey     : "X",
@@ -128,9 +133,15 @@ const Buildings: Building[] = [
       on: ["grass"],
     },
   },
+
   {
     name       : "Village",
     hotkey     : "V",
+    upgrade    : [
+      { name: "Small Town", cost: { "wood": 10, "gold": 3  } },
+      { name: "Large Town", cost: { "wood": 20, "gold": 5  } },
+      { name: "City"      , cost: { "wood": 50, "gold": 10 } },
+    ],
     vision     : 4,
     health     : 10,
     maxHealth  : 10,
