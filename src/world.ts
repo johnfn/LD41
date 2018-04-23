@@ -266,7 +266,6 @@ class World extends PIXI.Graphics implements Updatable {
 
   app          : PIXI.Application;
   map          : WorldCell[][];
-  enemies      : MacroEnemy[];
   tilemap      : PIXI.Sprite;
   state        : State;
   playergraphic: MacroPlayer;
@@ -275,7 +274,6 @@ class World extends PIXI.Graphics implements Updatable {
     super();
 
     this.state = state;
-    this.enemies = [];
 
     state.add(this)
 
@@ -312,13 +310,18 @@ class World extends PIXI.Graphics implements Updatable {
     );
   }
 
+  macroEnemies(): MacroEnemy[] {
+    return this.state.updaters.filter(x => x instanceof MacroEnemy) as MacroEnemy[];
+  }
+
   enemyAt(pos: { x: number, y: number }): MacroEnemy | undefined {
-    const enemList = this.enemies.filter(e => {
-      return (
-        e.worldX === pos.x &&
-        e.worldY === pos.y
-      );
-    });
+    const enemList = this.macroEnemies()
+      .filter(e => {
+        return (
+          e.worldX === pos.x &&
+          e.worldY === pos.y
+        );
+      });
 
     return enemList.length > 0 ? enemList[0] : undefined;
   }
@@ -562,10 +565,11 @@ class World extends PIXI.Graphics implements Updatable {
       const newEnemy = new MacroEnemy(
         this.state,
         wx,
-        wy
+        wy,
+        Constants.ENEMY_GROUP_SIZE_LOW +
+          Math.random() * (Constants.ENEMY_GROUP_SIZE_HIGH - Constants.ENEMY_GROUP_SIZE_LOW)
       );
 
-      this.enemies.push(newEnemy);
       this.addChild(newEnemy);
     }
   }

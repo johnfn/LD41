@@ -319,17 +319,17 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
   }
 
   checkShouldAddEnemies(state: State): void {
-    const enemy = this.world.enemies.filter(e => 
+    const enemy = this.world.macroEnemies().filter(e => 
       e.worldX === state.playersWorldX &&
       e.worldY === state.playersWorldY
-    );
+    )[0];
 
-    if (enemy.length === 0) {
+    if (!enemy) {
       return;
     }
 
-    for (let i = 0; i < 5; i++) {
-      const e = new MicroEnemy(state);
+    for (let i = 0; i < enemy.size; i++) {
+      const e = new MicroEnemy(state, enemy);
       const { x, y } = this.chooseRandomValidMapPos(state);
 
       e.x = x;
@@ -436,7 +436,7 @@ class Bullet extends PIXI.Sprite implements Updatable {
     state.add(this);
 
     this.texture = TextureCache.GetCachedSpritesheetTexture(
-      "micro", 7, 1).texture;
+      "macro", 7, 1).texture;
   }
 
   update(state: State): void {

@@ -8,6 +8,8 @@ const Constants = {
     JUST_ONE_ENEMY   : true,
   },
 
+  ENEMY_GROUP_SIZE_LOW : 3,
+  ENEMY_GROUP_SIZE_HIGH: 7,
   NUM_START_ENEMIES: 20,
   ENEMY_SPEED: 500,
 

@@ -8,7 +8,9 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
   type  : "normal";
   state : State;
 
-  constructor(state: State, worldX: number, worldY: number) {
+  size: number;
+
+  constructor(state: State, worldX: number, worldY: number, size: number) {
     super();
 
     this.state = state;
@@ -20,8 +22,19 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
 
     this.type = "normal";
 
+    this.size = size;
+
     this.texture = TextureCache.GetCachedSpritesheetTexture(
       "macro", 6, 0).texture;
+  }
+
+  subtractEnemy(): any {
+    this.size -= 1;
+
+    if (this.size <= 0) {
+      this.state.remove(this);
+      this.parent.removeChild(this);
+    }
   }
 
   update(state: State): void {
@@ -64,17 +77,20 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
   speed = 1;
   bar: HealthBar;
   state: State;
+  group: MacroEnemy;
 
   health    = 3;
   maxHealth = 3;
 
   dest: { x: number, y: number } | undefined;
 
-  constructor(state: State) {
+  constructor(state: State, group: MacroEnemy) {
     super();
 
     state.add(this);
+
     this.state = state;
+    this.group = group;
 
     this.texture = TextureCache.GetCachedSpritesheetTexture(
       "micro", 3, 0).texture;
@@ -135,6 +151,8 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     this.state.remove(this);
     this.state.remove(this.bar);
     this.parent.removeChild(this);
+
+    this.group.subtractEnemy();
   }
 }
 
