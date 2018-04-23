@@ -74,14 +74,18 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
       "micro", 3, 0).texture;
   }
 
+  chooseNewDest(): void {
+    this.dest = Util.RandElem([
+      { x: this.x + 50, y: this.y },
+      { x: this.x     , y: this.y + 50 },
+      { x: this.x - 50, y: this.y },
+      { x: this.x     , y: this.y - 50 },
+    ].filter(({ x, y }) => World.InBoundsAbs(x, y)));
+  }
+
   update(state: State): void {
-    if (this.dest === undefined) {
-      this.dest = Util.RandElem([
-        { x: this.x + 200, y: this.y },
-        { x: this.x      , y: this.y + 200 },
-        { x: this.x - 200, y: this.y },
-        { x: this.x      , y: this.y - 200 },
-      ].filter(({ x, y }) => World.InBoundsAbs(x, y)));
+    if (this.dest === undefined && state.tick % 50 === 0) {
+      this.chooseNewDest();
     }
 
     if (this.dest === undefined) { return; }
