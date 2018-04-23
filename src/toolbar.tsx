@@ -122,7 +122,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       );
     }
 
-    const result: BuildingAndCanAfford[] = [];
+    let result: BuildingAndCanAfford[] = [];
     
     for (const b of Buildings) {
       let obj = {
@@ -143,7 +143,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       // if you're on a building, cant build anything, except units.
 
       if (selection.building || selection.special === "start") {
-        if (b.justAUnit) {
+        if (b.hideWhenCantBuy) {
           if (selection.special === "start") {
             if (b.requirement.inBuilding !== "Town") {
               obj.canBuild = false;
@@ -267,6 +267,18 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       }
     }
 
+    result = result.filter(r => {
+      if (r.building.hideWhenCantBuy && !r.canBuild) {
+        if (r.whyNot === "Too expensive!") {
+          return true;
+        }
+
+        return false;
+      } else {
+        return true;
+      }
+    });
+
     return result;
   }
 
@@ -297,7 +309,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       be.populationOn = 0;
     }
 
-    if (b.building.justAUnit) {
+    if (b.building.hideWhenCantBuy) {
       if (b.building.name === "+1 Population") {
         this.gameState.pop += 1;
       }

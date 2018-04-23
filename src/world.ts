@@ -16,7 +16,8 @@ type Building = {
   description  : string;
   hotkey       : string;
   vision       : number;
-  justAUnit ?  : boolean;
+  hideWhenCantBuy   
+              ?: boolean;
   resourceName?: string;
 
   harvester    : boolean;
@@ -45,12 +46,12 @@ const CanAfford = (b: { cost: { wood?: number, meat?: number, gold?: number } },
   );
 }
 
-const Buildings: Building[] = [
-  {
+const Buildings: Building[] = [{
     name       : "+1 Population",
     hotkey     : "X",
     vision     : 0,
-    justAUnit  : true,
+    hideWhenCantBuy  
+               : true,
     harvester  : false,
     description: "A guy who will happily harvest resources for you.",
     cost       : { meat: 5 },
