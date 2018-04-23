@@ -31,6 +31,9 @@ class State {
   gold : number;
   pop  : number;
 
+  health   : number;
+  maxHealth: number;
+
   playersWorldX: number;
   playersWorldY: number;
   playersMapX  : number;
@@ -46,6 +49,9 @@ class State {
     this.keyboard = new Keyboard(this);
     this.macroCamera = new Camera();
     this.microCamera = new Camera();
+
+    this.health    = 5;
+    this.maxHealth = 5;
 
     this.wood = 20;
     this.meat = 5;

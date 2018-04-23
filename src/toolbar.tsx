@@ -7,6 +7,9 @@ interface ToolbarState {
   gold: number;
   pop : number;
 
+  health   : number;
+  maxHealth: number;
+
   playerWorldX: number;
   playerWorldY: number;
 
@@ -37,6 +40,9 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     this.state = {
       selX : 0,
       selY : 0,
+
+      health   : 0,
+      maxHealth: 0,
 
       playerWorldX: 0,
       playerWorldY: 0,
@@ -80,6 +86,9 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       meat: gameState.meat,
       gold: gameState.gold,
       pop : gameState.pop,
+
+      health   : gameState.health,
+      maxHealth: gameState.maxHealth,
 
       playerWorldX: gameState.playersWorldX,
       playerWorldY: gameState.playersWorldY,
@@ -579,6 +588,10 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       }}>
         <div>
           Meat: { this.state.meat } | Wood: { this.state.wood } | Gold: { this.state.gold } | Pop: { this.state.pop }
+        </div>
+
+        <div>
+          Health: { this.state.health } / { this.state.maxHealth }
         </div>
 
         <div>

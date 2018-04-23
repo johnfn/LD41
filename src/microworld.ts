@@ -375,6 +375,7 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
   size             = 32;
   facing: [number, number] = [1, 0];
   cooldown         = 60;
+  invinc           = 0;
 
   constructor(state: State, mw: MicroWorld) {
     super();
@@ -388,6 +389,14 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
   }
 
   update(state: State): void {
+    if (this.invinc > 0) {
+      this.invinc--
+
+      this.alpha = 0.4;
+    } else {
+      this.alpha = 1;
+    }
+
     let newx = state.playersMapX;
     let newy = state.playersMapY;
 
@@ -402,16 +411,52 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
       this.facing = newFacing;
     }
 
-    if (!this.microworld.isCollision(state, newx, state.playersMapY, this.size - 5).hit) {
+    let c1 = this.microworld.isCollision(state, newx, state.playersMapY, this.size - 5);
+
+    if (!c1.hit) {
       state.playersMapX = newx;
     }
+    
+    let c2 = this.microworld.isCollision(state, state.playersMapX, newy, this.size - 5);
 
-    if (!this.microworld.isCollision(state, state.playersMapX, newy, this.size - 5).hit) {
+    if (!c2.hit) {
       state.playersMapY = newy;
     }
 
+    if ((c1.hit && c1.enemy) || (c2.hit && c2.enemy)) {
+      // attempt to bump player back
+
+      if (this.invinc <= 0) {
+        state.health -= 1;
+
+        const txtgfx = new FloatUpText(state, "-1");
+
+        state.microworld.addChild(txtgfx)
+
+        txtgfx.x = this.x;
+        txtgfx.y = this.y;
+      }
+
+      this.invinc = 40;
+
+      const dx = newx - this.x;
+      const dy = newy - this.y;
+
+      const bumpedx = this.x + (-dx) * 10;
+      const bumpedy = this.y + (-dy) * 10;
+
+      if (!this.microworld.isCollision(state, bumpedx, bumpedy, this.size - 5).hit) {
+        state.playersMapX = bumpedx;
+        state.playersMapY = bumpedy;
+      }
+    }
+
+    // playersMapX/Y is actually the source of truth
+
     this.x = state.playersMapX;
     this.y = state.playersMapY;
+
+    // shoot
 
     if (state.keyboard.justDown.Spacebar || (
           state.keyboard.down.Spacebar && 
