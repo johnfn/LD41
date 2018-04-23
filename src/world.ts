@@ -483,23 +483,47 @@ class World extends PIXI.Graphics implements Updatable {
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0)
 
     if (building.name === "Road") {
-      this.calculateRoadVariantAt(x, y);
+      this.rerouteRoadsAt(this.map[x][y]);
+    }
+  }
 
-      for (const [dx, dy] of [
-        [ 0, -1],
-        [ 1,  0],
-        [ 0,  1],
-        [-1,  0],
-      ]) {
-        const nx = x + dx;
-        const ny = y + dy;
+  removeBuilding(cell: WorldCell): void {
+    if (!cell.building) { return; }
 
-        if (World.InBoundsRel(nx, ny) && 
-            this.map[nx][ny].building && 
-            this.map[nx][ny].building!.building.name === "Road"
-          ) {
-          this.calculateRoadVariantAt(nx, ny);
-        }
+    cell.building.graphics.parent.removeChild(cell.building.graphics);
+
+    this.recalculateFogOfWar();
+    this.renderWorld();
+
+    this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0)
+
+    if (cell.building.building.name === "Road") {
+      this.rerouteRoadsAt(cell);
+    }
+
+    cell.building = undefined;
+  }
+
+  rerouteRoadsAt(cell: WorldCell): void {
+    const x = cell.xIndex;
+    const y = cell.yIndex;
+
+    this.calculateRoadVariantAt(x, y);
+
+    for (const [dx, dy] of [
+      [ 0, -1],
+      [ 1,  0],
+      [ 0,  1],
+      [-1,  0],
+    ]) {
+      const nx = x + dx;
+      const ny = y + dy;
+
+      if (World.InBoundsRel(nx, ny) && 
+          this.map[nx][ny].building && 
+          this.map[nx][ny].building!.building.name === "Road"
+        ) {
+        this.calculateRoadVariantAt(nx, ny);
       }
     }
   }
@@ -1049,11 +1073,6 @@ class BuildingGraphic extends PIXI.Sprite implements Updatable {
   damage(amount: number): void {
     this.cell.building!.extra.health -= amount;
 
-    this.state.addMessage({
-      type: "error",
-      msg: `A monster attacks your ${ this.cell.building!.building.name }, dealing ${ amount } damage! It has ${ this.cell.building!.extra.health } health left.`
-    });
-
     const txtgfx = new FloatUpText(this.state, "-1");
 
     this.state.microworld.addChild(txtgfx)
@@ -1061,8 +1080,22 @@ class BuildingGraphic extends PIXI.Sprite implements Updatable {
     txtgfx.x = this.x;
     txtgfx.y = this.y;
 
-    this.bar!.setPercentage(this.cell.building!.extra.health / this.cell.building!.building.maxHealth);
+    if (this.cell.building!.extra.health > 0) {
+      this.state.addMessage({
+        type: "error",
+        msg: `A monster attacks your ${ this.cell.building!.building.name }, dealing ${ amount } damage! It has ${ this.cell.building!.extra.health } health left.`
+      });
 
-    this.bar!.visible = true;
+      this.bar!.setPercentage(this.cell.building!.extra.health / this.cell.building!.building.maxHealth);
+
+      this.bar!.visible = true;
+    } else {
+      this.state.addMessage({
+        type: "error",
+        msg: `A monster destroys your ${ this.cell.building!.building.name }!`,
+      });
+
+      this.state.map.world.removeBuilding(this.cell);
+    }
   }
 }
