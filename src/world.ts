@@ -30,7 +30,7 @@ type Building = {
   cost         : { wood?: number; meat?: number; gold?: number; }
   requirement  : {
     on        ?: TerrainName[];
-    inBuilding?: BuildingName;
+    inBuilding?: BuildingName[];
     near      ?: TerrainName[];
     higher    ?: number;
     lower     ?: number;
@@ -65,7 +65,7 @@ const Buildings: Building[] = [
     description: "A guy who will happily harvest resources for you.",
     cost       : { meat: 5 },
     requirement: {
-      inBuilding: "Town",
+      inBuilding: ["Town", "Village"],
     },
   },
 
@@ -80,7 +80,7 @@ const Buildings: Building[] = [
     description: "The town's priest will heal you, for a small fee.",
     cost       : { meat: 5, gold: 1 },
     requirement: {
-      inBuilding: "Town",
+      inBuilding: ["Town", "Village"],
     },
   },
 

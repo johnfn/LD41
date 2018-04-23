@@ -140,7 +140,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       if (selection.building || selection.special === "start") {
         if (b.hideWhenCantBuy) {
           if (selection.special === "start") {
-            if (b.requirement.inBuilding !== "Town") {
+            if (b.requirement.inBuilding && b.requirement.inBuilding.indexOf("Town") === -1) {
               obj.canBuild = false;
               obj.whyNot   = `You need to be in a ${ b.requirement.inBuilding } to make one of those.`;
 
@@ -149,7 +149,8 @@ class Toolbar extends React.Component<{}, ToolbarState> {
               continue;
             }
           } else {
-            if (selection.building!.building.name !== b.requirement.inBuilding) {
+            if (b.requirement.inBuilding && 
+              b.requirement.inBuilding.indexOf(selection.building!.building.name) === -1) {
               obj.canBuild = false;
               obj.whyNot   = `You need to be in a ${ b.requirement.inBuilding } to make one of those.`;
 
@@ -557,21 +558,31 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
     return (
       <>
-        <div style={{ paddingTop: "20px" }}>
-          Build:
-        </div>
+      {
+        availableBuildings.filter(x => x.canBuild).length > 0 &&
+        <>
+          <div style={{ paddingTop: "20px" }}>
+            Build:
+          </div>
 
-        {
-          availableBuildings.map(b => renderThing(b))
-        }
+          {
+            availableBuildings.map(b => renderThing(b))
+          }
+        </>
+      }
 
-        <div style={{ paddingTop: "20px" }}>
-          Buy:
-        </div>
+      {
+        availableOther.filter(x => x.canBuild).length > 0 &&
+          <>
+            <div style={{ paddingTop: "20px" }}>
+              Buy:
+            </div>
 
-        {
-          availableOther.map(b => renderThing(b))
-        }
+            {
+              availableOther.map(b => renderThing(b))
+            }
+          </>
+      }
 
 
         <div style={{ paddingTop: "20px" }}>
@@ -682,8 +693,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
           </div>
 
           {
-            !onTopOf.building &&
-              this.renderBuildSomething(this.gameState.map.world.enemyAt({ x: onTopOf.xIndex, y: onTopOf.yIndex }))
+            this.renderBuildSomething(this.gameState.map.world.enemyAt({ x: onTopOf.xIndex, y: onTopOf.yIndex }))
           }
 
           {

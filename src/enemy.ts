@@ -49,6 +49,9 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
 
     this.health2.x = 4;
     this.health2.y = 4;
+
+    this.x = this.worldX * Constants.MACRO.TILE_WIDTH;
+    this.y = this.worldY * Constants.MACRO.TILE_HEIGHT;
   }
 
   subtractEnemy(): any {
