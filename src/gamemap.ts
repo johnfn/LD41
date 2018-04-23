@@ -161,7 +161,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
         if (blockers.water   && this.world.map[next.x][next.y].terrain   === "water") { continue; }
         if (blockers.unknown && this.world.map[next.x][next.y].fogStatus === "unknown") { continue; }
         if (blockers.unseen  && 
-          !Constants.DEBUG.TRAVEL_ON_UNKNOWN &&
+          !Constants.DEBUG.ALWAYS_FAST_TRAVEL &&
           this.world.map[next.x][next.y].fogStatus === "seen"
         ) { continue; }
 

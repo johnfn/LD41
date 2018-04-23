@@ -65,13 +65,66 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
   }
 
   update(state: State): void {
-    if (state.tick % Constants.ENEMY_SPEED === 0) {
-      const validNextPos = ([
+    if ((state.tick % Constants.ENEMY_SPEED === 0) || (
+        Constants.DEBUG.FAST_ENEMY &&
+        state.tick % 100 === 0
+      )
+    ) {
+
+      // try to find building to destroy
+
+      let buildingTargets = this.state.map.world.getCells()
+        .filter(cell => cell.building)
+        .filter(cell => Util.ManhattanDistance(
+          cell,
+          { xIndex: this.worldX, yIndex: this.worldY }
+        ) < Constants.ENEMY_BUILDING_SIGHT)
+      ;
+
+      // TODO if you're on top of any building, dont move!
+
+      buildingTargets = Util.SortByKey(buildingTargets, k => (
+        ((k.building!.building.cost.gold || 0) * 3) + 
+        ( k.building!.building.cost.wood || 0) + 
+        ( k.building!.building.cost.meat || 0)
+      ));
+
+      const buildingTarget = buildingTargets[0];
+
+      let nextPosChoices: [number, number][] 
+
+      const fourDirections: [number, number][] = [
         [this.worldX +  0, this.worldY +  1],
         [this.worldX +  0, this.worldY + -1],
         [this.worldX +  1, this.worldY +  0],
         [this.worldX + -1, this.worldY +  0]
-      ] as [number, number][]).filter(([x, y]) => {
+      ];
+
+      debugger;
+
+      if (buildingTarget) {
+        const buildingDir: [number, number] = [
+          this.worldX + Util.Sign(buildingTarget.xIndex - this.worldX),
+          this.worldY + Util.Sign(buildingTarget.yIndex - this.worldY),
+        ];
+
+        // generally walk in the building dir but introduce a lil randomness
+
+        // TODO could use pathfind algo here
+
+        nextPosChoices = [
+          buildingDir,
+          buildingDir,
+          buildingDir,
+          buildingDir,
+          buildingDir,
+          Util.RandElem(fourDirections),
+        ]
+      } else {
+        nextPosChoices = fourDirections;
+      }
+
+      const validNextPos = nextPosChoices.filter(([x, y]) => {
         if (!World.InBoundsRel(x, y)) {
           return false;
         }

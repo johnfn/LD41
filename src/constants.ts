@@ -1,14 +1,17 @@
 const Constants = {
   DEBUG: {
-    FOG_OF_WAR       : true,
-    TRAVEL_ON_UNKNOWN: false,
-    FAST_RESOURCES   : false,
-    MANY_RESOURCES   : true,
-    POP_BOOST        : false,
-    JUST_ONE_ENEMY   : true,
+    FOG_OF_WAR        : true,
+    ALWAYS_FAST_TRAVEL: true,
+    FAST_RESOURCES    : false,
+    MANY_RESOURCES    : true,
+    POP_BOOST         : false,
+    JUST_ONE_ENEMY    : true,
+    FAST_ENEMY        : true,
   },
 
   GOLD_DROP_RATE: 0.4,
+
+  ENEMY_BUILDING_SIGHT: 15,
 
   ENEMY_GROUP_SIZE_LOW : 3,
   ENEMY_GROUP_SIZE_HIGH: 7,
