@@ -365,6 +365,55 @@ class World extends PIXI.Graphics implements Updatable {
     this.addChild(this.map[x][y].building!.graphics);
 
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0)
+
+    if (building.name === "Road") {
+      this.calculateRoadVariantAt(x, y);
+
+      for (const [dx, dy] of [
+        [ 0, -1],
+        [ 1,  0],
+        [ 0,  1],
+        [-1,  0],
+      ]) {
+        const nx = x + dx;
+        const ny = y + dy;
+
+        if (World.InBounds(nx, ny)) {
+          this.calculateRoadVariantAt(nx, ny);
+        }
+      }
+    }
+  }
+
+  calculateRoadVariantAt(x: number, y: number): void {
+    let roadVariant = "road";
+
+    // clockwise NESW
+    for (const [dx, dy] of [
+      [ 0, -1],
+      [ 1,  0],
+      [ 0,  1],
+      [-1,  0],
+    ]) {
+      const nx = x + dx;
+      const ny = y + dy;
+
+      if (!World.InBounds(nx, ny)) {
+        roadVariant += "0"
+
+        continue;
+      }
+
+      const neighbor = this.map[nx][ny];
+
+      if (neighbor.building && neighbor.building.building.name === "Road") {
+        roadVariant += "1";
+      } else {
+        roadVariant += "0";
+      }
+    }
+
+    this.map[x][y].variant = roadVariant;
   }
 
   getCellAt(x: number, y: number) {

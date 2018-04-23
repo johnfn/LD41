@@ -65,6 +65,24 @@ const Constants = {
     ],
     town: [
       "town",
+    ],
+    roads: [ 
+      "road0000",
+      "road0001",
+      "road0010",
+      "road0011",
+      "road0100",
+      "road0101",
+      "road0110",
+      "road0111",
+      "road1000",
+      "road1001",
+      "road1010",
+      "road1011",
+      "road1100",
+      "road1101",
+      "road1110",
+      "road1111",
     ]
   }
 };
