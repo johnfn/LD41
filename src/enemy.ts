@@ -176,12 +176,17 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
   }
 
   remove(): void {
-    const c = new Coin(this.state);
+    if (
+      Math.random() < Constants.GOLD_DROP_RATE ||
+      this.state.gold < 3
+    ) {
+      const c = new Coin(this.state);
 
-    c.x = this.x;
-    c.y = this.y;
+      c.x = this.x;
+      c.y = this.y;
 
-    this.parent.addChild(c);
+      this.parent.addChild(c);
+    }
 
     this.state.remove(this);
     this.state.remove(this.bar);

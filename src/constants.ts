@@ -8,6 +8,8 @@ const Constants = {
     JUST_ONE_ENEMY   : true,
   },
 
+  GOLD_DROP_RATE: 0.4,
+
   ENEMY_GROUP_SIZE_LOW : 3,
   ENEMY_GROUP_SIZE_HIGH: 7,
   NUM_START_ENEMIES: 20,
