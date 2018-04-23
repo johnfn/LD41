@@ -147,7 +147,7 @@ class Rect {
   }
 
   // consider overlapping edges as intersection, but not overlapping corners.
-  intersects(other: Rect, { edgesOnlyIsAnIntersection = false }): boolean {
+  intersects(other: Rect, edgesOnlyIsAnIntersection = false): boolean {
     const intersection = this.getIntersection(other, true);
 
     if (edgesOnlyIsAnIntersection) {

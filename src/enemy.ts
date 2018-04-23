@@ -148,6 +148,13 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
   }
 
   remove(): void {
+    const c = new Coin(this.state);
+
+    c.x = this.x;
+    c.y = this.y;
+
+    this.parent.addChild(c);
+
     this.state.remove(this);
     this.state.remove(this.bar);
     this.parent.removeChild(this);
@@ -187,5 +194,46 @@ class HealthBar extends PIXI.Graphics implements Updatable {
 
   update(_state: State): void {
 
+  }
+}
+
+class Coin extends PIXI.Sprite implements Updatable {
+  activeMode: Mode = "Micro";
+  z     = 100;
+  speed = 5;
+  state: State;
+
+  constructor(state: State) {
+    super();
+
+    this.state = state;
+
+    state.add(this);
+
+    this.texture = TextureCache.GetCachedSpritesheetTexture(
+      "micro", 3, 1).texture;
+  }
+
+  update(state: State): void {
+    const coin = new Rect({ x: this.x, y: this.y, w: 32, h: 32 });
+    const player = new Rect({ x: this.state.playersMapX, y: this.state.playersMapY, w: 32, h: 32 });
+
+    if (coin.intersects(player)) {
+      this.state.gold += 1;
+
+      this.remove(state);
+
+      const txtgfx = new FloatUpText(state, "+1 Gold");
+
+      this.state.microworld.addChild(txtgfx)
+
+      txtgfx.x = this.x;
+      txtgfx.y = this.y;
+    }
+  }
+
+  remove(state: State): void {
+    state.remove(this);
+    this.parent.removeChild(this);
   }
 }

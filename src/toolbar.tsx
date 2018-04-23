@@ -78,6 +78,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
       wood: gameState.wood,
       meat: gameState.meat,
+      gold: gameState.gold,
       pop : gameState.pop,
 
       playerWorldX: gameState.playersWorldX,

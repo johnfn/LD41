@@ -1,12 +1,13 @@
 - enemies?
   - drop gold
+    - floating text
+    - remove on map leave
   - can attack you?
+  - spawn
   - ways to heal (i think just at town) (you can just buy it, easy)
   - buy more health
   - buy better weapons.
   - buy bullets
-  - can be CLEARED, which removes them from macro
-    - also killing one is a perma removal from the group
   - enemy destroying buildings 
   - walls
   - shouldn't enemy groups have sizes
