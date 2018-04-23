@@ -1,5 +1,4 @@
 - enemies?
-  - walls
   - enemy destroying buildings 
   - spawn
   - buy better weapons.
@@ -15,10 +14,13 @@
   - start out not able to access
   - gain access somehow
 - build villages
+  - village: can build anywhere
 - add like, 400 more variations
 - icons for stats
 - win condition
 - destroy building
+- STUPID health bar sorting issues
+- it's also hard to make them invis
 
 - bullets go over water
 
@@ -89,6 +91,7 @@ BUGS
 - keys can get stuck in wrong mode
 - should prob add escape hatches for do whiles
 - hometown can be a forest lol
+- what happens when two macro enemies overlap
 
 DREAMLAND
 - a hierarchy view would be nice

@@ -63,9 +63,7 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
     this.health.text = String(this.size);
   }
 
-  move(state: State): void {
-    // try to find building to destroy
-
+  buildingTarget(): WorldCell | undefined {
     let buildingTargets = this.state.map.world.getCells()
       .filter(cell => cell.building && cell.building.building.name !== "Wall")
       .filter(cell => Util.ManhattanDistance(
@@ -80,7 +78,11 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
       ( k.building!.building.cost.meat || 0)
     )).reverse();
 
-    const buildingTarget = buildingTargets[0];
+    return buildingTargets[0];
+  }
+
+  move(state: State): void {
+    // try to find building to destroy
 
     let nextPosChoices: [number, number][] 
 
@@ -90,6 +92,8 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
       [this.worldX +  1, this.worldY +  0],
       [this.worldX + -1, this.worldY +  0]
     ];
+
+    const buildingTarget = this.buildingTarget();
 
     if (buildingTarget) {
       if (
@@ -146,12 +150,39 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
     }
   }
 
+  buildingOnTopOf(): WorldCell | undefined {
+    const buildingTarget = this.buildingTarget();
+
+    if (buildingTarget) {
+      if (
+        this.worldX === buildingTarget.xIndex &&
+        this.worldY === buildingTarget.yIndex
+      ) {
+        return buildingTarget;
+      }
+    }
+
+    return undefined;
+  }
+
+  attack(): void {
+    const target = this.buildingOnTopOf();
+
+    if (!target) {
+      return;
+    }
+
+    target.building!.graphics.damage(1);
+  }
+
   update(state: State): void {
     if ((state.tick % Constants.ENEMY_SPEED === 0) || (
         Constants.DEBUG.FAST_ENEMY &&
         state.tick % 100 === 0
       )
     ) {
+      this.attack();
+
       this.move(state);
     }
 
@@ -317,6 +348,10 @@ class HealthBar extends PIXI.Graphics implements Updatable {
   update(_state: State): void {
 
   }
+}
+
+class HealthBarMacro extends HealthBar {
+  activeMode: Mode = "Macro";
 }
 
 class Coin extends PIXI.Sprite implements Updatable {

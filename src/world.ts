@@ -18,6 +18,8 @@ type Building = {
   name         : BuildingName;
   description  : string;
   hotkey      ?: string;
+  health       : number;
+  maxHealth    : number;
   vision       : number;
   hideWhenCantBuy   
               ?: boolean;
@@ -38,6 +40,7 @@ type Building = {
 
 type BuildingExtra = {
   resourcesLeft ?: number;
+  health         : number;
   harvestState  ?: HarvestState | undefined;
   populationOn  ?: number;
 }
@@ -54,6 +57,8 @@ const Buildings: Building[] = [
   {
     name       : "+1 Population",
     vision     : 0,
+    health     : 0,
+    maxHealth  : 0,
     hideWhenCantBuy  
                : true,
     harvester  : false,
@@ -67,6 +72,8 @@ const Buildings: Building[] = [
   {
     name       : "+3 Health",
     vision     : 0,
+    health     : 0,
+    maxHealth  : 0,
     hideWhenCantBuy  
                : true,
     harvester  : false,
@@ -82,6 +89,8 @@ const Buildings: Building[] = [
     name       : "Road",
     hotkey     : "X",
     vision     : 2,
+    health     : 5,
+    maxHealth  : 5,
     spritesheet: [4, 0],
     description: "All buildings must be connected by roads.",
     harvester  : false,
@@ -94,6 +103,8 @@ const Buildings: Building[] = [
     name       : "Farm",
     hotkey     : "C",
     vision     : 2,
+    health     : 10,
+    maxHealth  : 10,
     spritesheet: [4, 2],
     description: "Harvests food, slowly. Can harvest more when closer to water.",
     harvester  : true,
@@ -107,6 +118,8 @@ const Buildings: Building[] = [
     name       : "Village",
     hotkey     : "V",
     vision     : 4,
+    health     : 10,
+    maxHealth  : 10,
     spritesheet: [5, 0],
     harvester  : false,
     description: "Sells basic adventuring supplies. Has an Inn to rest at.",
@@ -119,6 +132,8 @@ const Buildings: Building[] = [
     name        : "Lumber Yard",
     hotkey      : "B",
     vision      : 3,
+    health     : 10,
+    maxHealth  : 10,
     spritesheet: [4, 1],
     harvester   : true,
     description : "Harvests wood.",
@@ -133,6 +148,8 @@ const Buildings: Building[] = [
     name       : "Dock",
     hotkey     : "N",
     vision     : 3,
+    health     : 20,
+    maxHealth  : 20,
     harvester  : true,
     resourceName: "meat",
     description: "Builds ships to sail the seas.",
@@ -147,9 +164,11 @@ const Buildings: Building[] = [
     name       : "Guard Tower",
     hotkey     : "M",
     vision     : 12,
+    health     : 10,
+    maxHealth  : 10,
     harvester  : false,
     spritesheet: [4, 3],
-    description: "Allows you to see enemies from a far distance.",
+    description: "Allows you to see a far distance.",
     cost       : { wood: 10 },
     requirement: {
       on: ["grass"],
@@ -160,9 +179,11 @@ const Buildings: Building[] = [
     name       : "Wall",
     hotkey     : "1",
     vision     : 2,
+    health     : 5,
+    maxHealth  : 5,
     harvester  : false,
     spritesheet: [4, 4],
-    description: "Keeps enemies out.",
+    description: "Blocks enemies, but you can still walk on them.",
     cost       : { wood: 1 },
     requirement: {
       on: ["grass", "snow"],
@@ -953,6 +974,7 @@ class BuildingGraphic extends PIXI.Sprite implements Updatable {
   showPop   = false;
   pop      ?: PIXI.Text;
   pop2     ?: PIXI.Text;
+  bar      ?: HealthBar;
 
   constructor(state: State, cell: WorldCell) {
     super();
@@ -1002,6 +1024,14 @@ class BuildingGraphic extends PIXI.Sprite implements Updatable {
       this.pop2.x = 4;
       this.pop2.y = 4;
     }
+
+    this.bar = new HealthBarMacro(this.state);
+    this.addChild(this.bar);
+
+    this.bar.y = this.y - 8;
+    this.bar.x = this.x;
+
+    this.bar.visible = false;
   }
 
   update(_state: State): void {
@@ -1014,5 +1044,25 @@ class BuildingGraphic extends PIXI.Sprite implements Updatable {
       this.pop !.text = String(player + (this.cell.building!.extra.populationOn || 0));
       this.pop2!.text = String(player + (this.cell.building!.extra.populationOn || 0));
     }
+  }
+
+  damage(amount: number): void {
+    this.cell.building!.extra.health -= amount;
+
+    this.state.addMessage({
+      type: "error",
+      msg: `A monster attacks your ${ this.cell.building!.building.name }, dealing ${ amount } damage! It has ${ this.cell.building!.extra.health } health left.`
+    });
+
+    const txtgfx = new FloatUpText(this.state, "-1");
+
+    this.state.microworld.addChild(txtgfx)
+
+    txtgfx.x = this.x;
+    txtgfx.y = this.y;
+
+    this.bar!.setPercentage(this.cell.building!.extra.health / this.cell.building!.building.maxHealth);
+
+    this.bar!.visible = true;
   }
 }

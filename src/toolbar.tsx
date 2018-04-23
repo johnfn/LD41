@@ -316,7 +316,9 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       this.gameState.gold -= b.building.cost.gold;
     }
 
-    const be: BuildingExtra = {};
+    const be: BuildingExtra = {
+      health: b.building.health,
+    };
 
     if (b.building.name === "Farm") {
       be.resourcesLeft = 10 + (Constants.DEBUG.MANY_RESOURCES ? 10000 : 0);
@@ -364,7 +366,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       if (cell.building.building.harvester) {
         return (
           <div>
-            <div>A { name }.</div>
+            <div>A { name } ({ cell.building.extra.health }/{ cell.building.building.maxHealth }).</div>
             <div>
               { extra.resourcesLeft } { cell.building.building.resourceName } left.
             </div>
@@ -374,7 +376,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
           </div>
         );
       } else {
-        return `A ${ name }.`;
+        return `A ${ name } (${ cell.building.building.health }/${ cell.building.building.maxHealth }).`;
       }
     } 
 
@@ -668,11 +670,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       }}>
         <div style={{ minHeight: "400px" }}>
           <div>
-            Meat: { this.state.meat } | Wood: { this.state.wood } | Gold: { this.state.gold } | Pop: { this.state.pop }
-          </div>
-
-          <div>
-            Health: { this.state.health } / { this.state.maxHealth }
+            Meat: { this.state.meat } | Wood: { this.state.wood } | Gold: { this.state.gold } | Pop: { this.state.pop } | Health: { this.state.health }/{ this.state.maxHealth }
           </div>
 
           <div>
