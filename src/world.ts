@@ -290,6 +290,16 @@ class World extends PIXI.Graphics implements Updatable {
     );
   }
 
+  enemyAt(pos: { x: number, y: number }): MacroEnemy | undefined {
+    const enemList = this.enemies.filter(e => {
+      return (
+        e.worldX === pos.x &&
+        e.worldY === pos.y
+      );
+    });
+
+    return enemList.length > 0 ? enemList[0] : undefined;
+  }
 
   update(_state: State) {
 

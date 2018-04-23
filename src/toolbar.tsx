@@ -4,7 +4,7 @@ interface ToolbarState {
 
   wood: number;
   meat: number;
-  ore : number;
+  gold: number;
   pop : number;
 
   playerWorldX: number;
@@ -302,7 +302,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     }
   }
 
-  getDescription(cell: WorldCell): React.ReactNode {
+  getDescription(cell: WorldCell, enemies: MacroEnemy | undefined): React.ReactNode {
     if (cell.fogStatus === "unknown") {
       return "I can't see anything there";
     }
@@ -328,31 +328,41 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       }
     } 
 
+    let desc = "";
+
     if (cell.special !== "none") {
       if (cell.special === "ice") {
-        return "A mysterious-looking ice temple.";
+        desc = "A mysterious-looking ice temple";
       } else if (cell.special === "water") {
-        return "It seems like there's something under the water.";
+        desc = "A mysterious underwater temple";
       } else if (cell.special === "end") {
-        return "A mysterious obelisk.";
+        desc = "A mysterious obelisk";
       } else if (cell.special === "start") {
-        return "My hometown.";
+        desc = "My hometown";
       }
     }
 
     if (cell.terrain === "snow") {
-      return "Snowy mountains.";
+      desc = "Snowy mountains";
     } else if (cell.terrain === "water") {
-      return "A body of water.";
+      desc = "A body of water";
     } else if (cell.terrain === "grass") {
       if (cell.hasResources) {
-        return "A forest.";
+        desc = "A forest";
       } else {
-        return "A grassy field.";
+        desc = "A grassy field";
       }
     }
 
-    return "";
+    if (enemies) {
+      return (
+        <span>
+          { desc }<span style={{ color: "red" }}>, with enemies!</span>
+        </span>
+      )
+    } else {
+      return `${ desc }.`;
+    }
   }
 
   buyPop(): void {
@@ -449,11 +459,19 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     );
   }
 
-  renderBuildSomething(): JSX.Element {
+  renderBuildSomething(enemies: MacroEnemy | undefined): JSX.Element {
     if (this.gameState.mode === "Micro") {
       return (
         <div>
           Return to world view (Z) to build something here.
+        </div>
+      );
+    }
+
+    if (enemies) {
+      return (
+        <div>
+          You can't build anything while enemies are here!
         </div>
       );
     }
@@ -563,7 +581,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         </div>
 
         <div>
-          { this.getDescription(selection) }
+          { this.getDescription(selection, this.gameState.map.world.enemyAt({ x: selection.xIndex, y: selection.yIndex })) }
         </div>
 
         <div>
@@ -572,7 +590,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
         {
           !onTopOf.building &&
-            this.renderBuildSomething()
+            this.renderBuildSomething(this.gameState.map.world.enemyAt({ x: onTopOf.xIndex, y: onTopOf.yIndex }))
         }
 
         {
