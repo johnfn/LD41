@@ -394,7 +394,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     if (enemies) {
       return (
         <span>
-          { desc }<span style={{ color: "red" }}>, with enemies!</span>
+          { desc }<span style={{ color: "red" }}>, with { enemies.size } enemies!</span>
         </span>
       )
     } else {

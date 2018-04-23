@@ -581,8 +581,10 @@ class World extends PIXI.Graphics implements Updatable {
         this.state,
         wx,
         wy,
-        Constants.ENEMY_GROUP_SIZE_LOW +
-          Math.random() * (Constants.ENEMY_GROUP_SIZE_HIGH - Constants.ENEMY_GROUP_SIZE_LOW)
+        Math.floor(
+          Constants.ENEMY_GROUP_SIZE_LOW +
+            Math.random() * (Constants.ENEMY_GROUP_SIZE_HIGH - Constants.ENEMY_GROUP_SIZE_LOW)
+        ),
       );
 
       this.addChild(newEnemy);

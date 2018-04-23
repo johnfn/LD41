@@ -10,6 +10,9 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
 
   size: number;
 
+  health  : PIXI.Text;
+  health2 : PIXI.Text;
+
   constructor(state: State, worldX: number, worldY: number, size: number) {
     super();
 
@@ -26,6 +29,27 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
 
     this.texture = TextureCache.GetCachedSpritesheetTexture(
       "macro", 6, 0).texture;
+
+    this.addChild(this.health2 = new PIXI.Text(String(this.size), {
+      fontFamily: 'FreePixel', 
+      fontSize  : 24, 
+      fill      : 0x000000, 
+      align     : 'left'
+    }));
+
+    this.addChild(this.health = new PIXI.Text(String(this.size), {
+      fontFamily: 'FreePixel', 
+      fontSize  : 24, 
+      fill      : 0xffffff, 
+      align     : 'left'
+    }));
+
+
+    this.health.x  = 2;
+    this.health.y  = 2;
+
+    this.health2.x = 4;
+    this.health2.y = 4;
   }
 
   subtractEnemy(): any {
@@ -35,6 +59,9 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
       this.state.remove(this);
       this.parent.removeChild(this);
     }
+
+    this.health2.text = String(this.size);
+    this.health.text = String(this.size);
   }
 
   update(state: State): void {
