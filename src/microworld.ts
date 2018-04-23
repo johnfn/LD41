@@ -55,6 +55,14 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       }
     }
 
+    for (const me of this.microEnemies) {
+      const r = new Rect({ x: me.x, y: me.y, w: 32, h: 32 });
+
+      if (r.contains({ x, y })) {
+        return true;
+      }
+    }
+
     return false;
   }
 

@@ -12,8 +12,6 @@
 - win condition
 - you have a graphic now
 
-
-
 - lumber yard etc should indicate population
   - also resources left
 
@@ -72,11 +70,14 @@
 BUGS
 - you can get stuck when zooming
   - chooseRandomValidMapPos should help.
+- the border from snow to grass is actually white
+- you overlap the white borders
 - the town you start should never border anything.
 - when you click somewhere, put the character in the center
 - diagonal kinda poses some problemz. hmm
 - pathfind should be cancelled when you press Z
 - keys can get stuck in wrong mode
+- should prob add escape hatches for do whiles
 
 DREAMLAND
 - a hierarchy view would be nice
