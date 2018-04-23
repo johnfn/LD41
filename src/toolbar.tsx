@@ -286,7 +286,10 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
   build(b: BuildingAndCanAfford): void {
     if (!b.canBuild) {
-      alert(b.whyNot);
+      this.gameState.messages.push({
+        type: "error",
+        msg: b.whyNot,
+      });
 
       return;
     }
@@ -593,6 +596,28 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     );
   }
 
+  renderMessages(): JSX.Element {
+    const messages = this.gameState.messages.slice(-3);
+
+    return (
+      <div>
+        <div>Messages</div>
+
+        { 
+          messages.map(m => 
+            <div
+              style={{
+                color: m.type === "error" ? "red" : "gray"
+              }}
+            >
+              { m.msg }
+            </div>
+          )
+        }
+      </div>
+    );
+  }
+
   render(): JSX.Element {
     let onTopOf = this.gameState.map.world.getCellAt(
       this.state.playerWorldX, 
@@ -631,29 +656,35 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         color: "white",
         paddingLeft: "20px",
       }}>
-        <div>
-          Meat: { this.state.meat } | Wood: { this.state.wood } | Gold: { this.state.gold } | Pop: { this.state.pop }
-        </div>
+        <div style={{ minHeight: "400px" }}>
+          <div>
+            Meat: { this.state.meat } | Wood: { this.state.wood } | Gold: { this.state.gold } | Pop: { this.state.pop }
+          </div>
 
-        <div>
-          Health: { this.state.health } / { this.state.maxHealth }
-        </div>
+          <div>
+            Health: { this.state.health } / { this.state.maxHealth }
+          </div>
 
-        <div>
-          { this.getDescription(selection, this.gameState.map.world.enemyAt({ x: selection.xIndex, y: selection.yIndex })) }
-        </div>
+          <div>
+            { this.getDescription(selection, this.gameState.map.world.enemyAt({ x: selection.xIndex, y: selection.yIndex })) }
+          </div>
 
-        <div>
-          Elevation: { height }
+          <div>
+            Elevation: { height }
+          </div>
+
+          {
+            !onTopOf.building &&
+              this.renderBuildSomething(this.gameState.map.world.enemyAt({ x: onTopOf.xIndex, y: onTopOf.yIndex }))
+          }
+
+          {
+            this.renderBuyAndHarvest(onTopOf)
+          }
         </div>
 
         {
-          !onTopOf.building &&
-            this.renderBuildSomething(this.gameState.map.world.enemyAt({ x: onTopOf.xIndex, y: onTopOf.yIndex }))
-        }
-
-        {
-          this.renderBuyAndHarvest(onTopOf)
+          this.renderMessages()
         }
       </div>
     )

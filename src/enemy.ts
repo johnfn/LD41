@@ -289,6 +289,11 @@ class Coin extends PIXI.Sprite implements Updatable {
 
       txtgfx.x = this.x;
       txtgfx.y = this.y;
+
+      state.addMessage({
+        type: "warning",
+        msg: `You get 1 gold.`,
+      });
     }
   }
 

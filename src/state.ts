@@ -1,6 +1,6 @@
 type Mode = "Macro" | "Micro" | "All";
 
-interface Notification {
+interface Message {
   type: "error" | "warning";
   msg: string;
 }
@@ -39,7 +39,7 @@ class State {
   playersMapX  : number;
   playersMapY  : number;
 
-  notifications: Notification[];
+  messages: Message[];
 
   tick = 0;
 
@@ -59,7 +59,7 @@ class State {
 
     this.pop  = Constants.DEBUG.POP_BOOST ? 5 : 0;
 
-    this.notifications = [];
+    this.messages = [];
 
     const app = new PIXI.Application(
       Constants.SCREEN_SIZE, 
@@ -93,8 +93,8 @@ class State {
     this.gameLoop();
   }
 
-  addNotification(notification: Notification): void {
-    this.notifications.push(notification);
+  addMessage(msg: Message): void {
+    this.messages.push(msg);
   }
 
   add(u: Updatable) {
@@ -191,16 +191,36 @@ class State {
 
           currentCell.building.extra.resourcesLeft! -= 1;
           showText = true;
+
+          this.addMessage({
+            type: "warning",
+            msg: `You harvest 1 meat.`,
+          });
         } else {
           if (currentCell.terrain === "grass") {
             this.wood++;
             showText = true;
+
+            this.addMessage({
+              type: "warning",
+              msg: `You harvest 1 wood.`,
+            });
           } else if (currentCell.terrain === "snow") {
             this.gold++;
             showText = true;
+
+            this.addMessage({
+              type: "warning",
+              msg: `You harvest 1 gold.`,
+            });
           } else if (currentCell.terrain === "water") {
             this.meat++;
             showText = true;
+
+            this.addMessage({
+              type: "warning",
+              msg: `You harvest 1 meat.`,
+            });
           }
         }
 

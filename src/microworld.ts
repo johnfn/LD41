@@ -505,6 +505,7 @@ class Bullet extends PIXI.Sprite implements Updatable {
   activeMode: Mode = "Micro";
   z     = 100;
   speed = 5;
+  damage = 1;
   dir: [number, number];
 
   constructor(state: State, dir: [number, number]) {
@@ -532,11 +533,21 @@ class Bullet extends PIXI.Sprite implements Updatable {
       this.remove(state);
 
       if (coll.enemy) {
-        coll.enemy.damage(1);
+        coll.enemy.damage(this.damage);
+
+        state.addMessage({
+          type: "warning",
+          msg: `The monster takes ${ this.damage } damage!`,
+        });
       }
 
       if (coll.player) {
-        state.microworld.player.tryToTakeDamage(state, 1, { x: this.dir[0], y: this.dir[1] });
+        state.microworld.player.tryToTakeDamage(state, this.damage, { x: this.dir[0], y: this.dir[1] });
+
+        state.addMessage({
+          type: "error",
+          msg: `You take ${ this.damage } damage!`,
+        });
       }
     }
   }

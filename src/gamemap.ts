@@ -41,14 +41,25 @@ class GameMap extends PIXI.Graphics implements Updatable {
     if (state.keyboard.justDown.S) d.y =  1;
 
     if (d.x !== 0 || d.y !== 0) {
-      this.path = this.pathfind({
+      const start = {
         x: this.state.playersWorldX, 
         y: this.state.playersWorldY, 
-      },
-      { 
+      };
+
+      const end = { 
         x: this.state.playersWorldX + d.x, 
         y: this.state.playersWorldY + d.y, 
+      };
+
+      this.path = this.pathfind(start, end, {
+        water  : true,
+        unknown: true,
+        unseen : true
       });
+
+      if (!this.path) {
+        this.showHelpfulPathfindMessage(start, end);
+      }
     }
 
     if (this.path && this.path.length > 0) {
@@ -61,25 +72,61 @@ class GameMap extends PIXI.Graphics implements Updatable {
     }
   }
 
+  showHelpfulPathfindMessage(start: { x: number, y: number }, end: { x: number, y: number }) {
+    if (start.x === end.x && start.y === end.y) {
+      return;
+    }
+
+    const p = this.pathfind(start, end, { 
+      water  : true,
+      unknown: true,
+      unseen : false
+    });
+
+    if (p) {
+      this.state.addMessage({
+        type: "warning",
+        msg: "You need to navigate there in the Zoomed-In World (press Z) before you can fast travel.",
+      });
+
+      return;
+    }
+  }
+
   click(ev: any): void {
     if (ev.type === "click") { return; } // wtf i didnt ask for u go away
 
     const pt: PIXI.Point = ev.data.getLocalPosition(this);
 
-    this.path = this.pathfind( { 
-        x: this.state.playersWorldX, 
-        y: this.state.playersWorldY, 
-      },
-      { 
-        x: Math.floor(pt.x / Constants.MACRO.TILE_WIDTH ), 
-        y: Math.floor(pt.y / Constants.MACRO.TILE_HEIGHT), 
-      },
-    );
+    const start = { 
+      x: this.state.playersWorldX, 
+      y: this.state.playersWorldY, 
+    };
+
+    const end = { 
+      x: Math.floor(pt.x / Constants.MACRO.TILE_WIDTH ), 
+      y: Math.floor(pt.y / Constants.MACRO.TILE_HEIGHT), 
+    };
+
+    this.path = this.pathfind(start, end, {
+      water  : true,
+      unknown: true,
+      unseen : true,
+    });
+
+    if (!this.path) {
+      this.showHelpfulPathfindMessage(start, end);
+    }
   }
 
   pathfind(
     start: { x: number, y: number }, 
-    end  : { x: number, y: number }
+    end  : { x: number, y: number },
+    blockers: {
+      water  : boolean;
+      unknown: boolean;
+      unseen : boolean;
+    }
   ): { x: number, y: number }[] | undefined {
     const hash = (props: { x: number, y: number }) => `${ props.x },${ props.y }`;
     const parent: {
@@ -110,9 +157,10 @@ class GameMap extends PIXI.Graphics implements Updatable {
 
         if (!World.InBoundsRel(next.x, next.y)) { continue; }
         if (parent[hash(next)]) { continue; }
-        if (this.world.map[next.x][next.y].terrain   === "water") { continue; }
-        if (this.world.map[next.x][next.y].fogStatus === "unknown") { continue; }
-        if (
+
+        if (blockers.water   && this.world.map[next.x][next.y].terrain   === "water") { continue; }
+        if (blockers.unknown && this.world.map[next.x][next.y].fogStatus === "unknown") { continue; }
+        if (blockers.unseen  && 
           !Constants.DEBUG.TRAVEL_ON_UNKNOWN &&
           this.world.map[next.x][next.y].fogStatus === "seen"
         ) { continue; }
