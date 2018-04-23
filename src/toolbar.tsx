@@ -195,7 +195,10 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         }
       }
 
-      if (b.name !== "Road" && !hasRoadNeighbor) {
+      if ((
+        b.name !== "Road" && 
+        b.name !== "Wall"
+      ) && !hasRoadNeighbor) {
         obj.canBuild = false;
         obj.whyNot   = "I need to build next to another road, or my hometown."
 
@@ -203,6 +206,13 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       }
 
       if (b.name === "Road" && !hasAnyNeighbor) {
+        obj.canBuild = false;
+        obj.whyNot   = "I need to build next to another building, or my hometown."
+
+        continue;
+      }
+
+      if (b.name === "Wall" && !hasAnyNeighbor) {
         obj.canBuild = false;
         obj.whyNot   = "I need to build next to another building, or my hometown."
 

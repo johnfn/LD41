@@ -126,6 +126,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
       water  : boolean;
       unknown: boolean;
       unseen : boolean;
+      wall   : boolean;
     }
   ): { x: number, y: number }[] | undefined {
     const hash = (props: { x: number, y: number }) => `${ props.x },${ props.y }`;
@@ -158,11 +159,15 @@ class GameMap extends PIXI.Graphics implements Updatable {
         if (!World.InBoundsRel(next.x, next.y)) { continue; }
         if (parent[hash(next)]) { continue; }
 
-        if (blockers.water   && this.world.map[next.x][next.y].terrain   === "water") { continue; }
-        if (blockers.unknown && this.world.map[next.x][next.y].fogStatus === "unknown") { continue; }
+        const nextCell = this.world.map[next.x][next.y]
+
+        if (blockers.water   && nextCell.terrain   === "water") { continue; }
+        if (blockers.unknown && nextCell.fogStatus === "unknown") { continue; }
+        if (blockers.wall    && nextCell.building && 
+            nextCell.building.building.name === "Wall") { continue; }
         if (blockers.unseen  && 
           !Constants.DEBUG.ALWAYS_FAST_TRAVEL &&
-          this.world.map[next.x][next.y].fogStatus === "seen"
+          nextCell.fogStatus === "seen"
         ) { continue; }
 
         queue.push(next);

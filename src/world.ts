@@ -1,5 +1,6 @@
 type BuildingName = "Road"
                   | "Farm"
+                  | "Wall"
                   | "Village"
                   | "Town"
                   | "City"
@@ -21,7 +22,7 @@ type Building = {
   hideWhenCantBuy   
               ?: boolean;
   resourceName?: string;
-  spritesheet  : [number, number];
+  spritesheet ?: [number, number];
 
   harvester    : boolean;
   cost         : { wood?: number; meat?: number; gold?: number; }
@@ -152,6 +153,19 @@ const Buildings: Building[] = [
     cost       : { wood: 10 },
     requirement: {
       on: ["grass"],
+    },
+  },
+
+  {
+    name       : "Wall",
+    hotkey     : "1",
+    vision     : 2,
+    harvester  : false,
+    spritesheet: [4, 4],
+    description: "Keeps enemies out.",
+    cost       : { wood: 1 },
+    requirement: {
+      on: ["grass", "snow"],
     },
   },
 ];
@@ -959,11 +973,13 @@ class BuildingGraphic extends PIXI.Sprite implements Updatable {
       this.showPop = true;
     }
 
-    this.texture = TextureCache.GetCachedSpritesheetTexture(
-      "macro", 
-      building.spritesheet[0],
-      building.spritesheet[1]
-    ).texture;
+    if (building.spritesheet) {
+      this.texture = TextureCache.GetCachedSpritesheetTexture(
+        "macro", 
+        building.spritesheet[0],
+        building.spritesheet[1]
+      ).texture;
+    }
 
     if (this.showPop) {
       this.addChild(this.pop2 = new PIXI.Text("0", {

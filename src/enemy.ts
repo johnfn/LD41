@@ -67,7 +67,7 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
     // try to find building to destroy
 
     let buildingTargets = this.state.map.world.getCells()
-      .filter(cell => cell.building)
+      .filter(cell => cell.building && cell.building.building.name !== "Wall")
       .filter(cell => Util.ManhattanDistance(
         cell,
         { xIndex: this.worldX, yIndex: this.worldY }
@@ -103,6 +103,7 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
         { x: this.worldX, y: this.worldY },
         { x: buildingTarget.xIndex, y: buildingTarget.yIndex }, {
           water  : true ,
+          wall   : true,
           unknown: false, // enemies op
           unseen : false,
         }
@@ -127,6 +128,10 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
       const cell = state.map.world.map[x][y];
 
       if (cell.terrain === "water") {
+        return false;
+      }
+
+      if (cell.building && cell.building.building.name === "Wall") {
         return false;
       }
 
