@@ -60,7 +60,10 @@ class MacroEnemy extends PIXI.Sprite implements Updatable {
 
 class MicroEnemy extends PIXI.Sprite implements Updatable {
   activeMode: Mode = "Micro";
-  z = 100;
+  z     = 100;
+  speed = 1;
+
+  dest: { x: number, y: number } | undefined;
 
   constructor(state: State) {
     super();
@@ -71,6 +74,35 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
       "micro", 3, 0).texture;
   }
 
-  update(_state: State): void {
+  update(state: State): void {
+    if (this.dest === undefined) {
+      this.dest = Util.RandElem([
+        { x: this.x + 200, y: this.y },
+        { x: this.x      , y: this.y + 200 },
+        { x: this.x - 200, y: this.y },
+        { x: this.x      , y: this.y - 200 },
+      ].filter(({ x, y }) => World.InBoundsAbs(x, y)));
+    }
+
+    if (this.dest === undefined) { return; }
+
+    const nx = this.x + Util.Sign(this.dest.x - this.x) * this.speed;
+    const ny = this.y + Util.Sign(this.dest.y - this.y) * this.speed;
+
+    if (state.microworld.isCollision(state, nx, ny, 32, { ignoreEnemy: this })) {
+      this.dest = undefined;
+
+      return;
+    } else {
+      this.x = nx;
+      this.y = ny;
+    }
+
+    if (Util.ManhattanDistance(
+      { xIndex: this.x     , yIndex: this.y },
+      { xIndex: this.dest.x, yIndex: this.dest.y }
+    ) < 5) {
+      this.dest = undefined;
+    }
   }
 }

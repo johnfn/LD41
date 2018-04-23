@@ -31,4 +31,11 @@ class Util {
   public static rgbToHexNumber(r: number, g: number, b: number): number {
     return ((1 << 24) + (r << 16) + (g << 8) + b);
   }
+  
+  public static Sign(x: number): number {
+    if (x > 0) return  1;
+    if (x < 0) return -1;
+
+    return 0;
+  }
 }

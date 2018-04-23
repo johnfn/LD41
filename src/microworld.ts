@@ -32,7 +32,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.darkAreas.alpha = 1.0;
   }
 
-  isCollisionHelper(state: State, x: number, y: number): boolean {
+  isCollisionHelper(state: State, x: number, y: number, p?: { ignoreEnemy?: MicroEnemy }): boolean {
     const darkAreas = this.getDarkAreaRects(state);
 
     for (const { rect, type } of darkAreas) {
@@ -56,6 +56,10 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     }
 
     for (const me of this.microEnemies) {
+      if (p && p.ignoreEnemy === me) {
+        continue;
+      }
+
       const r = new Rect({ x: me.x, y: me.y, w: 32, h: 32 });
 
       if (r.contains({ x, y })) {
@@ -66,12 +70,12 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     return false;
   }
 
-  isCollision(state: State, x: number, y: number, size: number): boolean {
+  isCollision(state: State, x: number, y: number, size: number, p?: { ignoreEnemy?: MicroEnemy }): boolean {
     return (
-      this.isCollisionHelper(state, x       , y)        || 
-      this.isCollisionHelper(state, x + size, y)        || 
-      this.isCollisionHelper(state, x       , y + size) || 
-      this.isCollisionHelper(state, x + size, y + size)
+      this.isCollisionHelper(state, x       , y       , p) || 
+      this.isCollisionHelper(state, x + size, y       , p) || 
+      this.isCollisionHelper(state, x       , y + size, p) || 
+      this.isCollisionHelper(state, x + size, y + size, p)
     );
   }
 
