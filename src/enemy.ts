@@ -65,6 +65,9 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
   bar: HealthBar;
   state: State;
 
+  health    = 3;
+  maxHealth = 3;
+
   dest: { x: number, y: number } | undefined;
 
   constructor(state: State) {
@@ -80,6 +83,16 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     this.addChild(this.bar);
 
     this.bar.y = -8;
+  }
+
+  damage(amount: number): void {
+    this.health -= amount;
+
+    if (this.health <= 0) {
+      this.remove();
+    } else {
+      this.bar.setPercentage(this.health / this.maxHealth);
+    }
   }
 
   chooseNewDest(): void {
@@ -129,7 +142,7 @@ class HealthBar extends PIXI.Graphics implements Updatable {
   activeMode: Mode = "Micro";
   z     = 100;
   state: State;
-  perc  = 0.5;
+  perc  = 1;
 
   constructor(state: State) {
     super();

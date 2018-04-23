@@ -453,7 +453,7 @@ class Bullet extends PIXI.Sprite implements Updatable {
       this.remove(state);
 
       if (coll.enemy) {
-        coll.enemy.remove();
+        coll.enemy.damage(1);
       }
     }
   }
