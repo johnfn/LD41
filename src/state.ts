@@ -115,6 +115,10 @@ class State {
         this.mode = "Micro";
 
         this.microworld.loadNewMapRegion(this);
+        const playerPos = this.microworld.chooseRandomValidMapPos(this);
+
+        this.playersMapX = playerPos.x;
+        this.playersMapY = playerPos.y;
       } else {
         this.mode = "Macro";
       }

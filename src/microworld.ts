@@ -288,8 +288,6 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     return { x, y };
   }
 
-  // TODO clean up any old enemy batch if there is one
-
   clearOldEnemies(state: State): void {
     for (const e of this.microEnemies) {
       state.remove(e);
@@ -349,7 +347,8 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
   activeMode: Mode = "Micro";
   z                = 5;
   size             = 32;
-  facing: [number, number] = [0, 0];
+  facing: [number, number] = [1, 0];
+  cooldown         = 60;
 
   constructor(state: State, mw: MicroWorld) {
     super();
@@ -388,7 +387,11 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
     this.x = state.playersMapX;
     this.y = state.playersMapY;
 
-    if (state.keyboard.down.Spacebar) {
+    if (state.keyboard.justDown.Spacebar || (
+          state.keyboard.down.Spacebar && 
+          state.tick % this.cooldown === 0
+        )
+      ) {
       const bullet = new Bullet(state, this.facing);
 
       state.microworld.addChild(bullet);
