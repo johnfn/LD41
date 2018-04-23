@@ -1,16 +1,16 @@
-- add player in macroworld
-- two inaccessible areas - snow and water
-  - start out not able to access
-  - gain access somehow
 - enemies?
   - weapons
+  - get hurt
   - ways to heal (i think just at town)
-  - stuff to buy at town
-  - like better weapons.
+  - buy more health
+  - buy better weapons.
   - enemy destroying buildings and vague macro AI
   - walls
   - shouldn't enemy groups have sizes
   - should move slowly, but deliberately
+- two inaccessible areas - snow and water
+  - start out not able to access
+  - gain access somehow
 - win condition
 - you have a graphic now
 

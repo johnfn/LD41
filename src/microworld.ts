@@ -250,8 +250,17 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
     this.clearOldEnemies(state);
     this.checkShouldAddEnemies(state);
+    this.removeBullets(state);
 
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0);
+  }
+
+  removeBullets(state: State): void {
+    const allBullets: Bullet[] = state.updaters.filter(x => x instanceof Bullet) as Bullet[];
+
+    for (const b of allBullets) {
+      b.remove(state);
+    }
   }
 
   chooseRandomValidMapPos(state: State): { x: number, y: number } {
@@ -340,6 +349,7 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
   activeMode: Mode = "Micro";
   z                = 5;
   size             = 32;
+  facing: [number, number] = [0, 0];
 
   constructor(state: State, mw: MicroWorld) {
     super();
@@ -356,10 +366,16 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
     let newx = state.playersMapX;
     let newy = state.playersMapY;
 
-    if (state.keyboard.down.A) newx -= this.speed;
-    if (state.keyboard.down.D) newx += this.speed;
-    if (state.keyboard.down.W) newy -= this.speed;
-    if (state.keyboard.down.S) newy += this.speed;
+    let newFacing: [number, number] = [0, 0];
+
+    if (state.keyboard.down.A) { newx -= this.speed; newFacing[0] = -1; }
+    if (state.keyboard.down.D) { newx += this.speed; newFacing[0] =  1; }
+    if (state.keyboard.down.W) { newy -= this.speed; newFacing[1] = -1; }
+    if (state.keyboard.down.S) { newy += this.speed; newFacing[1] =  1; }
+
+    if (newFacing[0] !== 0 || newFacing[1] !== 0) {
+      this.facing = newFacing;
+    }
 
     if (!this.microworld.isCollision(state, newx, state.playersMapY, this.size - 5)) {
       state.playersMapX = newx;
@@ -371,5 +387,50 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
 
     this.x = state.playersMapX;
     this.y = state.playersMapY;
+
+    if (state.keyboard.down.Spacebar) {
+      const bullet = new Bullet(state, this.facing);
+
+      state.microworld.addChild(bullet);
+
+      bullet.x = (this.x + 16) + this.facing[0] * 16;
+      bullet.y = (this.y + 16) + this.facing[1] * 16;
+    }
+  }
+}
+
+class Bullet extends PIXI.Sprite implements Updatable {
+  activeMode: Mode = "Micro";
+  z     = 100;
+  speed = 5;
+  dir: [number, number];
+
+  constructor(state: State, dir: [number, number]) {
+    super();
+
+    this.dir = dir;
+
+    state.add(this);
+
+    this.texture = TextureCache.GetCachedSpritesheetTexture(
+      "micro", 7, 1).texture;
+  }
+
+  update(state: State): void {
+    this.x += this.dir[0] * this.speed;
+    this.y += this.dir[1] * this.speed;
+
+    if (
+      !World.InBoundsAbs(this.x, this.y) ||
+      state.microworld.isCollision(state, this.x, this.y, 4)
+    ) {
+      this.remove(state);
+    }
+  }
+
+  remove(state: State): void {
+    state.remove(this);
+    this.parent.removeChild(this);
+    this.destroy();
   }
 }

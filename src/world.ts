@@ -119,7 +119,7 @@ const Buildings: Building[] = [
       near: ["water"],
     },
   },
-]
+];
 
 type WorldCell = {
   height: number;
