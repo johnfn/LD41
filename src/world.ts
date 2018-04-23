@@ -143,6 +143,25 @@ type WorldCell = {
   fogStatus: "unknown" | "seen" | "walked";
 }
 
+class MacroPlayer extends PIXI.Sprite implements Updatable {
+  activeMode: Mode = "Macro";
+  z = 100;
+
+  constructor(state: State) {
+    super();
+
+    state.add(this);
+
+    this.texture = TextureCache.GetCachedSpritesheetTexture(
+      "macro", 7, 0).texture;
+  }
+
+  update(state: State): void {
+    this.x = state.playersWorldX * Constants.MACRO.TILE_WIDTH;
+    this.y = state.playersWorldY * Constants.MACRO.TILE_HEIGHT;
+  }
+}
+
 class MouseGraphic extends PIXI.Graphics implements Updatable {
   z = 100;
   activeMode: Mode = "Macro";
@@ -245,11 +264,12 @@ class World extends PIXI.Graphics implements Updatable {
 
   activeMode: Mode = "Macro";
 
-  app    : PIXI.Application;
-  map    : WorldCell[][];
-  enemies: MacroEnemy[];
-  tilemap: PIXI.Sprite;
-  state: State;
+  app          : PIXI.Application;
+  map          : WorldCell[][];
+  enemies      : MacroEnemy[];
+  tilemap      : PIXI.Sprite;
+  state        : State;
+  playergraphic: MacroPlayer;
 
   constructor(state: State) {
     super();
@@ -270,6 +290,8 @@ class World extends PIXI.Graphics implements Updatable {
     this.buildWorld();
     this.recalculateFogOfWar();
     this.renderWorld();
+
+    this.addChild(this.playergraphic = new MacroPlayer(this.state));
   }
 
   static InBoundsRel(x: number, y: number): boolean {
