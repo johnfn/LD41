@@ -378,7 +378,10 @@ class World extends PIXI.Graphics implements Updatable {
         const nx = x + dx;
         const ny = y + dy;
 
-        if (World.InBounds(nx, ny)) {
+        if (World.InBounds(nx, ny) && 
+            this.map[nx][ny].building && 
+            this.map[nx][ny].building!.building.name === "Road"
+          ) {
           this.calculateRoadVariantAt(nx, ny);
         }
       }
@@ -857,9 +860,14 @@ class BuildingGraphic extends PIXI.Sprite implements Updatable {
   }
 
   update(_state: State): void {
+    const player = (
+      this.state.playersWorldX === this.cell.xIndex && 
+      this.state.playersWorldY === this.cell.yIndex
+    ) ? 1 : 0;
+
     if (this.showPop) {
-      this.pop !.text = String(this.cell.building!.extra.populationOn || 0);
-      this.pop2!.text = String(this.cell.building!.extra.populationOn || 0);
+      this.pop !.text = String(player + (this.cell.building!.extra.populationOn || 0));
+      this.pop2!.text = String(player + (this.cell.building!.extra.populationOn || 0));
     }
   }
 }
