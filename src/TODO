@@ -1,7 +1,6 @@
 - enemies?
   - can attack you?
   - spawn
-  - ways to heal (i think just at town) (you can just buy it, easy)
   - buy better weapons.
   - buy bullets
   - shouldn't be visible in fog of war
@@ -10,10 +9,14 @@
   - should move slowly, but deliberately
   - ... can just walk on you.
 - two inaccessible areas - snow and water
+  - you cant walk on mountains by default
   - start out not able to access
   - gain access somehow
+- build villages
 - win condition
 - you have a graphic now
+
+- bullets go ove water
 
 - lumber yard etc should indicate population
   - also resources left
@@ -81,6 +84,7 @@ BUGS
 - pathfind should be cancelled when you press Z
 - keys can get stuck in wrong mode
 - should prob add escape hatches for do whiles
+- hometown can be a forest lol
 
 DREAMLAND
 - a hierarchy view would be nice

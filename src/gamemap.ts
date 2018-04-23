@@ -33,6 +33,24 @@ class GameMap extends PIXI.Graphics implements Updatable {
   }
 
   update(state: State): void {
+    let d = { x: 0, y: 0 };
+
+    if (state.keyboard.justDown.A) d.x = -1;
+    if (state.keyboard.justDown.D) d.x =  1;
+    if (state.keyboard.justDown.W) d.y = -1;
+    if (state.keyboard.justDown.S) d.y =  1;
+
+    if (d.x !== 0 || d.y !== 0) {
+      this.path = this.pathfind({
+        x: this.state.playersWorldX, 
+        y: this.state.playersWorldY, 
+      },
+      { 
+        x: this.state.playersWorldX + d.x, 
+        y: this.state.playersWorldY + d.y, 
+      });
+    }
+
     if (this.path && this.path.length > 0) {
       if (state.tick % 10 === 0) {
         this.state.playersWorldX = this.path[0].x;
@@ -48,8 +66,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
 
     const pt: PIXI.Point = ev.data.getLocalPosition(this);
 
-    this.path = this.pathfind(
-      { 
+    this.path = this.pathfind( { 
         x: this.state.playersWorldX, 
         y: this.state.playersWorldY, 
       },

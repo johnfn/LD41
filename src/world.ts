@@ -77,7 +77,7 @@ const Buildings: Building[] = [
 
   {
     name       : "Road",
-    hotkey     : "A",
+    hotkey     : "X",
     vision     : 2,
     description: "All buildings must be connected by roads.",
     harvester  : false,
@@ -88,7 +88,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Farm",
-    hotkey     : "S",
+    hotkey     : "C",
     vision     : 2,
     description: "Harvests food, slowly. Can harvest more when closer to water.",
     harvester  : true,
@@ -100,7 +100,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Village",
-    hotkey     : "D",
+    hotkey     : "V",
     vision     : 4,
     harvester  : false,
     description: "Sells basic adventuring supplies. Has an Inn to rest at.",
@@ -111,7 +111,7 @@ const Buildings: Building[] = [
   },
   {
     name        : "Lumber Yard",
-    hotkey      : "F",
+    hotkey      : "B",
     vision      : 3,
     harvester   : true,
     description : "Harvests wood.",
@@ -124,7 +124,7 @@ const Buildings: Building[] = [
   },
   {
     name       : "Dock",
-    hotkey     : "G",
+    hotkey     : "N",
     vision     : 3,
     harvester  : true,
     resourceName: "meat",
@@ -343,7 +343,6 @@ class World extends PIXI.Graphics implements Updatable {
   }
 
   update(_state: State) {
-
   }
 
   recalculateFogOfWar(): void {
