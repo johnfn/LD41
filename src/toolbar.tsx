@@ -344,6 +344,11 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         }
       }
 
+      if (b.building.name === "+3 Max Health") {
+        this.gameState.maxHealth += 3;
+        this.gameState.health += 3;
+      }
+
     } else {
       this.gameState.map.world.addBuilding({
         building: b.building,

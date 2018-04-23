@@ -10,6 +10,7 @@ type BuildingName = "Road"
                   | "Dock"
                   | "+1 Population"
                   | "+3 Health"
+                  | "+3 Max Health"
 
 type TerrainName = "snow" | "grass" | "water";
 type SpecialName = "none" | "ice" | "water" | "start" | "end";
@@ -84,7 +85,20 @@ const Buildings: Building[] = [
     },
   },
 
-
+  {
+    name       : "+3 Max Health",
+    vision     : 0,
+    health     : 0,
+    maxHealth  : 0,
+    hideWhenCantBuy  
+               : true,
+    harvester  : false,
+    description: "Your overall health will increase. Handy for not dying.",
+    cost       : { meat: 5, gold: 5 },
+    requirement: {
+      inBuilding: ["Town", "Village"],
+    },
+  },
   {
     name       : "Road",
     hotkey     : "X",
@@ -122,7 +136,7 @@ const Buildings: Building[] = [
     maxHealth  : 10,
     spritesheet: [5, 0],
     harvester  : false,
-    description: "Sells basic adventuring supplies. Has an Inn to rest at.",
+    description: "Sells adventuring supplies. You can heal here.",
     cost       : { wood: 5, meat: 3 },
     requirement: {
       on: ["grass"],
