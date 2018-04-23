@@ -63,6 +63,7 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
   z     = 100;
   speed = 1;
   bar: HealthBar;
+  state: State;
 
   dest: { x: number, y: number } | undefined;
 
@@ -70,6 +71,7 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     super();
 
     state.add(this);
+    this.state = state;
 
     this.texture = TextureCache.GetCachedSpritesheetTexture(
       "micro", 3, 0).texture;
@@ -99,7 +101,7 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     const nx = this.x + Util.Sign(this.dest.x - this.x) * this.speed;
     const ny = this.y + Util.Sign(this.dest.y - this.y) * this.speed;
 
-    if (state.microworld.isCollision(state, nx, ny, 32, { ignoreEnemy: this })) {
+    if (state.microworld.isCollision(state, nx, ny, 32, { ignoreEnemy: this }).hit) {
       this.dest = undefined;
 
       return;
@@ -114,6 +116,12 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     ) < 5) {
       this.dest = undefined;
     }
+  }
+
+  remove(): void {
+    this.state.remove(this);
+    this.state.remove(this.bar);
+    this.parent.removeChild(this);
   }
 }
 

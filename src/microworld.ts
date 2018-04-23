@@ -14,7 +14,6 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
   activeMode      : Mode = "Micro";
   z               = 0;
   darkAreas       : PIXI.Graphics;
-  microEnemies    : MicroEnemy[];
   currentMapRegion: PIXI.Sprite | undefined;
 
   constructor(state: State) {
@@ -22,7 +21,6 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
     state.add(this);
 
-    this.microEnemies = [];
     this.tiled = new TiledTilemap(PIXI.loader.resources["town"].data, state);
     this.world = state.map.world;
 
@@ -32,14 +30,19 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.darkAreas.alpha = 1.0;
   }
 
-  isCollisionHelper(state: State, x: number, y: number, p?: { ignoreEnemy?: MicroEnemy }): boolean {
+  isCollisionHelper(state: State, x: number, y: number, p?: { ignoreEnemy?: MicroEnemy }): {
+    hit: boolean;
+    isDarkArea?: boolean;
+    isTile?: boolean;
+    enemy?: MicroEnemy;
+  } {
     const darkAreas = this.getDarkAreaRects(state);
 
     for (const { rect, type } of darkAreas) {
       if ((type === "unknown" || type === "water") && 
           rect.contains({ x, y })) {
 
-        return true;
+        return { hit: true, isDarkArea: true };
       }
     }
 
@@ -51,11 +54,13 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       const { tile: { spritesheetx: sx } } = tile;
 
       if (sx === 1) {
-        return true;
+        return { hit: true, isTile: true };
       }
     }
 
-    for (const me of this.microEnemies) {
+    const enemies = state.updaters.filter(x => x instanceof MicroEnemy) as MicroEnemy[];
+
+    for (const me of enemies) {
       if (p && p.ignoreEnemy === me) {
         continue;
       }
@@ -63,20 +68,32 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       const r = new Rect({ x: me.x, y: me.y, w: 32, h: 32 });
 
       if (r.contains({ x, y })) {
-        return true;
+        return { hit: true, enemy: me };
       }
     }
 
-    return false;
+    return { hit: false };
   }
 
-  isCollision(state: State, x: number, y: number, size: number, p?: { ignoreEnemy?: MicroEnemy }): boolean {
-    return (
-      this.isCollisionHelper(state, x       , y       , p) || 
-      this.isCollisionHelper(state, x + size, y       , p) || 
-      this.isCollisionHelper(state, x       , y + size, p) || 
-      this.isCollisionHelper(state, x + size, y + size, p)
-    );
+  isCollision(state: State, x: number, y: number, size: number, p?: { ignoreEnemy?: MicroEnemy }): {
+    hit: boolean;
+    isDarkArea?: boolean;
+    isTile?: boolean;
+    enemy?: MicroEnemy;
+  } {
+    const res0 = this.isCollisionHelper(state, x       , y       , p);
+    if (res0.hit) { return res0; }
+
+    const res1 = this.isCollisionHelper(state, x + size, y       , p);
+    if (res1.hit) { return res1; }
+
+    const res2 = this.isCollisionHelper(state, x       , y + size, p);
+    if (res2.hit) { return res2; }
+
+    const res3 = this.isCollisionHelper(state, x + size, y + size, p);
+    if (res3.hit) { return res3; }
+
+    return { hit: false };
   }
 
   getDarkAreaRects(state: State): { 
@@ -283,7 +300,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
         { xIndex: state.playersMapX , yIndex: state.playersMapY }
       ) < 100) { valid = false; continue; }
 
-      if (this.isCollision(state, x, y, 32)) {
+      if (this.isCollision(state, x, y, 32).hit) {
         valid = false; continue;
       }
 
@@ -293,12 +310,12 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
   }
 
   clearOldEnemies(state: State): void {
-    for (const e of this.microEnemies) {
+    const enemies = state.updaters.filter(x => x instanceof MicroEnemy) as MicroEnemy[];
+
+    for (const e of enemies) {
       state.remove(e);
       e.parent.removeChild(e);
     }
-
-    this.microEnemies = [];
   }
 
   checkShouldAddEnemies(state: State): void {
@@ -319,7 +336,6 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       e.y = y;
 
       this.addChild(e);
-      this.microEnemies.push(e);
     }
   }
 
@@ -380,11 +396,11 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
       this.facing = newFacing;
     }
 
-    if (!this.microworld.isCollision(state, newx, state.playersMapY, this.size - 5)) {
+    if (!this.microworld.isCollision(state, newx, state.playersMapY, this.size - 5).hit) {
       state.playersMapX = newx;
     }
 
-    if (!this.microworld.isCollision(state, state.playersMapX, newy, this.size - 5)) {
+    if (!this.microworld.isCollision(state, state.playersMapX, newy, this.size - 5).hit) {
       state.playersMapY = newy;
     }
 
@@ -427,17 +443,23 @@ class Bullet extends PIXI.Sprite implements Updatable {
     this.x += this.dir[0] * this.speed;
     this.y += this.dir[1] * this.speed;
 
-    if (
-      !World.InBoundsAbs(this.x, this.y) ||
-      state.microworld.isCollision(state, this.x, this.y, 4)
-    ) {
+    if (!World.InBoundsAbs(this.x, this.y)) {
       this.remove(state);
+    }
+
+    const coll = state.microworld.isCollision(state, this.x, this.y, 4);
+
+    if (coll.hit) {
+      this.remove(state);
+
+      if (coll.enemy) {
+        coll.enemy.remove();
+      }
     }
   }
 
   remove(state: State): void {
     state.remove(this);
     this.parent.removeChild(this);
-    this.destroy();
   }
 }
