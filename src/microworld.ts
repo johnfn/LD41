@@ -30,8 +30,13 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.darkAreas.alpha = 1.0;
   }
 
-  isCollisionHelper(state: State, x: number, y: number, p?: { ignoreEnemy?: MicroEnemy }): {
+  isCollisionHelper(state: State, x: number, y: number, p?: { 
+    ignoreEnemy?: MicroEnemy;
+    ignorePlayer?: boolean;
+  }): {
     hit: boolean;
+
+    player?: boolean;
     isDarkArea?: boolean;
     isTile?: boolean;
     enemy?: MicroEnemy;
@@ -72,12 +77,29 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
       }
     }
 
+    if (!p || p && !p.ignorePlayer) {
+      const rectplayer = new Rect({
+        x: this.player.x,
+        y: this.player.y,
+        w: 32,
+        h: 32,
+      });
+
+      if (rectplayer.contains({ x, y })) {
+        return { hit: true, player: true };
+      }
+    }
+
     return { hit: false };
   }
 
-  isCollision(state: State, x: number, y: number, size: number, p?: { ignoreEnemy?: MicroEnemy }): {
+  isCollision(state: State, x: number, y: number, size: number, p?: { 
+    ignoreEnemy?: MicroEnemy;
+    ignorePlayer?: boolean;
+  }): {
     hit: boolean;
     isDarkArea?: boolean;
+    player?: boolean;
     isTile?: boolean;
     enemy?: MicroEnemy;
   } {
@@ -388,6 +410,31 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
     this.drawRect(0, 0, this.size, this.size);
   }
 
+  tryToTakeDamage(state: State, amount: number, dir: { x: number, y: number }): void {
+    if (this.invinc > 0) {
+      return;
+    }
+
+    state.health -= amount;
+
+    const txtgfx = new FloatUpText(state, `-${ amount }`);
+
+    state.microworld.addChild(txtgfx)
+
+    txtgfx.x = this.x;
+    txtgfx.y = this.y;
+
+    this.invinc = 40;
+
+    const bumpedx = this.x + Util.Sign(dir.x) * 40;
+    const bumpedy = this.y + Util.Sign(dir.y) * 40;
+
+    if (!this.microworld.isCollision(state, bumpedx, bumpedy, this.size - 5, { ignorePlayer: true }).hit) {
+      state.playersMapX = bumpedx;
+      state.playersMapY = bumpedy;
+    }
+  }
+
   update(state: State): void {
     if (this.invinc > 0) {
       this.invinc--
@@ -411,13 +458,13 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
       this.facing = newFacing;
     }
 
-    let c1 = this.microworld.isCollision(state, newx, state.playersMapY, this.size - 5);
+    let c1 = this.microworld.isCollision(state, newx, state.playersMapY, this.size - 5, { ignorePlayer: true });
 
     if (!c1.hit) {
       state.playersMapX = newx;
     }
     
-    let c2 = this.microworld.isCollision(state, state.playersMapX, newy, this.size - 5);
+    let c2 = this.microworld.isCollision(state, state.playersMapX, newy, this.size - 5, { ignorePlayer: true });
 
     if (!c2.hit) {
       state.playersMapY = newy;
@@ -426,29 +473,10 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
     if ((c1.hit && c1.enemy) || (c2.hit && c2.enemy)) {
       // attempt to bump player back
 
-      if (this.invinc <= 0) {
-        state.health -= 1;
-
-        const txtgfx = new FloatUpText(state, "-1");
-
-        state.microworld.addChild(txtgfx)
-
-        txtgfx.x = this.x;
-        txtgfx.y = this.y;
-      }
-
-      this.invinc = 40;
-
       const dx = newx - this.x;
       const dy = newy - this.y;
 
-      const bumpedx = this.x + (-dx) * 10;
-      const bumpedy = this.y + (-dy) * 10;
-
-      if (!this.microworld.isCollision(state, bumpedx, bumpedy, this.size - 5).hit) {
-        state.playersMapX = bumpedx;
-        state.playersMapY = bumpedy;
-      }
+      this.tryToTakeDamage(state, 1, { x: -dx, y: -dy })
     }
 
     // playersMapX/Y is actually the source of truth
@@ -467,8 +495,8 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
 
       state.microworld.addChild(bullet);
 
-      bullet.x = (this.x + 16) + this.facing[0] * 16;
-      bullet.y = (this.y + 16) + this.facing[1] * 16;
+      bullet.x = (this.x + 16) + this.facing[0] * 32;
+      bullet.y = (this.y + 16) + this.facing[1] * 32;
     }
   }
 }
@@ -505,6 +533,10 @@ class Bullet extends PIXI.Sprite implements Updatable {
 
       if (coll.enemy) {
         coll.enemy.damage(1);
+      }
+
+      if (coll.player) {
+        state.microworld.player.tryToTakeDamage(state, 1, { x: this.dir[0], y: this.dir[1] });
       }
     }
   }

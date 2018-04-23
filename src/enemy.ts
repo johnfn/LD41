@@ -154,7 +154,9 @@ class MicroEnemy extends PIXI.Sprite implements Updatable {
     const nx = this.x + Util.Sign(this.dest.x - this.x) * this.speed;
     const ny = this.y + Util.Sign(this.dest.y - this.y) * this.speed;
 
-    if (state.microworld.isCollision(state, nx, ny, 32, { ignoreEnemy: this }).hit) {
+    const coll = state.microworld.isCollision(state, nx, ny, 32, { ignoreEnemy: this });
+
+    if (coll.hit) {
       this.dest = undefined;
 
       return;
