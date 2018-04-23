@@ -5,7 +5,7 @@ const Constants = {
     FAST_RESOURCES    : false,
     MANY_RESOURCES    : true,
     POP_BOOST         : false,
-    JUST_ONE_ENEMY    : true,
+    JUST_ONE_ENEMY    : false,
     FAST_ENEMY        : true,
   },
 
@@ -17,6 +17,7 @@ const Constants = {
   ENEMY_GROUP_SIZE_HIGH: 7,
   NUM_START_ENEMIES: 20,
   ENEMY_SPEED: 500,
+  ENEMY_SPAWN_RATE: 1000,
 
   SCREEN_SIZE: 32 * 16,
   BORDER_REGION_WIDTH: 1,

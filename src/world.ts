@@ -622,12 +622,11 @@ class World extends PIXI.Graphics implements Updatable {
     this.nameTerrain();
     this.addResources();
     this.chooseVariants();
-    this.addEnemies();
+    this.addEnemies(Constants.DEBUG.JUST_ONE_ENEMY ? 1 : Constants.NUM_START_ENEMIES);
   }
 
-  addEnemies(): void {
+  addEnemies(num: number): void {
     const start = this.getStartCell();
-    const num = Constants.DEBUG.JUST_ONE_ENEMY ? 1 : Constants.NUM_START_ENEMIES;
 
     for (let i = 0; i < num; i++) {
       let wx = 0, wy = 0;
@@ -642,6 +641,8 @@ class World extends PIXI.Graphics implements Updatable {
         const cell = this.map[wx][wy];
 
         if (cell.terrain === "water") { valid = false; continue; }
+        if (cell.fogStatus === "seen" || 
+            cell.fogStatus === "walked") { valid = false; continue; }
 
         const distToStart = Util.ManhattanDistance(
           { xIndex: wx, yIndex: wy },
@@ -653,6 +654,7 @@ class World extends PIXI.Graphics implements Updatable {
             ? distToStart > 5
             : distToStart < 15
         ) { valid = false; continue; }
+
       } while (!valid);
 
       const newEnemy = new MacroEnemy(

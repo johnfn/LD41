@@ -114,6 +114,7 @@ class State {
   update(): void {
     this.checkSwitchStates();
     this.checkHarvest();
+    this.checkEnemySpawn();
   }
 
   checkSwitchStates(): void {
@@ -129,6 +130,14 @@ class State {
       } else {
         this.mode = "Macro";
       }
+    }
+  }
+
+  checkEnemySpawn(): void {
+    if (this.mode === "Micro") { return; }
+
+    if (this.tick % Constants.ENEMY_SPAWN_RATE === 0) {
+      this.map.world.addEnemies(1);
     }
   }
 
