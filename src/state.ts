@@ -98,8 +98,16 @@ class State {
     }
 
     if (Constants.DEBUG.DEBUG_WATER_TEMPLE) {
-      this.playersWorldX = this.map.world.getIceSpecial().xIndex + 1;
-      this.playersWorldY = this.map.world.getIceSpecial().yIndex + 1;
+      this.playersWorldX = this.map.world.getWaterSpecial().xIndex + 1;
+      this.playersWorldY = this.map.world.getWaterSpecial().yIndex + 1;
+    }
+
+    if (Constants.DEBUG.DEBUG_FINAL_TEMPLE) {
+      this.hasWaterKey = true;
+      this.hasSnowKey  = true;
+
+      this.playersWorldX = this.map.world.getEndCell().xIndex + 1;
+      this.playersWorldY = this.map.world.getEndCell().yIndex + 1;
     }
 
     this.macroCamera.centerX = this.playersWorldX * Constants.MACRO.TILE_WIDTH;

@@ -304,7 +304,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.checkShouldAddEnemies(state);
     this.removeBullets(state);
 
-    const gems = state.updaters.filter(x => (x instanceof SnowGem) || (x instanceof WaterGem)) as (SnowGem | WaterGem)[];
+    const gems = state.updaters.filter(x => (x instanceof SnowGem) || (x instanceof WaterGem) || (x instanceof FinalThingy)) as (SnowGem | WaterGem | FinalThingy)[];
 
     for (const g of gems) {
       g.remove();
@@ -321,6 +321,15 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
     if (variant === "watertemple" && !state.hasWaterKey) {
       const g = new WaterGem(state);
+
+      this.addChild(g);
+
+      g.x = Constants.MICRO.MAP_WIDTH / 2 - 16;
+      g.y = Constants.MICRO.MAP_WIDTH / 2 - 16;
+    }
+
+    if (variant === "finaltemple") {
+      const g = new FinalThingy(state);
 
       this.addChild(g);
 

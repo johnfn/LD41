@@ -10,6 +10,7 @@ const Constants = {
     WALK_ON_WATER     : true,
     DEBUG_ICE_TEMPLE  : false,
     DEBUG_WATER_TEMPLE: false,
+    DEBUG_FINAL_TEMPLE: false,
   },
 
   EASY_MODE: true,

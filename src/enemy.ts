@@ -480,3 +480,73 @@ class WaterGem extends PIXI.Sprite implements Updatable {
     this.parent.removeChild(this);
   }
 }
+
+class FinalThingy extends PIXI.Sprite implements Updatable {
+  activeMode: Mode = "Micro";
+  z     = 1000;
+  speed = 5;
+  state: State;
+
+  constructor(state: State) {
+    super();
+
+    this.state = state;
+
+    state.add(this);
+
+    this.texture = TextureCache.GetCachedSpritesheetTexture(
+      "micro", 3, 4).texture;
+  }
+
+  update(state: State): void {
+    const coin = new Rect({ x: this.x, y: this.y, w: 32, h: 32 });
+    const player = new Rect({ x: this.state.playersMapX, y: this.state.playersMapY, w: 32, h: 32 });
+
+    if (coin.intersects(player)) {
+      state.addMessage({
+        type: "warning",
+        msg: `This hastily-drawn object has two slots for gems.`,
+      });
+
+      if (this.state.hasWaterKey) {
+        state.addMessage({
+          type: "warning",
+          msg: `You place your water gem in one of the slots.`,
+        });
+      } else {
+        state.addMessage({
+          type: "warning",
+          msg: `You leave one of the slots empty.`,
+        });
+      }
+
+      if (this.state.hasSnowKey) {
+        state.addMessage({
+          type: "warning",
+          msg: `You place your snow gem in one of the slots.`,
+        });
+      } else {
+        state.addMessage({
+          type: "warning",
+          msg: `You leave one of the slots empty.`,
+        });
+      }
+
+      if (this.state.hasSnowKey && this.state.hasWaterKey) {
+        state.addMessage({
+          type: "warning",
+          msg: `
+          A light comes down from the heavens, the angels sing in choir, and God itself gives you a high five!!!
+          
+          You win! (But you can keep playing, if you'd like!)
+          `,
+        });
+      }
+    }
+  }
+
+  remove(): void {
+    this.state.remove(this);
+    this.parent.removeChild(this);
+  }
+}

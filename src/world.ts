@@ -587,6 +587,11 @@ class World extends PIXI.Graphics implements Updatable {
   }
 
   getCellAt(x: number, y: number) {
+    if (x >= 33) { console.log('i should fix this.'); x = 32; }
+    if (y >= 33) { console.log('i should fix this.'); y = 32; }
+    if (x < 0)   { console.log('i should fix this.'); x = 0; }
+    if (y < 0)   { console.log('i should fix this.'); y = 0; }
+
     return this.map[x][y];
   }
 
