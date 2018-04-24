@@ -402,3 +402,81 @@ class Coin extends PIXI.Sprite implements Updatable {
     this.parent.removeChild(this);
   }
 }
+
+class SnowGem extends PIXI.Sprite implements Updatable {
+  activeMode: Mode = "Micro";
+  z     = 1000;
+  speed = 5;
+  state: State;
+
+  constructor(state: State) {
+    super();
+
+    this.state = state;
+
+    state.add(this);
+
+    this.texture = TextureCache.GetCachedSpritesheetTexture(
+      "micro", 3, 3).texture;
+  }
+
+  update(state: State): void {
+    const coin = new Rect({ x: this.x, y: this.y, w: 32, h: 32 });
+    const player = new Rect({ x: this.state.playersMapX, y: this.state.playersMapY, w: 32, h: 32 });
+
+    if (coin.intersects(player)) {
+      this.state.hasSnowKey = true;
+
+      this.remove();
+
+      state.addMessage({
+        type: "warning",
+        msg: `You pick up the snow gem. Hope it doesn't melt!`,
+      });
+    }
+  }
+
+  remove(): void {
+    this.state.remove(this);
+    this.parent.removeChild(this);
+  }
+}
+
+class WaterGem extends PIXI.Sprite implements Updatable {
+  activeMode: Mode = "Micro";
+  z     = 1000;
+  speed = 5;
+  state: State;
+
+  constructor(state: State) {
+    super();
+
+    this.state = state;
+
+    state.add(this);
+
+    this.texture = TextureCache.GetCachedSpritesheetTexture(
+      "micro", 3, 3).texture;
+  }
+
+  update(state: State): void {
+    const coin = new Rect({ x: this.x, y: this.y, w: 32, h: 32 });
+    const player = new Rect({ x: this.state.playersMapX, y: this.state.playersMapY, w: 32, h: 32 });
+
+    if (coin.intersects(player)) {
+      this.state.hasWaterKey = true;
+
+      this.remove();
+
+      state.addMessage({
+        type: "warning",
+        msg: `You pick up the water gem. How is a gem made of water, anyways?`,
+      });
+    }
+  }
+
+  remove(): void {
+    this.state.remove(this);
+    this.parent.removeChild(this);
+  }
+}

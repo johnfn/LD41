@@ -7,7 +7,12 @@ const Constants = {
     POP_BOOST         : false,
     JUST_ONE_ENEMY    : false,
     FAST_ENEMY        : true,
+    WALK_ON_WATER     : true,
+    DEBUG_ICE_TEMPLE  : false,
+    DEBUG_WATER_TEMPLE: false,
   },
+
+  EASY_MODE: true,
 
   GOLD_DROP_RATE: 0.4,
 
@@ -77,6 +82,15 @@ const Constants = {
     ],
     town: [
       "town",
+    ],
+    icetemple: [
+      "icetemple"
+    ],
+    watertemple: [
+      "watertemple"
+    ],
+    finaltemple: [
+      "finaltemple"
     ],
     roads: [ 
       "road0000",

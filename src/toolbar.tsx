@@ -418,17 +418,17 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       } else if (cell.special === "start") {
         desc = "My hometown";
       }
-    }
-
-    if (cell.terrain === "snow") {
-      desc = "Snowy mountains";
-    } else if (cell.terrain === "water") {
-      desc = "A body of water";
-    } else if (cell.terrain === "grass") {
-      if (cell.hasResources) {
-        desc = "A forest";
-      } else {
-        desc = "A grassy field";
+    } else {
+      if (cell.terrain === "snow") {
+        desc = "Snowy mountains";
+      } else if (cell.terrain === "water") {
+        desc = "A body of water";
+      } else if (cell.terrain === "grass") {
+        if (cell.hasResources) {
+          desc = "A forest";
+        } else {
+          desc = "A grassy field";
+        }
       }
     }
 
@@ -441,10 +441,6 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     } else {
       return `${ desc }.`;
     }
-  }
-
-  buyPop(): void {
-
   }
 
   renderBuyAndHarvest(cell: WorldCell): JSX.Element {
@@ -719,6 +715,14 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         <div style={{ minHeight: "400px" }}>
           <div>
             Meat: { this.state.meat } | Wood: { this.state.wood } | Gold: { this.state.gold } | Pop: { this.state.pop } | Health: { this.state.health }/{ this.state.maxHealth }
+
+            {
+              this.gameState.hasSnowKey ? " | Snow Gem" : ""
+            }
+
+            {
+              this.gameState.hasWaterKey ? " | Water Gem" : ""
+            }
           </div>
 
           <div>

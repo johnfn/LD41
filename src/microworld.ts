@@ -44,7 +44,10 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     const darkAreas = this.getDarkAreaRects(state);
 
     for (const { rect, type } of darkAreas) {
-      if ((type === "unknown" || type === "water") && 
+      if ((
+        type === "unknown" || 
+        (type === "water" && ((state.walkOnWater || Constants.DEBUG.WALK_ON_WATER) ? false : true))
+      ) && 
           rect.contains({ x, y })) {
 
         return { hit: true, isDarkArea: true };
@@ -56,10 +59,16 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     const tile = this.tiled.getTileAt(x, y);
 
     if (tile) {
-      const { tile: { spritesheetx: sx } } = tile;
+      const { tile: { spritesheetx: sx, spritesheety: sy } } = tile;
 
       if (sx === 1) {
-        return { hit: true, isTile: true };
+        if (sy === 0) { // water
+          if (!(state.walkOnWater || Constants.DEBUG.WALK_ON_WATER)) {
+            return { hit: true, isTile: true, };
+          }
+        } else {
+          return { hit: true, isTile: true };
+        }
       }
     }
 
@@ -294,6 +303,30 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
     this.clearOldStuff(state);
     this.checkShouldAddEnemies(state);
     this.removeBullets(state);
+
+    const gems = state.updaters.filter(x => (x instanceof SnowGem) || (x instanceof WaterGem)) as (SnowGem | WaterGem)[];
+
+    for (const g of gems) {
+      g.remove();
+    }
+
+    if (variant === "icetemple" && !state.hasSnowKey) {
+      const g = new SnowGem(state);
+
+      this.addChild(g);
+
+      g.x = Constants.MICRO.MAP_WIDTH / 2 - 16;
+      g.y = Constants.MICRO.MAP_WIDTH / 2 - 16;
+    }
+
+    if (variant === "watertemple" && !state.hasWaterKey) {
+      const g = new WaterGem(state);
+
+      this.addChild(g);
+
+      g.x = Constants.MICRO.MAP_WIDTH / 2 - 16;
+      g.y = Constants.MICRO.MAP_WIDTH / 2 - 16;
+    }
 
     this.children = Util.SortByKey(this.children, x => (x as Updatable).z || 0);
   }

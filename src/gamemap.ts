@@ -52,7 +52,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
       };
 
       this.path = this.pathfind(start, end, {
-        water  : true,
+        water  : (this.state.walkOnWater || Constants.DEBUG.WALK_ON_WATER) ? false : true,
         unknown: true,
         unseen : true,
         wall   : false,
@@ -79,7 +79,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
     }
 
     const p = this.pathfind(start, end, { 
-      water  : true,
+      water  : (this.state.walkOnWater || Constants.DEBUG.WALK_ON_WATER) ? false : true,
       unknown: true,
       unseen : false,
       wall   : false,
@@ -111,7 +111,7 @@ class GameMap extends PIXI.Graphics implements Updatable {
     };
 
     this.path = this.pathfind(start, end, {
-      water  : true,
+      water  : (this.state.walkOnWater || Constants.DEBUG.WALK_ON_WATER) ? false : true,
       unknown: true,
       unseen : true,
       wall   : false,

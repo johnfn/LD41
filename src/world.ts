@@ -430,6 +430,12 @@ class World extends PIXI.Graphics implements Updatable {
     const waterTemple = this.getWaterSpecial();
     const endTemple   = this.getEndCell();
 
+    const templesToShow = Constants.EASY_MODE ? [
+      iceTemple,
+      waterTemple,
+      endTemple,
+    ] : [ ];
+
     const buildings = [
       ...this.getCells()
         .filter(c => !!c.building)
@@ -445,11 +451,7 @@ class World extends PIXI.Graphics implements Updatable {
         vision: 5,
       },
 
-      ...[
-        iceTemple,
-        waterTemple,
-        endTemple,
-      ].map(c => ({
+      ...templesToShow.map(c => ({
         x     : c.xIndex,
         y     : c.yIndex,
         vision: 2,
@@ -855,13 +857,13 @@ class World extends PIXI.Graphics implements Updatable {
         const cell = this.map[i][j];
 
         if (cell.special === "ice") {
-          console.log('TODO no variant');
+          cell.variant = Util.RandElem(Constants.MAPS.icetemple);
         } else if (cell.special === "water") {
-          console.log('TODO no variant');
+          cell.variant = Util.RandElem(Constants.MAPS.watertemple);
         } else if (cell.special === "start") {
           cell.variant = Util.RandElem(Constants.MAPS.town);
         } else if (cell.special === "end") {
-          console.log('TODO no variant');
+          cell.variant = Util.RandElem(Constants.MAPS.finaltemple);
         } else {
           if (cell.terrain === "grass") {
             if (cell.hasResources) {
@@ -896,7 +898,7 @@ class World extends PIXI.Graphics implements Updatable {
       candidatePairs.push([
         Util.RandElem(iceCells), // ice
         Util.RandElem(waterCells), // water
-        Util.RandElem(cells), // end
+        Util.RandElem(normalCells), // end
         Util.RandElem(normalCells), // start
       ]);
     }

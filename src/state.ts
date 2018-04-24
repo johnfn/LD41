@@ -15,6 +15,11 @@ class State {
   keyboard  : Keyboard;
   microworld: MicroWorld;
 
+  walkOnWater = false;
+
+  hasSnowKey  = false;
+  hasWaterKey = false;
+
   mode: Mode;
 
   updaters: Updatable[];
@@ -86,6 +91,16 @@ class State {
 
     this.playersMapX   = 200;
     this.playersMapY   = 200;
+
+    if (Constants.DEBUG.DEBUG_ICE_TEMPLE) {
+      this.playersWorldX = this.map.world.getIceSpecial().xIndex + 1;
+      this.playersWorldY = this.map.world.getIceSpecial().yIndex + 1;
+    }
+
+    if (Constants.DEBUG.DEBUG_WATER_TEMPLE) {
+      this.playersWorldX = this.map.world.getIceSpecial().xIndex + 1;
+      this.playersWorldY = this.map.world.getIceSpecial().yIndex + 1;
+    }
 
     this.macroCamera.centerX = this.playersWorldX * Constants.MACRO.TILE_WIDTH;
     this.macroCamera.centerY = this.playersWorldY * Constants.MACRO.TILE_HEIGHT;
