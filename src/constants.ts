@@ -7,7 +7,7 @@ const Constants = {
     POP_BOOST         : false,
     JUST_ONE_ENEMY    : false,
     FAST_ENEMY        : true,
-    WALK_ON_WATER     : true,
+    WALK_ON_WATER     : false,
     DEBUG_ICE_TEMPLE  : false,
     DEBUG_WATER_TEMPLE: false,
     DEBUG_FINAL_TEMPLE: false,

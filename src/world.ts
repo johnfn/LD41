@@ -2,15 +2,21 @@ type BuildingName = "Road"
                   | "Farm"
                   | "Wall"
                   | "Village"
+                  | "Small Town"
+                  | "Large Town"
+                  | "City"
                   | "Town"
                   | "City"
                   | "Factory"
                   | "Lumber Yard"
                   | "Guard Tower"
                   | "Dock"
+
                   | "+1 Population"
+                  | "+1 Damage"
                   | "+3 Health"
                   | "+3 Max Health"
+                  | "Flippers"
 
 type TerrainName = "snow" | "grass" | "water";
 type SpecialName = "none" | "ice" | "water" | "start" | "end";
@@ -20,7 +26,7 @@ type Building = {
   description  : string;
   hotkey      ?: string;
   upgrade     ?: {
-    name: string;
+    name: BuildingName;
     cost: { wood?: number; meat?: number; gold?: number; }
   }[];
   health       : number;
@@ -46,6 +52,7 @@ type Building = {
 type BuildingExtra = {
   resourcesLeft ?: number;
   health         : number;
+  name           : BuildingName;
   harvestState  ?: HarvestState | undefined;
   populationOn  ?: number;
 }
@@ -70,7 +77,7 @@ const Buildings: Building[] = [
     description: "A guy who will happily harvest resources for you.",
     cost       : { meat: 5 },
     requirement: {
-      inBuilding: ["Town", "Village"],
+      inBuilding: ["Town", "Village", "Small Town", "Large Town", "City"],
     },
   },
 
@@ -82,10 +89,10 @@ const Buildings: Building[] = [
     hideWhenCantBuy  
                : true,
     harvester  : false,
-    description: "The town's priest will heal you, for a small fee.",
+    description: "The town's priest will heal you, for a small fee. (He's a very hungry guy.)",
     cost       : { meat: 5, gold: 1 },
     requirement: {
-      inBuilding: ["Town", "Village"],
+      inBuilding: ["Town", "Village", "Small Town", "Large Town", "City"],
     },
   },
 
@@ -100,7 +107,37 @@ const Buildings: Building[] = [
     description: "Your overall health will increase. Handy for not dying.",
     cost       : { meat: 5, gold: 5 },
     requirement: {
-      inBuilding: ["Town", "Village"],
+      inBuilding: ["Large Town", "City"],
+    },
+  },
+
+  {
+    name       : "Flippers",
+    vision     : 0,
+    health     : 0,
+    maxHealth  : 0,
+    hideWhenCantBuy  
+               : true,
+    harvester  : false,
+    description: "You'll be able to swim the seas!",
+    cost       : { wood: 50, meat: 50, gold: 20 },
+    requirement: {
+      inBuilding: ["Large Town", "City"],
+    },
+  },
+
+  {
+    name       : "+1 Damage",
+    vision     : 0,
+    health     : 0,
+    maxHealth  : 0,
+    hideWhenCantBuy  
+               : true,
+    harvester  : false,
+    description: "You'll deal slightly more damage to enemies.",
+    cost       : { meat: 5, gold: 5 },
+    requirement: {
+      inBuilding: ["Small Town", "Large Town", "City"],
     },
   },
 
@@ -125,7 +162,7 @@ const Buildings: Building[] = [
     health     : 10,
     maxHealth  : 10,
     spritesheet: [4, 2],
-    description: "Harvests food, slowly. Can harvest more when closer to water.",
+    description: "Harvests food.",
     harvester  : true,
     resourceName: "meat",
     cost       : { wood: 5 },

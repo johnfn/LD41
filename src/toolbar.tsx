@@ -166,7 +166,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
             }
           } else {
             if (b.requirement.inBuilding && 
-              b.requirement.inBuilding.indexOf(selection.building!.building.name) === -1) {
+              b.requirement.inBuilding.indexOf(selection.building!.extra.name) === -1) {
               obj.canBuild = false;
               obj.whyNot   = `You need to be in a ${ b.requirement.inBuilding } to make one of those.`;
 
@@ -335,6 +335,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
 
     const be: BuildingExtra = {
       health: b.building.health,
+      name  : b.building.name,
     };
 
     if (b.building.name === "Farm") {
@@ -360,9 +361,22 @@ class Toolbar extends React.Component<{}, ToolbarState> {
         }
       }
 
+      if (b.building.name === "+1 Damage") {
+        this.gameState.microworld.player.damage++;
+      }
+
       if (b.building.name === "+3 Max Health") {
         this.gameState.maxHealth += 3;
         this.gameState.health += 3;
+      }
+
+      if (b.building.name === "Flippers") {
+        this.gameState.walkOnWater = true;
+
+        this.gameState.addMessage({
+          msg: "You can now swim in water.",
+          type: "warning",
+        });
       }
 
     } else {
@@ -382,7 +396,7 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     }
 
     if (cell.building) {
-      const name  = cell.building.building.name.toLowerCase();
+      const name  = cell.building.extra.name.toLowerCase();
       const extra = cell.building.extra;
 
       if (cell.building.building.harvester) {
@@ -661,6 +675,46 @@ class Toolbar extends React.Component<{}, ToolbarState> {
     );
   }
 
+  getNextUpgrade(cell: WorldCell): undefined | {
+    name: BuildingName;
+    cost: { wood?: number; meat?: number; gold?: number; }
+  } {
+    if (!cell.building || !cell.building.building.upgrade) {
+      return undefined;
+    }
+
+    const cur = cell.building.extra.name;
+    const ups = cell.building.building.upgrade;
+
+    let idx = -1;
+
+    for (let i = 0; i < ups.length; i++) {
+      if (ups[i].name === cur) {
+        idx = i + 1;
+      }
+    }
+
+    if (idx === -1) {
+      return ups[0];
+    }
+
+    if (idx >= ups.length) {
+      return undefined;
+    }
+
+    return ups[idx + 1];
+  }
+
+  buyUpgrade(cell: WorldCell): void {
+    if (!cell.building) { return; }
+
+    const up = this.getNextUpgrade(cell);
+
+    if (!up) { return; }
+
+    cell.building.extra.name = up.name;
+  }
+
   render(): JSX.Element {
     let onTopOf = this.gameState.map.world.getCellAt(
       this.state.playerWorldX, 
@@ -694,16 +748,18 @@ class Toolbar extends React.Component<{}, ToolbarState> {
       height = "Treacherous";
     }
 
+    let nextUp = this.getNextUpgrade(onTopOf);
+
     const upgrades = (
       onTopOf.building &&
-      onTopOf.building.building.upgrade && 
+      nextUp &&
         <div>
-          Upgrade to <a 
+          { onTopOf.building.extra.name }: Upgrade to <a 
             href="javascript:;"
-            style={{ color: CanAfford(onTopOf.building.building.upgrade[0], this.state) ? "white" : "gray" }}
-            >{ onTopOf.building.building.upgrade[0].name }
-          </a> (<RenderCost cost={ onTopOf.building.building.upgrade[0].cost } />)
-
+            onClick={ () => this.buyUpgrade(onTopOf) }
+            style={{ color: CanAfford(nextUp, this.state) ? "white" : "gray" }}
+            >{ nextUp.name }
+          </a> (<RenderCost cost={ nextUp.cost } />)
         </div>
     );
 
@@ -723,6 +779,9 @@ class Toolbar extends React.Component<{}, ToolbarState> {
             {
               this.gameState.hasWaterKey ? " | Water Gem" : ""
             }
+          </div>
+          <div>
+            ATK: { this.gameState.microworld.player.damage }
           </div>
 
           <div>

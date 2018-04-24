@@ -433,6 +433,7 @@ class MicroWorld extends PIXI.Graphics implements Updatable {
 
 class MicroPlayer extends PIXI.Graphics implements Updatable {
   speed            = 5;
+  damage           = 1;
   microworld: MicroWorld;
   activeMode: Mode = "Micro";
   z                = 5;
@@ -533,7 +534,7 @@ class MicroPlayer extends PIXI.Graphics implements Updatable {
           state.tick % this.cooldown === 0
         )
       ) {
-      const bullet = new Bullet(state, this.facing);
+      const bullet = new Bullet(state, this.facing, this.damage);
 
       state.microworld.addChild(bullet);
 
@@ -550,7 +551,7 @@ class Bullet extends PIXI.Sprite implements Updatable {
   damage = 1;
   dir: [number, number];
 
-  constructor(state: State, dir: [number, number]) {
+  constructor(state: State, dir: [number, number], damage = 1) {
     super();
 
     this.dir = dir;
@@ -559,6 +560,8 @@ class Bullet extends PIXI.Sprite implements Updatable {
 
     this.texture = TextureCache.GetCachedSpritesheetTexture(
       "macro", 7, 1).texture;
+
+    this.damage = damage;
   }
 
   update(state: State): void {
